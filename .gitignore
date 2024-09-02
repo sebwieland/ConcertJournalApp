@@ -1,0 +1,28 @@
+# Node.js and npm files
+node_modules/
+package-lock.json
+
+# TypeScript and JavaScript files
+*.js
+*.js.map
+*.d.ts
+
+# Compilation output
+lib/
+dist/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+npm-debug.log
+
+# Coverage files
+coverage/
