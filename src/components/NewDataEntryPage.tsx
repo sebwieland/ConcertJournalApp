@@ -3,11 +3,13 @@ import {Container, Grid2, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import {DatePicker} from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 const CreateNewEntryFormPage = () => {
     const [band, setBand] = useState('');
     const [place, setPlace] = useState('');
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(dayjs());
     const [message, setMessage] = useState('');
     const navigate = useNavigate()
 
@@ -38,6 +40,7 @@ const CreateNewEntryFormPage = () => {
                         variant="outlined"
                         fullWidth
                         value={band}
+                        sx={{ marginBottom: 2 }}
                         onChange={(event) => setBand(event.target.value)}
                     />
                 </Grid2>
@@ -47,16 +50,16 @@ const CreateNewEntryFormPage = () => {
                         variant="outlined"
                         fullWidth
                         value={place}
+                        sx={{ marginBottom: 2 }}
                         onChange={(event) => setPlace(event.target.value)}
                     />
                 </Grid2>
                 <Grid2>
-                    <TextField
+                    <DatePicker
                         label="Date"
-                        variant="outlined"
-                        fullWidth
-                        value={date}
-                        onChange={(event) => setDate(event.target.value)}
+                        value= {date}
+                        sx={{ marginBottom: 2 }}
+                        onChange={(newValue) => setDate(newValue? newValue : dayjs())}
                     />
                 </Grid2>
                 <Grid2>
@@ -64,6 +67,7 @@ const CreateNewEntryFormPage = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
+                        sx={{ marginBottom: 2 }}
                         onClick={handleSubmit}
                     >
                         Create New Entry
