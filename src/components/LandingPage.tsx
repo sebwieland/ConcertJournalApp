@@ -17,7 +17,6 @@ const LandingPage = () => {
     };
 
     const handleCreateNewEntry = () => {
-        console.log("Navigating to /new-entry")
         navigate('/new-entry');
     };
 
