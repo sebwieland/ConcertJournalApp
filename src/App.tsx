@@ -1,7 +1,7 @@
 import React from 'react';
-import DataCollector, {DataCollectorState} from './components/DataCollector';
-import DataTable from './components/DataTable';
-// import {DataCollectorState } from './components/DataCollector'
+import LandingPage from "./components/LandingPage";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import CreateNewEntryFormPage from "./components/NewDataEntryPage";
 
 interface AppProps {
     // No props needed for this component
@@ -10,11 +10,12 @@ interface AppProps {
 class App extends React.Component<AppProps, {}> {
     render() {
         return (
-            <DataCollector>
-                {({ data }: DataCollectorState) => (
-                    <DataTable data={data} />
-                )}
-            </DataCollector>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/new-entry" element={<CreateNewEntryFormPage />} />
+                </Routes>
+            </BrowserRouter>
         );
     }
 }
