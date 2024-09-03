@@ -16,11 +16,8 @@ const CreateNewEntryFormPage = () => {
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/BandTracker/events', { band, place });
+            const response = await axios.post('http://localhost:8080/BandTracker/events', {band, place});
             setMessage('New entry created successfully!');
-            setTimeout(() => {
-                navigate('')
-            }, 2000); // redirect after 2 seconds
         } catch (error) {
             setMessage(`Error creating new entry: ${(error as Error).message}`);
         }
@@ -40,7 +37,7 @@ const CreateNewEntryFormPage = () => {
                         variant="outlined"
                         fullWidth
                         value={band}
-                        sx={{ marginBottom: 2 }}
+                        sx={{marginBottom: 2}}
                         onChange={(event) => setBand(event.target.value)}
                     />
                 </Grid2>
@@ -50,16 +47,16 @@ const CreateNewEntryFormPage = () => {
                         variant="outlined"
                         fullWidth
                         value={place}
-                        sx={{ marginBottom: 2 }}
+                        sx={{marginBottom: 2}}
                         onChange={(event) => setPlace(event.target.value)}
                     />
                 </Grid2>
                 <Grid2>
                     <DatePicker
                         label="Date"
-                        value= {date}
-                        sx={{ marginBottom: 2 }}
-                        onChange={(newValue) => setDate(newValue? newValue : dayjs())}
+                        value={date}
+                        sx={{marginBottom: 2}}
+                        onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                     />
                 </Grid2>
                 <Grid2>
@@ -67,10 +64,20 @@ const CreateNewEntryFormPage = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ marginBottom: 2 }}
+                        sx={{marginBottom: 2}}
                         onClick={handleSubmit}
                     >
                         Create New Entry
+                    </Button>
+                </Grid2>
+                <Grid2>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        fullWidth
+                        onClick={() => navigate(-1)}
+                    >
+                        Go Back
                     </Button>
                 </Grid2>
                 {message && <div>{message}</div>}
@@ -78,7 +85,6 @@ const CreateNewEntryFormPage = () => {
         </Container>
     );
 };
-
 
 
 export default CreateNewEntryFormPage;
