@@ -17,7 +17,7 @@ class DataCollector extends React.Component<DataCollectorProps, DataCollectorSta
     }
 
     fetchData = () => {
-        fetch('http://localhost:8080/BandTracker/events')
+        fetch('http://localhost:8080/ConcertJournalAPI/events')
             .then(response => response.json())
             .then(data => this.setState({ data }));
     };

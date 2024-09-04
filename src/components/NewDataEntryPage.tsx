@@ -7,7 +7,7 @@ import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
 const CreateNewEntryFormPage = () => {
-    const [band, setBand] = useState('');
+    const [bandName, setBandName] = useState('');
     const [place, setPlace] = useState('');
     const [date, setDate] = useState(dayjs());
     const [message, setMessage] = useState('');
@@ -16,7 +16,8 @@ const CreateNewEntryFormPage = () => {
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/BandTracker/events', {band, place});
+            const response = await axios.post('http://localhost:8080/ConcertJournalAPI/events',
+                {bandName, place, date});
             setMessage('New entry created successfully!');
         } catch (error) {
             setMessage(`Error creating new entry: ${(error as Error).message}`);
@@ -36,9 +37,9 @@ const CreateNewEntryFormPage = () => {
                         label="Band"
                         variant="outlined"
                         fullWidth
-                        value={band}
+                        value={bandName}
                         sx={{marginBottom: 2}}
-                        onChange={(event) => setBand(event.target.value)}
+                        onChange={(event) => setBandName(event.target.value)}
                     />
                 </Grid2>
                 <Grid2>
