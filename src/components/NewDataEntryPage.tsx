@@ -16,7 +16,7 @@ const CreateNewEntryFormPage = () => {
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/ConcertJournalAPI/events',
+            const response = await axios.post('http://localhost:8080/events',
                 {bandName, place, date});
             setMessage('New entry created successfully!');
         } catch (error) {
