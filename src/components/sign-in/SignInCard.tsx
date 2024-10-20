@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -124,6 +123,12 @@ export default function SignInCard() {
                 onSubmit={handleSubmit}
                 noValidate
                 sx={{display: 'flex', flexDirection: 'column', width: '100%', gap: 2}}
+                onKeyDown={(event: React.KeyboardEvent<HTMLFormElement>) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        handleSubmit(event as React.FormEvent<HTMLFormElement>);
+                    }
+                }}
             >
                 <FormControl>
                     <FormLabel htmlFor="email">Email</FormLabel>
