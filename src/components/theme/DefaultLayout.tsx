@@ -1,16 +1,64 @@
 import {ThemeProvider} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import useTheme from "./useTheme";
-import React, {PropsWithChildren} from "react";
+import React, {PropsWithChildren, useState} from "react";
 import ToggleColorMode from "../sign-up/ToggleColorMode";
 import CssBaseline from "@mui/material/CssBaseline";
+import Typography from "@mui/material/Typography";
+import Toolbar from "@mui/material/Toolbar";
+import AppBar from "@mui/material/AppBar";
+import Button from "@mui/material/Button";
+import axios, {AxiosError} from "axios";
+import {useNavigate} from "react-router-dom";
+import Box from "@mui/material/Box";
 
 const DefaultLayout = ({children}: PropsWithChildren) => {
     const {theme, mode, toggleColorMode} = useTheme();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate()
+    const API_URL = 'http://localhost:8080';
+
+    const handleLogout = async () => {
+        try {
+            const response = await axios.post(`${API_URL}/logout`);
+            localStorage.removeItem('token');
+            setIsLoggedIn(false);
+            navigate('/'); // or wherever you want to redirect after logout
+
+        } catch (error: unknown) {
+            const axiosError = error as AxiosError;
+            if (axiosError.response) {
+                console.error('Error logging in:', axiosError.response.status);
+            } else {
+                console.error('Error logging in:', axiosError.message);
+            }
+        }
+    };
+
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme/>
+
+            <AppBar position="static">
+                <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h6" component="div">
+                        Band Journal
+                    </Typography>
+                    <Button color="inherit" onClick={() => navigate('/new-entry')}>
+                        Add Entry
+                    </Button>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Button color="inherit" onClick={handleLogout}>
+                        Logout
+                    </Button>
+                    <ToggleColorMode
+                        data-screenshot="toggle-mode"
+                        mode={mode}
+                        toggleColorMode={toggleColorMode}
+                    />
+                </Toolbar>
+            </AppBar>
 
             <Stack
                 direction="column"
@@ -51,11 +99,7 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
                         m: 'auto',
                     }}
                 >
-                    <ToggleColorMode
-                        data-screenshot="toggle-mode"
-                        mode={mode}
-                        toggleColorMode={toggleColorMode}
-                    />
+
                     {children}
                 </Stack>
             </Stack>

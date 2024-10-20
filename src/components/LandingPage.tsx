@@ -13,6 +13,7 @@ const LandingPage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate()
 
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -26,29 +27,6 @@ const LandingPage = () => {
 
     const handleToggleTable = () => {
         setShowTable(!showTable);
-    };
-
-    const handleCreateNewEntry = () => {
-        navigate('/new-entry');
-    };
-
-    const API_URL = 'http://localhost:8080';
-
-    const handleLogout = async () => {
-        try {
-            const response = await axios.post(`${API_URL}/logout`);
-            localStorage.removeItem('token');
-            setIsLoggedIn(false);
-            navigate('/'); // or wherever you want to redirect after logout
-
-        } catch (error: unknown) {
-            const axiosError = error as AxiosError;
-            if (axiosError.response) {
-                console.error('Error logging in:', axiosError.response.status);
-            } else {
-                console.error('Error logging in:', axiosError.message);
-            }
-        }
     };
 
     return (
@@ -66,31 +44,6 @@ const LandingPage = () => {
                             <DataTable data={data}/>
                         )}
                     </DataCollector>}
-
-                {/*<SpeedDial*/}
-                {/*    ariaLabel="SpeedDial example"*/}
-                {/*    icon={<SpeedDialIcon />}*/}
-                {/*    sx={{ position: 'absolute', bottom: 16, right: 16 }}*/}
-                {/*    onClose={() => console.log('SpeedDial closed')}*/}
-                {/*    onOpen={() => console.log('SpeedDial opened')}*/}
-                {/*    open={false}*/}
-                {/*>*/}
-                {/*<SpeedDialAction*/}
-                {/*        icon={<AddCircleIcon />}*/}
-                {/*        tooltipTitle="Create New Entry"*/}
-                {/*        onClick={handleCreateNewEntry}*/}
-                {/*    />*/}
-                {/*</SpeedDial>*/}
-                {/*<br/>*/}
-
-                <Button variant="contained" onClick={handleCreateNewEntry}>
-                    {"Add Entry"}
-                </Button>
-
-                <Button variant="contained" onClick={handleLogout}>
-                    {"Logout"}
-                </Button>
-
             </div>
         </DefaultLayout>
 

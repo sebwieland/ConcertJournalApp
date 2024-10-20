@@ -44,9 +44,11 @@ export default function SignInCard() {
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [open, setOpen] = React.useState(false);
+    const [signInError, setSignInError] = useState('');
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setSignInError('');
         const data = new FormData(event.currentTarget);
         const email = data.get('email') as string;
         const password = data.get('password') as string;
@@ -57,6 +59,7 @@ export default function SignInCard() {
                 navigate('/', { replace: true });
             } catch (error) {
                 console.error('Error logging in:', error);
+                setSignInError('Invalid email or password. Please try again')
             }
         } else {
             console.error('Invalid inputs');
@@ -183,6 +186,11 @@ export default function SignInCard() {
                 <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
                     Sign in
                 </Button>
+                {signInError && (
+                    <Typography color="error" sx={{ textAlign: 'center' }}>
+                        {signInError}
+                    </Typography>
+                )}
                 <Typography sx={{textAlign: 'center'}}>
                     Don&apos;t have an account?{' '}
                     <span>
