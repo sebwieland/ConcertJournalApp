@@ -15,7 +15,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ToggleColorMode from './ToggleColorMode';
-import getSignUpTheme from '../theme/getSignUpTheme';
+import getTheme from '../theme/getTheme';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: 'relative',
@@ -50,7 +50,7 @@ export default function TemplateFrame({
   const handleChange = (event: SelectChangeEvent) => {
     toggleCustomTheme(event.target.value === 'custom');
   };
-  const signUpTheme = createTheme(getSignUpTheme(mode));
+  const signUpTheme = createTheme(getTheme(mode));
 
   return (
     <ThemeProvider theme={signUpTheme}>

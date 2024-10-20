@@ -14,9 +14,8 @@ import Typography from '@mui/material/Typography';
 import {styled} from '@mui/material/styles';
 
 import ForgotPassword from './ForgotPassword';
-import {GoogleIcon, FacebookIcon, SitemarkIcon} from './CustomIcons';
+import {SitemarkIcon} from './CustomIcons';
 import {useNavigate} from "react-router-dom";
-import axios, {AxiosError} from "axios";
 import {useEffect, useState} from "react";
 import useAuth from "../../hooks/useAuth";
 

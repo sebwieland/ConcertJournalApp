@@ -18,7 +18,7 @@ import {
   styled,
   PaletteMode,
 } from '@mui/material/styles';
-import getSignUpTheme from '../theme/getSignUpTheme';
+import getTheme from '../theme/getTheme';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
 import TemplateFrame from './TemplateFrame';
 
@@ -57,7 +57,7 @@ export default function SignUp() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
-  const SignUpTheme = createTheme(getSignUpTheme(mode));
+  const SignUpTheme = createTheme(getTheme(mode));
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);

@@ -2,16 +2,14 @@ import React, {useEffect, useState} from 'react';
 import DataTable from "./DataTable";
 import DataCollector, {DataCollectorState} from "./DataCollector";
 import Button from '@mui/material/Button';
-import {SpeedDial, SpeedDialAction, SpeedDialIcon} from "@mui/material";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {useNavigate} from "react-router-dom";
-import SignInSide from "./sign-in-side/SignInSide";
+import SignInSide from "./sign-in/SignInSide";
 import axios, {AxiosError} from "axios";
-
+import useTheme from './theme/useTheme';
+import DefaultLayout from  './theme/DefaultLayout';
 
 const LandingPage = () => {
     const [showTable, setShowTable] = useState(false);
-    const [createNewEntry, setCreateNewEntry] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate()
 
@@ -54,45 +52,48 @@ const LandingPage = () => {
     };
 
     return (
-        <div>
-            <h1>Welcome to your Band Journal!</h1>
-            <p>Choose an option:</p>
-            <Button variant = "contained" onClick={handleToggleTable}>
-                {showTable ? "Hide Table" : "Show Table"}
-            </Button>
+        <DefaultLayout>
+            <div>
+                <h1>Welcome to your Band Journal!</h1>
+                <p>Choose an option:</p>
+                <Button variant="contained" onClick={handleToggleTable}>
+                    {showTable ? "Hide Table" : "Show Table"}
+                </Button>
 
-            {showTable &&
-                <DataCollector>
-                    {({data}: DataCollectorState) => (
-                        <DataTable data={data}/>
-                    )}
-                </DataCollector>}
+                {showTable &&
+                    <DataCollector>
+                        {({data}: DataCollectorState) => (
+                            <DataTable data={data}/>
+                        )}
+                    </DataCollector>}
 
-            {/*<SpeedDial*/}
-            {/*    ariaLabel="SpeedDial example"*/}
-            {/*    icon={<SpeedDialIcon />}*/}
-            {/*    sx={{ position: 'absolute', bottom: 16, right: 16 }}*/}
-            {/*    onClose={() => console.log('SpeedDial closed')}*/}
-            {/*    onOpen={() => console.log('SpeedDial opened')}*/}
-            {/*    open={false}*/}
-            {/*>*/}
-            {/*<SpeedDialAction*/}
-            {/*        icon={<AddCircleIcon />}*/}
-            {/*        tooltipTitle="Create New Entry"*/}
-            {/*        onClick={handleCreateNewEntry}*/}
-            {/*    />*/}
-            {/*</SpeedDial>*/}
-            {/*<br/>*/}
+                {/*<SpeedDial*/}
+                {/*    ariaLabel="SpeedDial example"*/}
+                {/*    icon={<SpeedDialIcon />}*/}
+                {/*    sx={{ position: 'absolute', bottom: 16, right: 16 }}*/}
+                {/*    onClose={() => console.log('SpeedDial closed')}*/}
+                {/*    onOpen={() => console.log('SpeedDial opened')}*/}
+                {/*    open={false}*/}
+                {/*>*/}
+                {/*<SpeedDialAction*/}
+                {/*        icon={<AddCircleIcon />}*/}
+                {/*        tooltipTitle="Create New Entry"*/}
+                {/*        onClick={handleCreateNewEntry}*/}
+                {/*    />*/}
+                {/*</SpeedDial>*/}
+                {/*<br/>*/}
 
-            <Button variant="contained" onClick={handleCreateNewEntry}>
-                {"Add Entry"}
-            </Button>
+                <Button variant="contained" onClick={handleCreateNewEntry}>
+                    {"Add Entry"}
+                </Button>
 
-            <Button variant="contained" onClick={handleLogout}>
-                {"Logout"}
-            </Button>
+                <Button variant="contained" onClick={handleLogout}>
+                    {"Logout"}
+                </Button>
 
-        </div>
+            </div>
+        </DefaultLayout>
+
     );
 };
 

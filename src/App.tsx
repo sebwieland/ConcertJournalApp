@@ -5,7 +5,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import SignUp from "./components/sign-up/SignUp";
-import SignInSide from "./components/sign-in-side/SignInSide";
+import SignInSide from "./components/sign-in/SignInSide";
 
 interface AppProps {
     // No props needed for this component

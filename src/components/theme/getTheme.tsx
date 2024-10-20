@@ -9,7 +9,7 @@ import {
   surfacesCustomizations,
 } from './customizations';
 
-export default function getSignInSideTheme(mode: PaletteMode): ThemeOptions {
+export default function getTheme(mode: PaletteMode): ThemeOptions {
   return {
     ...getDesignTokens(mode),
     components: {
@@ -21,3 +21,4 @@ export default function getSignInSideTheme(mode: PaletteMode): ThemeOptions {
     },
   };
 }
+
