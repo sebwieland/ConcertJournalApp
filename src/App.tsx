@@ -4,7 +4,7 @@ import CreateNewEntryFormPage from "./components/NewDataEntryPage";
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import SignUp from "./components/sign-up/SignUp";
+// import SignUp from "../../../Library/Application Support/JetBrains/IntelliJIdea2024.1/scratches/sign-up/SignUp";
 import SignInSide from "./components/sign-in/SignInSide";
 
 interface AppProps {
@@ -19,7 +19,7 @@ class App extends React.Component<AppProps, {}> {
                     <Routes>
                         <Route path="/" element={<LandingPage/>}/>
                         <Route path="/new-entry" element={<CreateNewEntryFormPage/>}/>
-                        <Route path="/sign-up" element={<SignUp />} />
+                        {/*<Route path="/sign-up" element={<SignUp />} />7*/}
                         <Route path="/sign-in" element={<SignInSide />} />
                     </Routes>
                 </BrowserRouter>

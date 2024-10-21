@@ -2,7 +2,7 @@ import {ThemeProvider} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import useTheme from "./useTheme";
 import React, {PropsWithChildren, useState} from "react";
-import ToggleColorMode from "../sign-up/ToggleColorMode";
+import ToggleColorMode from "../utilities/ToggleColorMode";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
@@ -20,18 +20,13 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
 
     const handleLogout = async () => {
         try {
-            const response = await axios.post(`${API_URL}/logout`);
+            await axios.post(`${API_URL}/logout`);
+        } catch (error: unknown) {
+            console.error('Error logging out:', error);
+        } finally {
             localStorage.removeItem('token');
             setIsLoggedIn(false);
-            navigate('/'); // or wherever you want to redirect after logout
-
-        } catch (error: unknown) {
-            const axiosError = error as AxiosError;
-            if (axiosError.response) {
-                console.error('Error logging in:', axiosError.response.status);
-            } else {
-                console.error('Error logging in:', axiosError.message);
-            }
+            window.location.href = '/';
         }
     };
 
