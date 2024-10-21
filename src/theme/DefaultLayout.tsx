@@ -1,8 +1,8 @@
 import {ThemeProvider} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import useTheme from "./useTheme";
-import React, {PropsWithChildren, useState} from "react";
-import ToggleColorMode from "../utilities/ToggleColorMode";
+import React, {PropsWithChildren, useContext, useEffect, useState} from "react";
+import ToggleColorMode from "../components/utilities/ToggleColorMode";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,10 +11,11 @@ import Button from "@mui/material/Button";
 import axios, {AxiosError} from "axios";
 import {useNavigate} from "react-router-dom";
 import Box from "@mui/material/Box";
+import {AuthContext} from "../contexts/AuthContext";
 
 const DefaultLayout = ({children}: PropsWithChildren) => {
     const {theme, mode, toggleColorMode} = useTheme();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
     const navigate = useNavigate()
     const API_URL = 'http://localhost:8080';
 
@@ -25,7 +26,7 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
             console.error('Error logging out:', error);
         } finally {
             localStorage.removeItem('token');
-            setIsLoggedIn(false);
+            // setIsLoggedIn(false);
             window.location.href = '/';
         }
     };
@@ -34,26 +35,27 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme/>
-
-            <AppBar position="static">
-                <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="h6" component="div">
-                        Band Journal
-                    </Typography>
-                    <Button color="inherit" onClick={() => navigate('/new-entry')}>
-                        Add Entry
-                    </Button>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Button color="inherit" onClick={handleLogout}>
-                        Logout
-                    </Button>
-                    <ToggleColorMode
-                        data-screenshot="toggle-mode"
-                        mode={mode}
-                        toggleColorMode={toggleColorMode}
-                    />
-                </Toolbar>
-            </AppBar>
+            {isLoggedIn && (
+                <AppBar position="static">
+                    <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="h6" component="div">
+                            Band Journal
+                        </Typography>
+                        <Button color="inherit" onClick={() => navigate('/new-entry')}>
+                            Add Entry
+                        </Button>
+                        <Box sx={{ flexGrow: 1 }} />
+                        <Button color="inherit" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                        <ToggleColorMode
+                            data-screenshot="toggle-mode"
+                            mode={mode}
+                            toggleColorMode={toggleColorMode}
+                        />
+                    </Toolbar>
+                </AppBar>
+            )}
 
             <Stack
                 direction="column"

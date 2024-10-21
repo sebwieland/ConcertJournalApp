@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 import { useQueryClient, useMutation } from 'react-query';
 import authApi from '../api/apiAuth';
 
@@ -8,22 +10,27 @@ interface UseAuth {
 }
 
 const useAuth = (): UseAuth => {
+    const authContext = useContext(AuthContext);
+    if (!authContext) {
+        throw new Error('AuthContext is not provided');
+    }
+    const { isLoggedIn, setIsLoggedIn, token, setToken } = authContext;
     const queryClient = useQueryClient();
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            localStorage.setItem('token', data.token);
+            setToken(data.token);
+            setIsLoggedIn(true);
             queryClient.invalidateQueries('token');
         },
     });
-
-    const token = localStorage.getItem('token');
 
     const login = async (data: { email: string; password: string }) => {
         await loginMutation(data);
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        setToken(null);
+        setIsLoggedIn(false);
         queryClient.invalidateQueries('token');
     };
 

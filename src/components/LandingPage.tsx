@@ -1,25 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import DataTable from "./DataTable";
 import DataCollector, {DataCollectorState} from "./DataCollector";
 import Button from '@mui/material/Button';
 import {useNavigate} from "react-router-dom";
 import SignInSide from "./sign-in/SignInSide";
-import axios, {AxiosError} from "axios";
-import useTheme from './theme/useTheme';
-import DefaultLayout from  './theme/DefaultLayout';
+import DefaultLayout from '../theme/DefaultLayout';
+import {AuthContext} from "../contexts/AuthContext";
 
 const LandingPage = () => {
     const [showTable, setShowTable] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate()
-
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            setIsLoggedIn(true);
-        }
-    }, [localStorage.getItem('token')]);
+    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
 
     if (!isLoggedIn) {
         return <SignInSide/>;
