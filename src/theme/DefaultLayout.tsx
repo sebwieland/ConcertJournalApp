@@ -41,6 +41,9 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
                         <Typography variant="h6" component="div">
                             Band Journal
                         </Typography>
+                        <Button color="inherit" onClick={() => navigate('/your-journal')}>
+                            Your Journal
+                        </Button>
                         <Button color="inherit" onClick={() => navigate('/new-entry')}>
                             Add Entry
                         </Button>

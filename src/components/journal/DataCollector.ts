@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useEvents from "../hooks/useEvents";
+import useEvents from "../../hooks/useEvents";
 
 interface DataCollectorProps {
     children: (state: DataCollectorState) => JSX.Element;
