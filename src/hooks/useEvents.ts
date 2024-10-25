@@ -1,6 +1,7 @@
-import {useMutation, useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import eventsApi from '../api/apiEvents';
 import useAuth from './useAuth';
+
 
 interface UseEvents {
     data: any;
@@ -18,6 +19,7 @@ interface UseEvents {
 
 const useEvents = (): UseEvents => {
     const { token } = useAuth();
+    const queryClient = useQueryClient();
 
     const { data, error, isLoading, refetch } = useQuery(
         'allEvents',
@@ -43,6 +45,7 @@ const useEvents = (): UseEvents => {
         {
             onSuccess: () => {
                 console.log('Event created successfully!');
+                queryClient.invalidateQueries('allEvents');
             },
             onError: (error) => {
                 console.error('Error creating event:', error);

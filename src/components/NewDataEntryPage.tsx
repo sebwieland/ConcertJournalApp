@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
-import {Alert, Container, Grid2, Rating, TextField} from "@mui/material";
+import React, {useContext, useEffect, useState} from 'react';
+import {Alert, Autocomplete, Container, Grid2, Rating, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import DefaultLayout from "../theme/DefaultLayout";
 import useEvents from "../hooks/useEvents";
+import {AuthContext} from "../contexts/AuthContext";
+import SignInSide from "./sign-in/SignInSide";
 
 const CreateNewEntryFormPage = () => {
     const [bandName, setBandName] = useState('');
@@ -15,8 +17,33 @@ const CreateNewEntryFormPage = () => {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
+    const [bandSuggestions, setBandSuggestions] = useState<string[]>([]);
+    const [bandInputValue, setBandInputValue] = useState('');
+    const [placeSuggestions, setPlaceSuggestions] = useState<string[]>([]);
+    const [placeInputValue, setPlaceInputValue] = useState('');
     const navigate = useNavigate()
-    const {createEvent} = useEvents();
+    const {data, createEvent} = useEvents();
+    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
+
+    useEffect(() => {
+        const fetchSuggestions =  () => {
+            if (!data) return;
+            const uniqueBandNames: string[] = Array.from(new Set(data.map((event: { bandName: string }) => event.bandName)));
+            const suggestions: string[] = uniqueBandNames.filter(s => s.toLowerCase().includes(bandInputValue.toLowerCase()));
+            setBandSuggestions(suggestions);
+        };
+        fetchSuggestions();
+    }, [bandInputValue]);
+
+    useEffect(() => {
+        const fetchSuggestions =  () => {
+            if (!data) return;
+            const uniquePlaces: string[] = Array.from(new Set(data.map((event: { place: string }) => event.place)));
+            const suggestions: string[] = uniquePlaces.filter(s => s.toLowerCase().includes(placeInputValue.toLowerCase()));
+            setPlaceSuggestions(suggestions);
+        };
+        fetchSuggestions();
+    }, [placeInputValue]);
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -35,12 +62,21 @@ const CreateNewEntryFormPage = () => {
             onSuccess: () => {
                 setMessage('New entry created successfully!');
                 setIsSuccess(true);
+                setPlace('');
+                setBandName('');
+                setDate(dayjs());
+                setRating(0);
+                setComment('');
             },
             onError: (error) => {
                 setMessage(`Error creating new entry: ${(error as Error).message}`);
                 setIsSuccess(false);
             }
         })
+    }
+
+    if (!isLoggedIn) {
+        return <SignInSide/>;
     }
 
     return (
@@ -51,24 +87,49 @@ const CreateNewEntryFormPage = () => {
                 component="form"
             >
                 <Grid2 spacing={1}>
+                    <Autocomplete
+                        options={bandSuggestions}
+                        value={bandName}
+                        onChange={(event, newValue) => setBandName(newValue ?? '')}
+                        inputValue={bandInputValue}
+                        onInputChange={(event, newInputValue) => {
+                            setBandInputValue(newInputValue);
+                            setBandName(newInputValue);
+                        }}
+                        autoComplete
+                        freeSolo
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Band"
+                                variant="outlined"
+                                fullWidth
+                                sx={{marginBottom: 2}}
+                            />
+                        )}
+                    />
+
                     <Grid2>
-                        <TextField
-                            label="Band"
-                            variant="outlined"
-                            fullWidth
-                            value={bandName}
-                            sx={{marginBottom: 2}}
-                            onChange={(event) => setBandName(event.target.value)}
-                        />
-                    </Grid2>
-                    <Grid2>
-                        <TextField
-                            label="Place"
-                            variant="outlined"
-                            fullWidth
+                        <Autocomplete
+                            options={placeSuggestions}
                             value={place}
-                            sx={{marginBottom: 2}}
-                            onChange={(event) => setPlace(event.target.value)}
+                            onChange={(event, newValue) => setPlace(newValue ?? '')}
+                            inputValue={placeInputValue}
+                            onInputChange={(event, newInputValue) => {
+                                setPlaceInputValue(newInputValue);
+                                setPlace(newInputValue);
+                            }}
+                            autoComplete
+                            freeSolo
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Place"
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{marginBottom: 2}}
+                                />
+                            )}
                         />
                     </Grid2>
 
