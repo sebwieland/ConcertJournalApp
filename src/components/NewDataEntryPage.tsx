@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Container, Grid2, Rating, TextField} from "@mui/material";
+import {Alert, Container, Grid2, Rating, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import {DatePicker} from "@mui/x-date-pickers";
@@ -14,30 +14,40 @@ const CreateNewEntryFormPage = () => {
     const [message, setMessage] = useState('');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
     const navigate = useNavigate()
-    const { createEvent } = useEvents();
+    const {createEvent} = useEvents();
 
     const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        try {
-            await createEvent( {
-                bandName,
-                place,
-                date,
-                rating,
-                comment
-            })
-        } catch (error) {
-            setMessage(`Error creating new entry: ${(error as Error).message}`);
+        if (!bandName.trim()) {
+            setMessage('Please enter a band name');
+            setIsSuccess(false);
+            return;
         }
-    };
-
+        await createEvent({
+            bandName,
+            place,
+            date,
+            rating,
+            comment
+        }, {
+            onSuccess: () => {
+                setMessage('New entry created successfully!');
+                setIsSuccess(true);
+            },
+            onError: (error) => {
+                setMessage(`Error creating new entry: ${(error as Error).message}`);
+                setIsSuccess(false);
+            }
+        })
+    }
 
     return (
         <DefaultLayout>
             <Container
                 maxWidth="sm"
-                style={{marginTop: "10vh"}}
+                sx={{marginTop: "10vh", width: '400px', maxWidth: "500px"}}
                 component="form"
             >
                 <Grid2 spacing={1}>
@@ -63,7 +73,6 @@ const CreateNewEntryFormPage = () => {
                     </Grid2>
 
                     <Grid2 sx={{textAlign: 'center', marginBottom: 2}}>
-                        {/*Rating:*/}
                         <Rating
                             name="Rating"
                             value={rating}
@@ -86,7 +95,7 @@ const CreateNewEntryFormPage = () => {
                         <DatePicker
                             label="Date"
                             value={date}
-                            sx={{marginBottom: 2}}
+                            sx={{marginBottom: 2, width: '100%'}}
                             onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                         />
                     </Grid2>
@@ -111,7 +120,13 @@ const CreateNewEntryFormPage = () => {
                             Go Back
                         </Button>
                     </Grid2>
-                    {message && <div>{message}</div>}
+                    <Grid2>
+                        {message &&
+                            <Alert
+                                severity={isSuccess ? 'success' : 'error'} sx={{maxWidth: '100%'}}>
+                                {message}
+                            </Alert>}
+                    </Grid2>
                 </Grid2>
             </Container>
         </DefaultLayout>

@@ -7,7 +7,13 @@ interface UseEvents {
     error: any;
     isLoading: boolean;
     refetch: () => void;
-    createEvent: (data: { /* event data */ }) => Promise<void>;
+    createEvent: (
+        data: { /* event data */ },
+        options?: {
+            onSuccess?: (data: any) => void;
+            onError?: (error: any) => void;
+        }
+    ) => Promise<void>;
 }
 
 const useEvents = (): UseEvents => {
@@ -44,11 +50,22 @@ const useEvents = (): UseEvents => {
         }
     );
 
-    const createEvent = async (data: { /* event data */ }) => {
+    const createEvent = async (
+        data: { /* event data */ },
+        options?: {
+            onSuccess?: (data: any) => void;
+            onError?: (error: any) => void;
+        }
+    ) => {
         if (!token) {
             throw new Error('No authentication token found');
         }
-        await createEventMutation({ data, token });
+        try {
+            const response = await createEventMutation({ data, token });
+            options?.onSuccess?.(response);
+        } catch (error) {
+            options?.onError?.(error);
+        }
     };
 
     return { data, error, isLoading, refetch, createEvent };
