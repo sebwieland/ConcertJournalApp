@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Container, Grid2, TextField} from "@mui/material";
+import {Container, Grid2, Rating, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import {DatePicker} from "@mui/x-date-pickers";
@@ -12,7 +12,7 @@ const CreateNewEntryFormPage = () => {
     const [place, setPlace] = useState('');
     const [date, setDate] = useState(dayjs());
     const [message, setMessage] = useState('');
-    const [rating, setRating] = useState('');
+    const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const navigate = useNavigate()
     const { createEvent } = useEvents();
@@ -61,14 +61,15 @@ const CreateNewEntryFormPage = () => {
                             onChange={(event) => setPlace(event.target.value)}
                         />
                     </Grid2>
-                    <Grid2>
-                        <TextField
-                            label="Rating"
-                            variant="outlined"
-                            fullWidth
+
+                    <Grid2 sx={{textAlign: 'center', marginBottom: 2}}>
+                        {/*Rating:*/}
+                        <Rating
+                            name="Rating"
                             value={rating}
-                            sx={{marginBottom: 2}}
-                            onChange={(event) => setRating(event.target.value)}
+                            onChange={(event, newValue) => {
+                                setRating(newValue ?? 0);
+                            }}
                         />
                     </Grid2>
                     <Grid2>
