@@ -1,6 +1,6 @@
 import React from 'react';
-import type {} from '@mui/x-data-grid/themeAugmentation';
 import {DataGrid} from '@mui/x-data-grid';
+import dayjs from "dayjs";
 
 interface DataTableProps {
     data: any[];
@@ -11,7 +11,11 @@ class DataTable extends React.Component<DataTableProps, {}> {
         {field: 'id', headerName: 'ID', width: 70},
         {field: 'bandName', headerName: 'Band', width: 130},
         {field: 'place', headerName: 'Place', width: 130},
-        {field: 'date', headerName: 'date', width: 130},
+        {field: 'date', headerName: 'Date', width: 130,
+            valueFormatter: (params: any)  => {
+                return dayjs(params.value).format('DD/MM/YYYY');
+            }
+        },
         {field: 'comment', headerName: 'comment', width: 130},
         {field: 'rating', headerName: 'rating', width: 130},
         {
@@ -20,7 +24,6 @@ class DataTable extends React.Component<DataTableProps, {}> {
             width: 130,
             valueGetter: (params: any) => params.username,
         },
-        // Add more columns as needed
     ];
 
     render() {
