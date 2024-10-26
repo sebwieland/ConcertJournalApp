@@ -1,14 +1,13 @@
 import {ThemeProvider} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import useTheme from "./useTheme";
-import React, {PropsWithChildren, useContext, useEffect, useState} from "react";
+import React, {PropsWithChildren, useContext} from "react";
 import ToggleColorMode from "../components/utilities/ToggleColorMode";
 import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
 import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
 import Button from "@mui/material/Button";
-import axios, {AxiosError} from "axios";
+import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Box from "@mui/material/Box";
 import {AuthContext} from "../contexts/AuthContext";
@@ -38,9 +37,9 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
             {isLoggedIn && (
                 <AppBar position="static">
                     <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="h6" component="div">
-                            Band Journal
-                        </Typography>
+                        <Button color="inherit" onClick={() => navigate('/')}>
+                            BJ
+                        </Button>
                         <Button color="inherit" onClick={() => navigate('/your-journal')}>
                             Your Journal
                         </Button>
