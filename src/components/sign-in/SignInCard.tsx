@@ -15,9 +15,8 @@ import {styled} from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import {SitemarkIcon} from './CustomIcons';
 import {useNavigate} from "react-router-dom";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import useAuth from "../../hooks/useAuth";
-import {AuthContext} from "../../contexts/AuthContext";
 
 const Card = styled(MuiCard)(({theme}) => ({
     display: 'flex',
@@ -46,13 +45,6 @@ export default function SignInCard() {
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [open, setOpen] = React.useState(false);
     const [signInError, setSignInError] = useState('');
-    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/', { replace: true });
-        }
-    }, [isLoggedIn]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

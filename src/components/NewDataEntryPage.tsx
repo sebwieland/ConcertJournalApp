@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Autocomplete, Container, Grid2, Rating, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
@@ -6,8 +6,6 @@ import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import DefaultLayout from "../theme/DefaultLayout";
 import useEvents from "../hooks/useEvents";
-import {AuthContext} from "../contexts/AuthContext";
-import SignInSide from "./sign-in/SignInSide";
 
 const CreateNewEntryFormPage = () => {
     const [bandName, setBandName] = useState('');
@@ -23,12 +21,13 @@ const CreateNewEntryFormPage = () => {
     const [placeInputValue, setPlaceInputValue] = useState('');
     const navigate = useNavigate()
     const {data, createEvent} = useEvents();
-    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
 
     useEffect(() => {
-        const fetchSuggestions =  () => {
+        const fetchSuggestions = () => {
             if (!data) return;
-            const uniqueBandNames: string[] = Array.from(new Set(data.map((event: { bandName: string }) => event.bandName)));
+            const uniqueBandNames: string[] = Array.from(new Set(data.map((event: {
+                bandName: string
+            }) => event.bandName)));
             const suggestions: string[] = uniqueBandNames.filter(s => s.toLowerCase().includes(bandInputValue.toLowerCase()));
             setBandSuggestions(suggestions);
         };
@@ -36,7 +35,7 @@ const CreateNewEntryFormPage = () => {
     }, [bandInputValue]);
 
     useEffect(() => {
-        const fetchSuggestions =  () => {
+        const fetchSuggestions = () => {
             if (!data) return;
             const uniquePlaces: string[] = Array.from(new Set(data.map((event: { place: string }) => event.place)));
             const suggestions: string[] = uniquePlaces.filter(s => s.toLowerCase().includes(placeInputValue.toLowerCase()));
@@ -73,10 +72,6 @@ const CreateNewEntryFormPage = () => {
                 setIsSuccess(false);
             }
         })
-    }
-
-    if (!isLoggedIn) {
-        return <SignInSide/>;
     }
 
     return (
