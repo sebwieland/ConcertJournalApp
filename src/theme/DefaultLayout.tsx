@@ -11,6 +11,7 @@ import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Box from "@mui/material/Box";
 import {AuthContext} from "../contexts/AuthContext";
+import IconButton from "@mui/material/IconButton";
 
 const DefaultLayout = ({children}: PropsWithChildren) => {
     const {theme, mode, toggleColorMode} = useTheme();
@@ -25,7 +26,6 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
             console.error('Error logging out:', error);
         } finally {
             localStorage.removeItem('token');
-            // setIsLoggedIn(false);
             window.location.href = '/';
         }
     };
@@ -37,9 +37,9 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
             {isLoggedIn && (
                 <AppBar position="static">
                     <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Button color="inherit" onClick={() => navigate('/')}>
-                            BJ
-                        </Button>
+                        <IconButton color="inherit" onClick={() => navigate('/')}>
+                            <img src={'/Bandjournal_logo.png'} alt="BJ" style={{ width: '40px', height: '40px' }} />
+                        </IconButton>
                         <Button color="inherit" onClick={() => navigate('/your-journal')}>
                             Your Journal
                         </Button>
