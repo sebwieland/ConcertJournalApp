@@ -22,6 +22,18 @@ const eventsApi = {
         console.log("createEventResponse: ", response.data)
         return response.data;
     },
+
+    deleteEvent: async (id: number, token: string) => {
+        const response = await apiClient.delete(`/event/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+        console.log("deleteEventResponse: ", response.data)
+        return response.data;
+    },
+
 }
 
 export default eventsApi;

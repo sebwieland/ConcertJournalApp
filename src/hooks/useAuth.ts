@@ -1,10 +1,10 @@
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
-import { useQueryClient, useMutation } from 'react-query';
+import {useContext} from 'react';
+import {AuthContext} from '../contexts/AuthContext';
+import {useQueryClient, useMutation} from 'react-query';
 import authApi from '../api/apiAuth';
 
 interface UseAuth {
-    token: string | null;
+    token: string;
     login: (data: { email: string; password: string }) => Promise<void>;
     logout: () => void;
 }
@@ -14,9 +14,9 @@ const useAuth = (): UseAuth => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const { isLoggedIn, setIsLoggedIn, token, setToken } = authContext;
+    const {isLoggedIn, setIsLoggedIn, token, setToken} = authContext;
     const queryClient = useQueryClient();
-    const { mutateAsync: loginMutation } = useMutation(authApi.login, {
+    const {mutateAsync: loginMutation} = useMutation(authApi.login, {
         onSuccess: (data) => {
             setToken(data.token);
             setIsLoggedIn(true);
@@ -29,12 +29,12 @@ const useAuth = (): UseAuth => {
     };
 
     const logout = () => {
-        setToken(null);
+        setToken('');
         setIsLoggedIn(false);
         queryClient.invalidateQueries('token');
     };
 
-    return { token, login, logout };
+    return {token, login, logout};
 };
 
 export default useAuth;

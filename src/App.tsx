@@ -23,7 +23,7 @@ class App extends React.Component<AppProps, {}> {
                             <Route path="/" element={<AuthenticatedPage element={<LandingPage />} />} />
                             <Route path="/new-entry" element={<AuthenticatedPage element={<CreateNewEntryFormPage />} />} />
                             <Route path="/your-journal" element={<AuthenticatedPage element={<Journal />} />} />
-                            {/*<Route path="/sign-up" element={<SignUp />} />7*/}
+                            {/*<Route path="/sign-up" element={<SignUp />} />*/}
                             <Route path="/sign-in" element={<SignInSide/>}/>
                         </Routes>
                     </BrowserRouter>

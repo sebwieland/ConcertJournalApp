@@ -22,7 +22,8 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
     "react-router-dom": "^6.26.1",
-    "dayjs": "^1.11.13"
+    "dayjs": "^1.11.13",
+    "material-ui-confirm": "^3.0.16"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1"

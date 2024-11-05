@@ -1,9 +1,12 @@
 import React from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import dayjs from "dayjs";
+import Button from "@mui/material/Button";
 
 interface DataTableProps {
     data: any[];
+    onEdit: (id: number) => void;
+    onDelete: (id: number) => void;
 }
 
 class DataTable extends React.Component<DataTableProps, {}> {
@@ -24,6 +27,17 @@ class DataTable extends React.Component<DataTableProps, {}> {
             width: 130,
             valueGetter: (params: any) => params.username,
         },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            width: 200,
+            renderCell: (params: any) => (
+                <div>
+                    <Button variant="contained" color="primary" onClick={() => this.props.onEdit(params.id)}>Edit</Button>
+                    <Button variant="contained" color="error" style={{marginLeft: 10}} onClick={() => this.props.onDelete(params.id)}>Delete</Button>
+                </div>
+            )
+        }
     ];
 
     render() {

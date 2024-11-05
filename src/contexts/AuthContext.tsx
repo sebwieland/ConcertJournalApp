@@ -4,15 +4,15 @@ import React, { createContext, useState, useEffect } from 'react';
 interface AuthContextInterface {
     isLoggedIn: boolean;
     setIsLoggedIn: (isLoggedIn: boolean) => void;
-    token: string | null;
-    setToken: (token: string | null) => void;
+    token: string;
+    setToken: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
 
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+    const [token, setToken] = useState<string>('');
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
