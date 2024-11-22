@@ -1,6 +1,6 @@
 import DefaultLayout from "../../theme/DefaultLayout";
 import * as React from "react";
-import DataCollector, {DataCollectorState} from "./DataCollector";
+import DataCollector from "./DataCollector";
 import DataTable from "./DataTable";
 import {ConfirmProvider} from "material-ui-confirm";
 
