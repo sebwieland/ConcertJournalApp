@@ -14,13 +14,27 @@ class DataTable extends React.Component<DataTableProps, {}> {
         {field: 'id', headerName: 'ID', width: 70},
         {field: 'bandName', headerName: 'Band', width: 130},
         {field: 'place', headerName: 'Place', width: 130},
-        {field: 'date', headerName: 'Date', width: 130,
-            valueFormatter: (params: any)  => {
-                return dayjs(params.value).format('DD/MM/YYYY');
+        {
+            field: 'date', headerName: 'Date', width: 130,
+            type: 'date' as const, sortType: 'date',
+            valueFormatter: (params: any) => {
+                const date = dayjs(params);
+                return date.format('DD/MM/YYYY');
             }
         },
         {field: 'comment', headerName: 'comment', width: 130},
-        {field: 'rating', headerName: 'rating', width: 130},
+        {
+            field: 'rating', headerName: 'rating', width: 130,
+            renderCell: (params: any) => (
+                <div>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <span key={i} style={{color: i <= params.value ? 'gold' : 'gray'}}>
+                        ★
+                        </span>
+                    ))}
+                </div>
+            ),
+        },
         {
             field: 'appUser',
             headerName: 'Username',
@@ -33,8 +47,10 @@ class DataTable extends React.Component<DataTableProps, {}> {
             width: 200,
             renderCell: (params: any) => (
                 <div>
-                    <Button variant="contained" color="primary" onClick={() => this.props.onEdit(params.id)}>Edit</Button>
-                    <Button variant="contained" color="error" style={{marginLeft: 10}} onClick={() => this.props.onDelete(params.id)}>Delete</Button>
+                    <Button variant="contained" color="primary"
+                            onClick={() => this.props.onEdit(params.id)}>Edit</Button>
+                    <Button variant="contained" color="error" style={{marginLeft: 10}}
+                            onClick={() => this.props.onDelete(params.id)}>Delete</Button>
                 </div>
             )
         }

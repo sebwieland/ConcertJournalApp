@@ -7,7 +7,7 @@ import {ConfirmProvider} from "material-ui-confirm";
 export default function Journal() {
     return (
         <DefaultLayout>
-                <ConfirmProvider>
+            <ConfirmProvider>
                 <DataCollector>
                     {({data, onEdit, onDelete}) => (
                         <DataTable data={data} onEdit={onEdit} onDelete={onDelete}/>

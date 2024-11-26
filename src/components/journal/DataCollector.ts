@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import useEvents from "../../hooks/useEvents";
 import {useConfirm} from "material-ui-confirm";
 import eventsApi from "../../api/apiEvents";
 import useAuth from "../../hooks/useAuth";
+import {useNavigate} from "react-router-dom";
 
 interface DataCollectorProps {
     children: (state: DataCollectorState) => JSX.Element;
@@ -31,10 +32,10 @@ const DataCollector = ({children}: DataCollectorProps) => {
     const [localData, setLocalData] = useState(data);
     const confirm = useConfirm();
     const { token } = useAuth();
+    const navigate = useNavigate()
 
     const handleEdit = (id: number) => {
-        // handle edit logic here
-        console.log("edit: ", id)
+        navigate(`/edit-entry/${id}`);
     };
 
     const handleDelete = async (id: number) => {

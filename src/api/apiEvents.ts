@@ -23,6 +23,17 @@ const eventsApi = {
         return response.data;
     },
 
+    updateEvent: async (id: number, data: any, token: string) => {
+        const response = await apiClient.put(`/event/${id}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        });
+        console.log("updateEventResponse: ", response.data)
+        return response.data;
+    },
+
     deleteEvent: async (id: number, token: string) => {
         const response = await apiClient.delete(`/event/${id}`, {
             headers: {
