@@ -1,6 +1,6 @@
 import React from 'react';
 import LandingPage from "./components/LandingPage";
-import CreateNewEntryFormPage from "./components/NewDataEntryPage";
+import CreateNewEntryFormPage from "./components/entryForms/NewDataEntryPage";
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
@@ -8,7 +8,7 @@ import SignInSide from "./components/sign-in/SignInSide";
 import Journal from "./components/journal/Journal";
 import {AuthProvider} from "./contexts/AuthContext";
 import AuthenticatedPage from "./components/AuthenticatedPage";
-import EditEntryFormPage from "./components/EditEntryFormPage";
+import EditEntryFormPage from "./components/entryForms/EditEntryFormPage";
 
 interface AppProps {
     // No props needed for this component
