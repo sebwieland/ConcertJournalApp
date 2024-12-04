@@ -6,6 +6,13 @@ import authApi from '../api/apiAuth';
 interface UseAuth {
     token: string;
     login: (data: { email: string; password: string }) => Promise<void>;
+    signUp: (data: {
+        username: string;
+        password: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+    }) => Promise<void>;
     logout: () => void;
 }
 
@@ -23,10 +30,22 @@ const useAuth = (): UseAuth => {
             queryClient.invalidateQueries('token');
         },
     });
+    const {mutateAsync: signUpMutation} = useMutation(authApi.register, {});
 
     const login = async (data: { email: string; password: string }) => {
         await loginMutation(data);
     };
+
+    const signUp = async (data: {
+        username: string;
+        password: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+    }) => {
+        await signUpMutation(data);
+    };
+
 
     const logout = () => {
         setToken('');
@@ -34,7 +53,7 @@ const useAuth = (): UseAuth => {
         queryClient.invalidateQueries('token');
     };
 
-    return {token, login, logout};
+    return {token, login, logout, signUp};
 };
 
 export default useAuth;

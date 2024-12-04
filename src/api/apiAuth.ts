@@ -23,4 +23,15 @@ const login = async (data: LoginRequest): Promise<LoginResponse> => {
     return response.data;
 };
 
-export default { login };
+const register = async (data: {
+    username: string;
+    password: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+}) => {
+    const response = await apiClient.post('/register', data);
+    return response.data;
+};
+
+export default { login, register };
