@@ -19,19 +19,19 @@ const items = [
   },
   {
     icon: <SettingsSuggestRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Personalized Recommendations',
+    title: 'Personalized Recommendations*',
     description:
         'Get suggestions for upcoming concerts based on your favorite bands and artists.',
   },
   {
     icon: <ConstructionRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Build Your Music Community',
+    title: 'Build Your Music Community*',
     description:
         'Connect with fellow music lovers and share your concert experiences.',
   },
   {
     icon: <AutoFixHighRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Discover New Music',
+    title: 'Discover New Music*',
     description:
         'Find new bands and artists to love based on your concert history and preferences.',
   },
@@ -58,6 +58,12 @@ export default function Content() {
           </div>
         </Stack>
       ))}
+      <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
+        <a>
+          *
+        </a>{' '}
+        At some Point in the future...maybe..
+      </Typography>
     </Stack>
   );
 }
