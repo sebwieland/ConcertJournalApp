@@ -21,7 +21,7 @@ const useAuth = (): UseAuth => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const {isLoggedIn, setIsLoggedIn, token, setToken} = authContext;
+    const {setIsLoggedIn, token, setToken} = authContext;
     const queryClient = useQueryClient();
     const {mutateAsync: loginMutation} = useMutation(authApi.login, {
         onSuccess: (data) => {

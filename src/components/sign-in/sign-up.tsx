@@ -37,7 +37,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 export default function SignUpCard() {
     const navigate = useNavigate();
-    const { token, signUp } = useAuth();
+    const { signUp } = useAuth();
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -45,6 +45,7 @@ export default function SignUpCard() {
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState('');
     const [signUpError, setSignUpMessage] = useState('');
+    const [token, setToken] = useState(localStorage.getItem('token'));
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -63,7 +64,7 @@ export default function SignUpCard() {
             } catch (error) {
                 console.log(error);
                 if (error instanceof AxiosError) {
-                    if (error.status == 409) {
+                    if (error.status === 409) {
                         setSignUpMessage('User already exists. Please try a different email address.');
                     } else {
                         setSignUpMessage("Unknown error")
@@ -78,11 +79,14 @@ export default function SignUpCard() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        setToken(localStorage.getItem('token'));
+    }, []);
+
+    useEffect(() => {
         if (token) {
             navigate('/', { replace: true });
         }
-    }, [localStorage.getItem('token')]);
+    }, [navigate, token]);
 
     const validateInputs = () => {
         const email = document.getElementById('email') as HTMLInputElement;
