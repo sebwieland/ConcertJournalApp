@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import {createTheme, PaletteMode} from "@mui/material/styles";
 import getTheme from "./getTheme";
-import * as React from "react";
 
 const LIGHT_MODE = 'light';
 const DARK_MODE = 'dark';

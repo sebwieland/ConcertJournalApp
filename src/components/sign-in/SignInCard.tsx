@@ -15,7 +15,7 @@ import {styled} from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import {SitemarkIcon} from './CustomIcons';
 import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useLayoutEffect, useState} from "react";
 import useAuth from "../../hooks/useAuth";
 
 const Card = styled(MuiCard)(({theme}) => ({
@@ -38,7 +38,7 @@ const Card = styled(MuiCard)(({theme}) => ({
 
 export default function SignInCard() {
     const navigate = useNavigate();
-    const { token, login } = useAuth();
+    const { login } = useAuth();
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -74,12 +74,12 @@ export default function SignInCard() {
         setOpen(false);
     };
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             navigate('/', {replace: true});
         }
-    }, [localStorage.getItem('token')]);
+    }, [navigate]);
 
 
     const validateInputs = () => {

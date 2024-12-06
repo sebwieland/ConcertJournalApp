@@ -34,4 +34,6 @@ const register = async (data: {
     return response.data;
 };
 
-export default { login, register };
+const authApi = { login, register };
+
+export default authApi;

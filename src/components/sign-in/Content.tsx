@@ -59,10 +59,7 @@ export default function Content() {
         </Stack>
       ))}
       <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
-        <a>
-          *
-        </a>{' '}
-        At some Point in the future...maybe..
+        <span>*</span> At some Point in the future...maybe..
       </Typography>
     </Stack>
   );
