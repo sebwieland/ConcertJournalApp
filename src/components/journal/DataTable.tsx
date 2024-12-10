@@ -2,6 +2,7 @@ import React from 'react';
 import {DataGrid} from '@mui/x-data-grid';
 import dayjs from "dayjs";
 import Button from "@mui/material/Button";
+import RatingStars from "../utilities/RatingStars";
 
 interface DataTableProps {
     data: any[];
@@ -26,13 +27,7 @@ class DataTable extends React.Component<DataTableProps, {}> {
         {
             field: 'rating', headerName: 'rating', width: 130,
             renderCell: (params: any) => (
-                <div>
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <span key={i} style={{color: i <= params.value ? 'gold' : 'gray'}}>
-                        ★
-                        </span>
-                    ))}
-                </div>
+                <RatingStars rating={params.value} />
             ),
         },
         {
