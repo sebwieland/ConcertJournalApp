@@ -1,62 +1,20 @@
 import {ThemeProvider} from "@mui/material";
 import Stack from "@mui/material/Stack";
 import useTheme from "./useTheme";
+import Navbar from "../components/navbar/Navbar"
 import React, {PropsWithChildren, useContext} from "react";
-import ToggleColorMode from "../components/utilities/ToggleColorMode";
 import CssBaseline from "@mui/material/CssBaseline";
-import Toolbar from "@mui/material/Toolbar";
-import AppBar from "@mui/material/AppBar";
-import Button from "@mui/material/Button";
-import axios from "axios";
-import {useNavigate} from "react-router-dom";
-import Box from "@mui/material/Box";
 import {AuthContext} from "../contexts/AuthContext";
-import IconButton from "@mui/material/IconButton";
 
 const DefaultLayout = ({children}: PropsWithChildren) => {
-    const {theme, mode, toggleColorMode} = useTheme();
+    const {theme} = useTheme();
     const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
-    const navigate = useNavigate()
-    const API_URL = 'http://localhost:8080';
-
-    const handleLogout = async () => {
-        try {
-            await axios.post(`${API_URL}/logout`);
-        } catch (error: unknown) {
-            console.error('Error logging out:', error);
-        } finally {
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
-    };
-
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme/>
             {isLoggedIn && (
-                <AppBar position="static">
-                    <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <IconButton color="inherit" onClick={() => navigate('/')}>
-                            <img src={'/Bandjournal_logo.png'} alt="BJ" style={{ width: '40px', height: '40px' }} />
-                        </IconButton>
-                        <Button color="inherit" onClick={() => navigate('/your-journal')}>
-                            Your Journal
-                        </Button>
-                        <Button color="inherit" onClick={() => navigate('/new-entry')}>
-                            Add Entry
-                        </Button>
-                        <Box sx={{ flexGrow: 1 }} />
-                        <Button color="inherit" onClick={handleLogout}>
-                            Logout
-                        </Button>
-                        <ToggleColorMode
-                            data-screenshot="toggle-mode"
-                            mode={mode}
-                            toggleColorMode={toggleColorMode}
-                        />
-                    </Toolbar>
-                </AppBar>
+                <Navbar /> // Use your Navbar component here
             )}
 
             <Stack
@@ -67,7 +25,7 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
                         justifyContent: 'space-between',
                         height: {xs: 'auto', md: '100%'},
                     },
-                    (theme) => ({
+                    () => ({
                         backgroundImage:
                             'radial-gradient(ellipse at 70% 51%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
                         backgroundSize: '100vw 100vh',

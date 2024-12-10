@@ -83,7 +83,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
 
     return (
         <DefaultLayout>
-            <Container maxWidth="sm" sx={{marginTop: "10vh", width: '400px', maxWidth: "500px"}} component="form">
+            <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
                 <Grid2 spacing={1}>
                     <Grid2 spacing={1}>
                         <Autocomplete
