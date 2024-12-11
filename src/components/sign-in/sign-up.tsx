@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 
 import { styled } from '@mui/material/styles';
 
-import { SitemarkIcon } from './CustomIcons';
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
@@ -127,13 +126,18 @@ export default function SignUpCard() {
 
     return (
         <Card variant="outlined">
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                <SitemarkIcon />
+            <Box sx={{display: {xs: 'flex', md: 'none'}}}>
+                <img
+                    src="/ConcertJournal_logo.png"
+                    alt="Logo"
+                    width={"50"}
+                    height={"50"}
+                />
             </Box>
             <Typography
                 component="h1"
                 variant="h4"
-                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+                sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
             >
                 Sign up
             </Typography>
