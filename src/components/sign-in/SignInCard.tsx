@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import {styled} from '@mui/material/styles';
 
 import ForgotPassword from './ForgotPassword';
-import {SitemarkIcon} from './CustomIcons';
 import {useNavigate} from "react-router-dom";
 import {useLayoutEffect, useState} from "react";
 import useAuth from "../../hooks/useAuth";
@@ -112,14 +111,19 @@ export default function SignInCard() {
     return (
         <Card variant="outlined">
             <Box sx={{display: {xs: 'flex', md: 'none'}}}>
-                <SitemarkIcon/>
+                <img
+                    src="/ConcertJournal_logo.png"
+                    alt="Logo"
+                    width={"50"}
+                    height={"50"}
+                />f
             </Box>
             <Typography
                 component="h1"
                 variant="h4"
                 sx={{width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)'}}
             >
-                Sign in
+            Sign in
             </Typography>
             <Box
                 component="form"

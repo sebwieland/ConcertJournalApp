@@ -8,8 +8,6 @@ import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
 import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
 
-import { SitemarkIcon } from './CustomIcons';
-
 const items = [
   {
     icon: <ThumbUpAltRoundedIcon sx={{ color: 'text.secondary' }} />,
@@ -43,7 +41,12 @@ export default function Content() {
       sx={{ flexDirection: 'column', alignSelf: 'center', gap: 4, maxWidth: 450 }}
     >
       <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <SitemarkIcon />
+        <img
+            src="/ConcertJournal_logo.png"
+            alt="Logo"
+            width={"50"}
+            height={"50"}
+        />
       </Box>
       {items.map((item, index) => (
         <Stack key={index} direction="row" sx={{ gap: 2 }}>
