@@ -3,6 +3,8 @@ import DefaultLayout from '../theme/DefaultLayout';
 import DataCollector from './journal/DataCollector';
 import calculateStatistics from "../utils/calculateStatistics"
 import {ConfirmProvider} from "material-ui-confirm";
+import StatCard from './utilities/StatCard';
+import { MusicNote, Group, LocationOn } from '@mui/icons-material';
 
 export default function LandingPage() {
     return (
@@ -15,20 +17,10 @@ export default function LandingPage() {
                         return (
                             <div>
                                 <h1>Welcome to your Concert Journal!</h1>
-                                <div>
-                                    <h2>Interesting Facts:</h2>
-                                    <div>
-                                        <h3>Most Seen Artist:</h3>
-                                        <p>{statistics.mostSeenArtist}</p>
-                                    </div>
-                                    <div>
-                                        <h3>Most artists on a single day:</h3>
-                                        <p>{statistics.mostArtistsOnASingleDay}</p>
-                                    </div>
-                                    <div>
-                                        <h3>Most Visited Location:</h3>
-                                        <p>{statistics.mostVisitedLocation}</p>
-                                    </div>
+                                <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
+                                    <StatCard title="Most Seen Artist" value={statistics.mostSeenArtist} icon={<MusicNote />} />
+                                    <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
+                                    <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
                                 </div>
                             </div>
                         );
@@ -38,4 +30,3 @@ export default function LandingPage() {
         </DefaultLayout>
     );
 };
-

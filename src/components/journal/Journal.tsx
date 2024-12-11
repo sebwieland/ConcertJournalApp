@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import RatingStars from "../utilities/RatingStars";
-import {sortData} from "../utilities/SortData";
+import {sortData} from "../../utils/SortData";
 import {SwipeableList} from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import SortForm from "./SortForm";
