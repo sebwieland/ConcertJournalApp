@@ -32,7 +32,7 @@ const Navbar = () => {
 
     return (
         <AppBar position="sticky">
-            <Toolbar disableGutters>
+            <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <img
                     src="/ConcertJournal_logo.png"
                     alt="Logo"

@@ -14,7 +14,7 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme/>
             {isLoggedIn && (
-                <Navbar /> // Use your Navbar component here
+                <Navbar />
             )}
 
             <Stack
