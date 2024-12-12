@@ -44,7 +44,6 @@ const useEvents = (): UseEvents => {
         },
         {
             onSuccess: () => {
-                console.log('Event created successfully!');
                 queryClient.invalidateQueries('allEvents');
             },
             onError: (error) => {

@@ -39,11 +39,9 @@ const DataCollector = ({children}: DataCollectorProps) => {
     };
 
     const handleDelete = async (id: number) => {
-        console.log("handleDelete function called with id:", id);
         try {
 
             await confirm({description: "This action is permanent!"});
-            console.log("Deleting now: ", id)
             await eventsApi.deleteEvent(id, token);
             refetch();
         } catch (error) {

@@ -53,9 +53,6 @@ class DataTable extends React.Component<DataTableProps, {}> {
 
     render() {
         const {data} = this.props;
-        console.log("data: ", data)
-        console.log("DataTable Rendering table")
-
         return (
             <div style={{height: 600, width: '100%'}}>
                 <DataGrid

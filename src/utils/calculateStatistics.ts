@@ -19,7 +19,6 @@ interface ConcertData {
 }
 
 const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
-
     if (entries.length === 0) {
         return {
             mostSeenArtist: "",
@@ -44,7 +43,11 @@ const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
     const mostVisitedLocation = Object.keys(locationCount).reduce((a, b) => locationCount[a] > locationCount[b] ? a : b);
     const mostArtistsOnASingleDay = Math.max(...Object.values(dailyBandCount));
 
-    return {mostSeenArtist: mostSeenArtist, mostArtistsOnASingleDay: mostArtistsOnASingleDay, mostVisitedLocation: mostVisitedLocation};
+    return {
+        mostSeenArtist: mostSeenArtist,
+        mostArtistsOnASingleDay: mostArtistsOnASingleDay,
+        mostVisitedLocation: mostVisitedLocation
+    };
 }
 
 export default calculateStatistics;

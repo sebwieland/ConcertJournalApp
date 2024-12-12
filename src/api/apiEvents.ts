@@ -8,7 +8,6 @@ const eventsApi = {
                 'Content-Type': 'application/json'
             },
         });
-        console.log("allEventsResponse: ", response.data)
         return response.data;
     },
 
@@ -19,7 +18,6 @@ const eventsApi = {
                 'Content-Type': 'application/json'
             },
         });
-        console.log("createEventResponse: ", response.data)
         return response.data;
     },
 
@@ -30,7 +28,6 @@ const eventsApi = {
                 'Content-Type': 'application/json'
             },
         });
-        console.log("updateEventResponse: ", response.data)
         return response.data;
     },
 
@@ -41,7 +38,6 @@ const eventsApi = {
                 'Content-Type': 'application/json'
             },
         });
-        console.log("deleteEventResponse: ", response.data)
         return response.data;
     },
 

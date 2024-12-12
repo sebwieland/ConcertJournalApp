@@ -25,8 +25,10 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     useEffect(() => {
         if (token) {
             localStorage.setItem('token', token);
+            setIsLoggedIn(true);
         } else {
             localStorage.removeItem('token');
+            setIsLoggedIn(false);
         }
     }, [token]);
 

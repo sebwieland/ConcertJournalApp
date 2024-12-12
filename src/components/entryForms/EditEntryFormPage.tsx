@@ -26,10 +26,8 @@ const EditEntryFormPage = () => {
             try {
                 const event = data.find((event: any) => event.id === parseInt(id));
                 if (!event) {
-                    console.log('No event found with id', id);
                     return;
                 }
-                console.log('Found event:', event);
                 setBandName(event.bandName);
                 setPlace(event.place);
                 setDate(dayjs(event.date));
