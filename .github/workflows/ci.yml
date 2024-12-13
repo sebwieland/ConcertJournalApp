@@ -60,6 +60,10 @@ jobs:
           git tag ${{ env.new_version }}
           git push origin ${{ env.new_version }}
 
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push Docker image
         if: github.ref =='refs/heads/main'
         uses: docker/build-push-action@v3
@@ -67,3 +71,4 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/concertjournal:frontend-${{ env.new_version }}
+          platforms: linux/amd64,linux/arm64
