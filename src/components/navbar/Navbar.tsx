@@ -9,7 +9,7 @@ import axios from "axios";
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = useState<HTMLElement | null>(null);
     const navigate = useNavigate()
-    const API_URL = 'http://localhost:8080';
+    const API_URL = '';
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget as HTMLElement | null);
@@ -32,7 +32,7 @@ const Navbar = () => {
 
     return (
         <AppBar position="sticky">
-            <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Toolbar disableGutters sx={{display: 'flex', justifyContent: 'space-between'}}>
                 <img
                     src="/ConcertJournal_logo.png"
                     alt="Logo"
@@ -78,7 +78,7 @@ const Navbar = () => {
                     }}
                     open={Boolean(anchorElNav)}
                     onClose={handleCloseNavMenu}
-                    sx={{ display: { md: 'none' } }}
+                    sx={{display: {md: 'none'}}}
                 >
                     <MenuItem onClick={() => {
                         navigate('/your-journal');
