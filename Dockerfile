@@ -19,5 +19,5 @@ RUN npm run build
 # Expose the port that the application will use
 EXPOSE 3000
 
-# Run the command to start the development server when the container launches
-CMD ["npm", "start"]
+# Run the command to serve the production build when the container launches
+CMD ["npx", "serve", "-s", "build", "--port", "3000"]
