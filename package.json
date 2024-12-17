@@ -24,7 +24,8 @@
     "web-vitals": "^2.1.4",
     "react-router-dom": "^6.26.1",
     "dayjs": "^1.11.13",
-    "material-ui-confirm": "^3.0.16"
+    "material-ui-confirm": "^3.0.16",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "react-scripts": "^5.0.1"
@@ -52,6 +53,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://localhost:8080"
+  }
 }

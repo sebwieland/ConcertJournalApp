@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Run the command to serve the production build when the container launches
-CMD ["npx", "serve", "-s", "build", "--port", "3000"]
+CMD ["npx", "serve", "-s", "build"]
