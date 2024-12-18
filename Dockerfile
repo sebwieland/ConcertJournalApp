@@ -1,5 +1,5 @@
-# Use an official Node.js 16 image as the base
-FROM node:16-alpine
+# Use an official Node.js 16 image as the base for building
+FROM node:16-alpine AS build
 
 # Set the working directory to /app
 WORKDIR /app
@@ -12,6 +12,12 @@ RUN npm install
 
 # Copy the application code to the working directory
 COPY . .
+
+# Accept build arguments
+ARG REACT_APP_BACKEND_IP
+
+# Set environment variable for build
+ENV REACT_APP_BACKEND_IP=$REACT_APP_BACKEND_IP
 
 # Build the React application
 RUN npm run build
