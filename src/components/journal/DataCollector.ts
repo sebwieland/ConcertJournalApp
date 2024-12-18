@@ -1,7 +1,6 @@
-import {useState, useEffect} from 'react';
 import useEvents from "../../hooks/useEvents";
 import {useConfirm} from "material-ui-confirm";
-import eventsApi from "../../api/apiEvents";
+import EventsApi from "../../api/apiEvents";
 import useAuth from "../../hooks/useAuth";
 import {useNavigate} from "react-router-dom";
 
@@ -27,9 +26,10 @@ export interface DataCollectorState {
     onDelete: (id: number) => void;
 }
 
+
 const DataCollector = ({children}: DataCollectorProps) => {
+    const eventsApi = EventsApi();
     const {data, refetch} = useEvents();
-    const [localData, setLocalData] = useState(data);
     const confirm = useConfirm();
     const { token } = useAuth();
     const navigate = useNavigate()
@@ -49,13 +49,8 @@ const DataCollector = ({children}: DataCollectorProps) => {
         }
     };
 
-
-    useEffect(() => {
-        setLocalData(data);
-    }, [data]);
-
     return children({
-        data: localData,
+        data,
         onEdit: handleEdit,
         onDelete: handleDelete
     });

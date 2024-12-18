@@ -1,5 +1,5 @@
-import {useMutation, useQuery, useQueryClient} from 'react-query';
-import eventsApi from '../api/apiEvents';
+import {useQuery} from 'react-query';
+import EventsApi from '../api/apiEvents';
 import useAuth from './useAuth';
 
 
@@ -17,9 +17,11 @@ interface UseEvents {
     ) => Promise<void>;
 }
 
+
 const useEvents = (): UseEvents => {
+    const eventsApi = EventsApi();
+
     const { token } = useAuth();
-    const queryClient = useQueryClient();
 
     const { data, error, isLoading, refetch } = useQuery(
         'allEvents',
@@ -34,24 +36,6 @@ const useEvents = (): UseEvents => {
         }
     );
 
-    const { mutateAsync: createEventMutation } = useMutation(
-        async (variables: {data: any, token: string}) => {
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
-            const response = await eventsApi.createEvent(variables.data, token);
-            return response.data;
-        },
-        {
-            onSuccess: () => {
-                queryClient.invalidateQueries('allEvents');
-            },
-            onError: (error) => {
-                console.error('Error creating event:', error);
-            },
-        }
-    );
-
     const createEvent = async (
         data: { /* event data */ },
         options?: {
@@ -63,7 +47,7 @@ const useEvents = (): UseEvents => {
             throw new Error('No authentication token found');
         }
         try {
-            const response = await createEventMutation({ data, token });
+            const response = await eventsApi.createEvent(data, token);
             options?.onSuccess?.(response);
         } catch (error) {
             options?.onError?.(error);

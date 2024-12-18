@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import useEvents from '../../hooks/useEvents';
-import eventsApi from '../../api/apiEvents';
+import EventsApi from '../../api/apiEvents';
 import useAuth from '../../hooks/useAuth';
 import dayjs from "dayjs";
 import EntryForm from "./EntryForm";
 
+
 const EditEntryFormPage = () => {
+    const eventsApi = EventsApi();
+
     const { id } = useParams();
     const { data, refetch } = useEvents();
     const { token } = useAuth();

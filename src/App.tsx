@@ -10,6 +10,7 @@ import {AuthProvider} from "./contexts/AuthContext";
 import AuthenticatedPage from "./components/AuthenticatedPage";
 import EditEntryFormPage from "./components/entryForms/EditEntryFormPage";
 import SignUpSide from "./components/sign-in/SignUpSide";
+import {ConfigProvider} from "./contexts/ConfigContext";
 
 interface AppProps {
     // No props needed for this component
@@ -18,21 +19,25 @@ interface AppProps {
 class App extends React.Component<AppProps, {}> {
     render() {
         return (
-            <AuthProvider>
-                <LocalizationProvider dateAdapter={AdapterDayjs}> {
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/" element={<AuthenticatedPage element={<LandingPage />} />} />
-                            <Route path="/new-entry" element={<AuthenticatedPage element={<CreateNewEntryFormPage />} />} />
-                            <Route path="/your-journal" element={<AuthenticatedPage element={<Journal />} />} />
-                            <Route path="/edit-entry/:id" element={<AuthenticatedPage element={<EditEntryFormPage />} />} />
-                            <Route path="/sign-up" element={<SignUpSide />} />
-                            <Route path="/sign-in" element={<SignInSide/>}/>
-                        </Routes>
-                    </BrowserRouter>
-                }
-                </LocalizationProvider>
-            </AuthProvider>
+            <ConfigProvider>
+                <AuthProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}> {
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path="/" element={<AuthenticatedPage element={<LandingPage/>}/>}/>
+                                <Route path="/new-entry"
+                                       element={<AuthenticatedPage element={<CreateNewEntryFormPage/>}/>}/>
+                                <Route path="/your-journal" element={<AuthenticatedPage element={<Journal/>}/>}/>
+                                <Route path="/edit-entry/:id"
+                                       element={<AuthenticatedPage element={<EditEntryFormPage/>}/>}/>
+                                <Route path="/sign-up" element={<SignUpSide/>}/>
+                                <Route path="/sign-in" element={<SignInSide/>}/>
+                            </Routes>
+                        </BrowserRouter>
+                    }
+                    </LocalizationProvider>
+                </AuthProvider>
+            </ConfigProvider>
         );
     }
 }

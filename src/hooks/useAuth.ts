@@ -1,7 +1,7 @@
 import {useContext, useState} from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useQueryClient, useMutation } from 'react-query';
-import authApi from '../api/apiAuth';
+import useAuthApi from "../api/apiAuth";
 
 interface UseAuth {
     token: string;
@@ -19,6 +19,7 @@ interface UseAuth {
 }
 
 const useAuth = (): UseAuth => {
+    const authApi = useAuthApi();
     const authContext = useContext(AuthContext);
     if (!authContext) {
         throw new Error('AuthContext is not provided');
