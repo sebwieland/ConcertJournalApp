@@ -1,7 +1,7 @@
 import useApiClient from './apiClient';
 
 interface LoginResponse {
-    token: string;
+    accessToken: string;
 }
 
 interface LoginRequest {
@@ -19,7 +19,7 @@ const useAuthApi = () => {
 
         const response = await axiosInstance.post('/login', params.toString(), {
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
         });
 

@@ -8,7 +8,7 @@ const useApiClient = () => {
     return useMemo(() => {
         console.log("API_URL " + API_URL)
         return axios.create({
-            baseURL: API_URL,
+            baseURL: API_URL
         });
     }, [API_URL]);
 };

@@ -31,9 +31,9 @@ const useAuth = (): UseAuth => {
 
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            setToken(data.token);
+            console.log(data)
+            setToken(data.accessToken);
             setIsLoggedIn(true);
-            queryClient.invalidateQueries('token');
         },
         onError: (error: unknown) => {
             if (error instanceof Error) {

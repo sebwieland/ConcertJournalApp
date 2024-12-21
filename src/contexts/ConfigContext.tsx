@@ -23,7 +23,7 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 setLoading(false);
             })
             .catch(error => {
-                setConfig({backendURL: "http://localhost:7070"})
+                setConfig({backendURL: "http://localhost:8080"})
                 setLoading(false);
             });
     }, []);

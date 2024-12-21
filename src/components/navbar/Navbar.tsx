@@ -25,7 +25,6 @@ const Navbar = () => {
         } catch (error: unknown) {
             console.error('Error logging out:', error);
         } finally {
-            localStorage.removeItem('token');
             window.location.href = '/';
         }
     };

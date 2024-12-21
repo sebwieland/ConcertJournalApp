@@ -36,7 +36,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 export default function SignUpCard() {
     const navigate = useNavigate();
-    const { signUp } = useAuth();
+    const { signUp, token } = useAuth();
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -44,7 +44,6 @@ export default function SignUpCard() {
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = useState('');
     const [signUpError, setSignUpMessage] = useState('');
-    const [token, setToken] = useState(localStorage.getItem('token'));
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -76,10 +75,6 @@ export default function SignUpCard() {
             console.error('Invalid inputs');
         }
     };
-
-    useEffect(() => {
-        setToken(localStorage.getItem('token'));
-    }, []);
 
     useEffect(() => {
         if (token) {

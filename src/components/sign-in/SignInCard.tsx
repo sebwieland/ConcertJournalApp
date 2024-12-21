@@ -34,7 +34,7 @@ const Card = styled(MuiCard)(({theme}) => ({
 
 export default function SignInCard() {
     const navigate = useNavigate();
-    const {login} = useAuth();
+    const {login, token} = useAuth();
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -62,11 +62,10 @@ export default function SignInCard() {
     };
 
     useLayoutEffect(() => {
-        const token = localStorage.getItem('token');
         if (token) {
             navigate('/', {replace: true});
         }
-    }, [navigate]);
+    }, [token, navigate]);
 
 
     const validateInputs = () => {
