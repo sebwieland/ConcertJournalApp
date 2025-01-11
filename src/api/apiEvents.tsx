@@ -1,7 +1,7 @@
 import useApiClient from "./apiClient";
 
 const EventsApi = () => {
-    const apiClient = useApiClient();
+    const apiClient = useApiClient().apiClient;
 
     const getAllEvents = async (token: string) => {
         const response = await apiClient.get('/allEvents', {

@@ -66,7 +66,9 @@ const useAuth = (): UseAuth => {
     });
 
     const login = async (data: { email: string; password: string }) => {
+        await authApi.fetchXSRFtoken()
         await loginMutation(data);
+        await authApi.fetchXSRFtoken()
     };
 
     const signUp = async (data: {
@@ -83,6 +85,10 @@ const useAuth = (): UseAuth => {
         setToken('');
         setIsLoggedIn(false);
         queryClient.invalidateQueries('token');
+        document.cookie.split(';').forEach((cookie) => {
+            const cookieName = cookie.split('=')[0].trim();
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        });
     };
 
     return { token, login, logout, signUp, isLoading, error };

@@ -4,12 +4,13 @@ import React, {useState} from 'react';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import useApiClient from "../../api/apiClient";
+import useAuthApi from "../../api/apiAuth";
 
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = useState<HTMLElement | null>(null);
     const navigate = useNavigate()
-    const API_URL = '';
+    const api = useAuthApi();
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget as HTMLElement | null);
@@ -21,7 +22,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            await axios.post(`${API_URL}/logout`);
+            await api.logout()
         } catch (error: unknown) {
             console.error('Error logging out:', error);
         } finally {
