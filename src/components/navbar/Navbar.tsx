@@ -4,7 +4,6 @@ import React, {useState} from 'react';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
-import useApiClient from "../../api/apiClient";
 import useAuthApi from "../../api/apiAuth";
 
 const Navbar = () => {

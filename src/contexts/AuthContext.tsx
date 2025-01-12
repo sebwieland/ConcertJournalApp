@@ -48,13 +48,13 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
         } catch (error) {
             console.error(error);
         }
-    }, [apiClient]);
+    }, [apiClient, isLoggedIn]);
 
     useEffect(() => {
         if (isLoggedIn) {
             refreshToken().catch((error) => console.error(error));
         }
-    }, [refreshToken]);
+    }, [refreshToken, isLoggedIn]);
 
     useEffect(() => {
         const refreshAccessToken = async () => {
