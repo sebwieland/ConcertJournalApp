@@ -9,6 +9,7 @@ interface AuthContextInterface {
     refreshToken: () => void;
     csrfToken: string;
     updateCsrfToken: () => void;
+    logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
@@ -18,15 +19,35 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
     const [accessToken, setAccessToken] = useState<string>('');
     const apiClient = useApiClient().apiClient;
     const [csrfToken, setCsrfToken] = useState('');
+    const [shouldRefreshToken, setShouldRefreshToken] = useState(true);
 
     useEffect(() => {
+        if (!shouldRefreshToken) return;
         const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
         if (cookie && cookie[1]) {
             setCsrfToken(cookie[1]);
         } else {
             console.warn('CSRF token not found in cookies');
         }
-    }, []);
+
+        const refreshAccessToken = async () => {
+            if (!accessToken) {
+                try {
+                    const response = await apiClient.post('/refresh-token', {}, {
+                        'withCredentials': true,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    setAccessToken(response.data.accessToken);
+                    setIsLoggedIn(true);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        };
+        refreshAccessToken();
+    }, [apiClient, accessToken, shouldRefreshToken]);
 
     const updateCsrfToken = () => {
         const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
@@ -36,7 +57,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
     };
 
     const refreshToken = useCallback(async () => {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn || !shouldRefreshToken) return;
         try {
             const response = await apiClient.post('/refresh-token', {}, {
                 'withCredentials': true,
@@ -48,7 +69,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
         } catch (error) {
             console.error(error);
         }
-    }, [apiClient, isLoggedIn]);
+    }, [apiClient, isLoggedIn, shouldRefreshToken]);
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -57,32 +78,17 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
     }, [refreshToken, isLoggedIn]);
 
     useEffect(() => {
-        const refreshAccessToken = async () => {
-            if (accessToken) {
-                try {
-                    await refreshToken();
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        };
-        refreshAccessToken();
-    }, [accessToken, refreshToken]);
-
-    useEffect(() => {
-        if (accessToken) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
-    }, [accessToken]);
-
-    useEffect(() => {
         if (accessToken) {
             const intervalId = setInterval(refreshToken, 2 * 60 * 1000); // 2 minutes
             return () => clearInterval(intervalId);
         }
     }, [accessToken, refreshToken]);
+
+    const logout = useCallback(() => {
+        setShouldRefreshToken(false); // Set the flag to false when logging out
+        // setIsLoggedIn(false);
+        // setAccessToken('');
+    }, []);
 
     return (
         <AuthContext.Provider value={{
@@ -92,7 +98,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
             setToken: setAccessToken,
             refreshToken,
             csrfToken,
-            updateCsrfToken
+            updateCsrfToken,
+            logout
         }}>
             {children}
         </AuthContext.Provider>

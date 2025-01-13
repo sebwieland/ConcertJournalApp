@@ -17,11 +17,13 @@ import {SwipeableList} from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import SortForm from "./SortForm";
 import { StyledSwipeableListItem, leadingActions, trailingActions } from "./SwipeableListItem"
+import {useState} from "react";
 
 
 const Journal = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const [sortOrder, setSortOrder] = useState({ column: 'date', order: 'desc' });
 
     if (isMobile) {
         return (
@@ -31,11 +33,14 @@ const Journal = () => {
                         {({data, onEdit, onDelete}) => (
                             <Grid2 container spacing={2}>
                                 <Grid2 style={{width: '100%'}}>
-                                    <SortForm/>
+                                    <SortForm
+                                        sortOrder={sortOrder}
+                                        onSortOrderChange={(newSortOrder) => setSortOrder(newSortOrder)}
+                                    />
                                 </Grid2>
                                 <Grid2 style={{width: '100%'}}>
                                     <SwipeableList style={{width: '100%'}}>
-                                        {sortData(data, 'date', 'desc').map((item) => (
+                                        {sortData(data, sortOrder.column, sortOrder.order).map((item) => (
                                             <StyledSwipeableListItem
                                                 key={item.id}
                                                 leadingActions={leadingActions(onDelete, item.id)}

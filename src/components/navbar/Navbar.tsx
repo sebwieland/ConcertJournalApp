@@ -4,12 +4,12 @@ import React, {useState} from 'react';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
-import useAuthApi from "../../api/apiAuth";
+import useAuth from "../../hooks/useAuth";
 
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = useState<HTMLElement | null>(null);
     const navigate = useNavigate()
-    const api = useAuthApi();
+    const {logout} = useAuth();
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget as HTMLElement | null);
@@ -21,11 +21,10 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            await api.logout()
+            console.log("!Handling logout")
+            await logout()
         } catch (error: unknown) {
             console.error('Error logging out:', error);
-        } finally {
-            window.location.href = '/';
         }
     };
 
@@ -59,7 +58,7 @@ const Navbar = () => {
                     <Button color="inherit" onClick={() => navigate('/new-entry')}>
                         Add Entry
                     </Button>
-                    <Button color="inherit" onClick={handleLogout}>
+                    <Button type="button" color="inherit" onClick={handleLogout}>
                         Logout
                     </Button>
                 </Box>

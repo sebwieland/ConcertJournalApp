@@ -1,6 +1,6 @@
 import {useContext, useState} from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { useQueryClient, useMutation } from 'react-query';
+import { useMutation } from 'react-query';
 import useAuthApi from "../api/apiAuth";
 
 interface UseAuth {
@@ -25,13 +25,11 @@ const useAuth = (): UseAuth => {
         throw new Error('AuthContext is not provided');
     }
     const { setIsLoggedIn, token, setToken } = authContext;
-    const queryClient = useQueryClient();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
 
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            console.log(data)
             setToken(data.accessToken);
             setIsLoggedIn(true);
         },
@@ -81,14 +79,17 @@ const useAuth = (): UseAuth => {
         await signUpMutation(data);
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await authApi.logout();
         setToken('');
         setIsLoggedIn(false);
-        queryClient.invalidateQueries('token');
-        document.cookie.split(';').forEach((cookie) => {
-            const cookieName = cookie.split('=')[0].trim();
-            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        });
+        authContext.logout();
+        // queryClient.invalidateQueries('token');
+        // document.cookie.split(';').forEach((cookie) => {
+        //     const cookieName = cookie.split('=')[0].trim();
+        //     document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        // });
+        return Promise.resolve()
     };
 
     return { token, login, logout, signUp, isLoading, error };

@@ -16,16 +16,18 @@ const sortOrderOptions: SortCriteria[] = [
     {value: 'desc', label: 'Descending'}
 ];
 
-const SortForm = () => {
-    const [sortCriteria, setSortCriteria] = React.useState('date');
-    const [sortOrder, setSortOrder] = React.useState('desc');
+interface SortFormProps {
+    sortOrder: { column: string; order: string };
+    onSortOrderChange: (newSortOrder: { column: string; order: string }) => void;
+}
 
+const SortForm = ({ sortOrder, onSortOrderChange }: SortFormProps) => {
     const handleSortCriteriaChange = (event: SelectChangeEvent<string>) => {
-        setSortCriteria(event.target.value as string);
+        onSortOrderChange({ column: event.target.value as string, order: sortOrder.order });
     };
 
     const handleSortOrderChange = (event: SelectChangeEvent<string>) => {
-        setSortOrder(event.target.value as string);
+        onSortOrderChange({ column: sortOrder.column, order: event.target.value as string });
     };
 
     return (
@@ -36,7 +38,7 @@ const SortForm = () => {
                     <Select
                         labelId="sort-criteria-label"
                         id="sort-criteria"
-                        value={sortCriteria}
+                        value={sortOrder.column}
                         label="Sort by"
                         onChange={handleSortCriteriaChange}
                     >
@@ -54,7 +56,7 @@ const SortForm = () => {
                     <Select
                         labelId="sort-order-label"
                         id="sort-order"
-                        value={sortOrder}
+                        value={sortOrder.order}
                         label="Sort order"
                         onChange={handleSortOrderChange}
                     >
