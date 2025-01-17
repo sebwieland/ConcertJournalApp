@@ -26,8 +26,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
         const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
         if (cookie && cookie[1]) {
             setCsrfToken(cookie[1]);
-        } else {
-            console.warn('CSRF token not found in cookies');
         }
 
         const refreshAccessToken = async () => {
