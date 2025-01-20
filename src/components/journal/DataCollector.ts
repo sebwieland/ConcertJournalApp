@@ -13,7 +13,7 @@ export interface DataCollectorState {
         id: number,
         bandName: string,
         place: string,
-        date: Date
+        date: string[]
         comment: string,
         rating: number,
         appUser: {
@@ -40,7 +40,6 @@ const DataCollector = ({children}: DataCollectorProps) => {
 
     const handleDelete = async (id: number) => {
         try {
-
             await confirm({description: "This action is permanent!"});
             await eventsApi.deleteEvent(id, token);
             refetch();

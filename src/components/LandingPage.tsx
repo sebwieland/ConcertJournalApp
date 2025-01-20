@@ -12,6 +12,7 @@ export default function LandingPage() {
             <ConfirmProvider>
                 <DataCollector>
                     {({data}) => {
+                        console.log("data ", data)
                         const statistics = calculateStatistics(data);
                         return (
                             <div>

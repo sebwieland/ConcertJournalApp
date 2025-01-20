@@ -19,7 +19,7 @@ class DataTable extends React.Component<DataTableProps, {}> {
             field: 'date', headerName: 'Date', width: 130,
             type: 'date' as const, sortType: 'date',
             valueFormatter: (params: any) => {
-                const date = dayjs(params);
+                const date = dayjs(new Date(params[0], params[1]-1, params[2]));
                 return date.format('DD/MM/YYYY');
             }
         },

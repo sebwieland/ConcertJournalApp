@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 interface Statistics {
     mostSeenArtist: string;
     mostArtistsOnASingleDay: number;
@@ -8,7 +10,7 @@ interface ConcertData {
     id: number;
     bandName: string;
     place: string;
-    date: Date;
+    date: string[];
     comment: string;
     rating: number;
     appUser: {
@@ -31,7 +33,7 @@ const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
     const dailyBandCount: { [date: string]: number } = {};
 
     entries.forEach((item) => {
-        const date = new Date(item.date); // assuming item.date is a valid Date object
+        const date = dayjs(item.date[0], item.date[1], item.date[2]);
         const dateString = date.toISOString().split('T')[0];
         bandCount[item.bandName] = (bandCount[item.bandName] || 0) + 1;
         locationCount[item.place] = (locationCount[item.place] || 0) + 1;

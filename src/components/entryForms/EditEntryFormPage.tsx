@@ -33,7 +33,9 @@ const EditEntryFormPage = () => {
                 }
                 setBandName(event.bandName);
                 setPlace(event.place);
-                setDate(dayjs(event.date));
+                // console.log("Edit date: ", event.date)
+                // console.log("Edit date corrected: ", dayjs(new Date(event.date[0], event.date[1]-1, event.date[2])))
+                setDate(dayjs(new Date(event.date[0], event.date[1]-1, event.date[2])));
                 setRating(event.rating);
                 setComment(event.comment);
             } catch (error) {
