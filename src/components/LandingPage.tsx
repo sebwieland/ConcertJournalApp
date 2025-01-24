@@ -4,7 +4,7 @@ import DataCollector from './journal/DataCollector';
 import calculateStatistics from "../utils/calculateStatistics"
 import {ConfirmProvider} from "material-ui-confirm";
 import StatCard from './utilities/StatCard';
-import { MusicNote, Group, LocationOn } from '@mui/icons-material';
+import {MusicNote, Group, LocationOn, PlaylistAddCheck} from '@mui/icons-material';
 
 export default function LandingPage() {
     return (
@@ -17,6 +17,7 @@ export default function LandingPage() {
                             <div>
                                 <h1>Welcome to your Concert Journal!</h1>
                                 <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
+                                    <StatCard title="Concerts attended" value={statistics.totalCount.toString()} icon={<PlaylistAddCheck />} />
                                     <StatCard title="Most Seen Artist" value={statistics.mostSeenArtist} icon={<MusicNote />} />
                                     <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
                                     <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />

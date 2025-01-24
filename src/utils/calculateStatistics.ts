@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
 interface Statistics {
+    totalCount: number;
     mostSeenArtist: string;
     mostArtistsOnASingleDay: number;
     mostVisitedLocation: string;
@@ -23,6 +24,7 @@ interface ConcertData {
 const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
     if (entries.length === 0) {
         return {
+            totalCount: 0,
             mostSeenArtist: "",
             mostArtistsOnASingleDay: 0,
             mostVisitedLocation: "",
@@ -33,19 +35,20 @@ const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
     const dailyBandCount: { [date: string]: number } = {};
 
     entries.forEach((item) => {
-        const date = dayjs(item.date[0], item.date[1], item.date[2]);
+        const date = dayjs(`${item.date[0]}-${item.date[1]}-${item.date[2]}`);
         const dateString = date.toISOString().split('T')[0];
         bandCount[item.bandName] = (bandCount[item.bandName] || 0) + 1;
         locationCount[item.place] = (locationCount[item.place] || 0) + 1;
         dailyBandCount[dateString] = (dailyBandCount[dateString] || 0) + 1;
     });
 
-
+    const totalCount = entries.length;
     const mostSeenArtist = Object.keys(bandCount).reduce((a, b) => bandCount[a] > bandCount[b] ? a : b);
     const mostVisitedLocation = Object.keys(locationCount).reduce((a, b) => locationCount[a] > locationCount[b] ? a : b);
     const mostArtistsOnASingleDay = Math.max(...Object.values(dailyBandCount));
 
     return {
+        totalCount: totalCount,
         mostSeenArtist: mostSeenArtist,
         mostArtistsOnASingleDay: mostArtistsOnASingleDay,
         mostVisitedLocation: mostVisitedLocation

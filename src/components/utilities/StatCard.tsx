@@ -11,15 +11,15 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon }) => {
     return (
-        <Card style={{margin: '20px', width: '300px'}}>
-            <CardContent>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
+        <Card style={{ margin: '20px', width: '300px' }}>
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     {icon}
-                    <Typography variant="h5" component="h2" sx={{marginLeft: '10px', textAlign: 'center'}}>
+                    <Typography variant="h5" component="h2" sx={{ marginLeft: '10px' }}>
                         {title}:
                     </Typography>
                 </Box>
-                <Typography variant="h5" component="p" sx={{marginTop: '10px', textAlign: 'center'}}>
+                <Typography variant="h5" component="p" sx={{ marginTop: '10px' }}>
                     {value}
                 </Typography>
             </CardContent>
