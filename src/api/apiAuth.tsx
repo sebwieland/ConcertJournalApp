@@ -27,7 +27,7 @@ const useAuthApi = () => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const { csrfToken, refreshToken } = authContext;
+    const { csrfToken } = authContext;
 
     const login = async (data: LoginRequest): Promise<LoginResponse> => {
         const params = new URLSearchParams();

@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import useApiClient from '../api/apiClient';
 
 interface AuthContextInterface {
+    isLoading: boolean;
     isLoggedIn: boolean;
     setIsLoggedIn: (isLoggedIn: boolean) => void;
     token: string;
@@ -18,6 +19,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [token, setAccessToken] = useState<string>('');
     const [refreshToken, setRefreshToken] = useState<string>('');
     const [csrfToken, setCsrfToken] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const apiClient = useApiClient().apiClient;
 
     const fetchCsrfToken = useCallback(async () => {
@@ -32,17 +34,18 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [apiClient]);
 
-    const setTokenState = (accessToken: string, refreshToken: string) => {
+    const setTokenState = useCallback((accessToken: string, refreshToken: string) => {
         setAccessToken(accessToken);
         setIsLoggedIn(true);
         setRefreshToken(refreshToken);
-    };
+    }, [setAccessToken, setIsLoggedIn, setRefreshToken]);
 
-    const setLoggedOut = () => {
+    const setLoggedOut = useCallback(() => {
         setIsLoggedIn(false);
         setAccessToken('');
         setRefreshToken('');
-    };
+        setIsLoading(false);
+    }, [setIsLoggedIn, setAccessToken, setRefreshToken, setIsLoading]);
 
     const refreshTokenApiCall = useCallback(async () => {
         if (!refreshToken) return;
@@ -56,6 +59,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 },
             });
             setTokenState(response.data.accessToken, refreshToken);
+            setIsLoading(false);
         } catch (error) {
             setLoggedOut();
             console.error("Failed to refresh token:", error);
@@ -69,20 +73,16 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             if (storedRefreshToken) {
                 setRefreshToken(storedRefreshToken);
                 await refreshTokenApiCall();
+            } else {
+                setIsLoading(false);
             }
         };
         setupAuth();
     }, [fetchCsrfToken, refreshTokenApiCall]);
 
-    useEffect(() => {
-        if (token) {
-            const intervalId = setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
-            return () => clearInterval(intervalId);
-        }
-    }, [token, refreshTokenApiCall]);
-
     return (
         <AuthContext.Provider value={{
+            isLoading,
             isLoggedIn,
             setIsLoggedIn,
             token,

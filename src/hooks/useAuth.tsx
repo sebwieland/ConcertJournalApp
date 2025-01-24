@@ -31,7 +31,6 @@ const useAuth = (): UseAuth => {
     const setTokenState = (accessToken: string, refreshToken: string) => {
         setAccessToken(accessToken);
         setIsLoggedIn(true);
-        document.cookie = `refreshToken=${refreshToken}; path=/`;
     };
 
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
@@ -74,7 +73,6 @@ const useAuth = (): UseAuth => {
         onSuccess: () => {
             authContext.setIsLoggedIn(false);
             authContext.setAccessToken('');
-            document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
             fetchCsrfToken();
         },
         onError: (error) => {

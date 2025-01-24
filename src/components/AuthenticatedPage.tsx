@@ -1,4 +1,4 @@
-import React, {memo, useEffect} from 'react';
+import React, { memo, useEffect } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Navigate } from "react-router-dom";
@@ -9,21 +9,23 @@ interface AuthenticatedPageProps {
 }
 
 const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
-    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
-    const [isLoading, setIsLoading] = React.useState(true);
+    const authContext = useContext(AuthContext);
+    if (!authContext) {
+        throw new Error('AuthContext is not provided');
+    }
+    const { isLoggedIn, isLoading: authLoading } = authContext;
+    const [isLoading, setIsLoading] = React.useState(authLoading);
 
     useEffect(() => {
-        if (element) {
-            setIsLoading(false);
-        }
-    }, [element]);
-
-    if (!isLoggedIn) {
-        return <Navigate to="/sign-in" replace />;
-    }
+        setIsLoading(authLoading);
+    }, [authLoading]);
 
     if (isLoading) {
         return <LoadingIndicator />;
+    }
+
+    if (!isLoggedIn) {
+        return <Navigate to="/sign-in" replace />;
     }
 
     return element;
