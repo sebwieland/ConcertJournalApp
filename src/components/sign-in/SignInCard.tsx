@@ -103,7 +103,7 @@ export default function SignInCard() {
                     alt="Logo"
                     width={"50"}
                     height={"50"}
-                />f
+                />
             </Box>
             <Typography
                 component="h1"

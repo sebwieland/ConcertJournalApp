@@ -1,0 +1,41 @@
+# Node.js modules and package lock
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# React build output
+build/
+
+# Git files
+.git
+.gitignore
+
+# VS Code specific
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Documentation and examples
+docs/
+examples/
+
+# Testing files
+*.spec.js
+*.test.js
+test/
+tests/
+
+# Other environment files
+.env
+config/development.env
+config/production.env
