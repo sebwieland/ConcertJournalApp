@@ -7,7 +7,6 @@ interface AuthContextInterface {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
     token: string;
     setAccessToken: (token: string) => void;
-    refreshToken: () => void;
     csrfToken: string;
     fetchCsrfToken: () => void;
 }
@@ -17,7 +16,7 @@ const AuthContext = createContext<AuthContextInterface | null>(null);
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [token, setAccessToken] = useState<string>('');
-    const [refreshToken, setRefreshToken] = useState<string>('');
+    const [, setRefreshToken] = useState<string>('');
     const [csrfToken, setCsrfToken] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const apiClient = useApiClient().apiClient;
@@ -42,7 +41,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [setIsLoggedIn, setAccessToken, setRefreshToken, setIsLoading]);
 
     const refreshTokenApiCall = useCallback(async () => {
-        if (!isLoggedIn || !refreshToken) return;
         setIsLoading(true); // Start loading state
         try {
             const response = await apiClient.post('/refresh-token', {}, {
@@ -53,29 +51,35 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 },
             });
             setAccessToken(response.data.accessToken);
-            setIsLoading(false); // Stop loading state on success
+            setIsLoggedIn(true);
         } catch (error) {
             setLoggedOut();
-            setIsLoading(false); // Stop loading state on error
             console.error("Failed to refresh token:", error);
+        } finally {
+            setIsLoading(false); // Ensure isLoading is set to false after attempt
         }
-    }, [refreshToken, csrfToken, apiClient, setLoggedOut, isLoggedIn]);
+    }, [csrfToken, apiClient, setLoggedOut, setAccessToken, setIsLoggedIn]);
 
     useEffect(() => {
         const setupAuth = async () => {
-            await fetchCsrfToken();
-            const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
-            if (storedRefreshToken) {
-                setRefreshToken(storedRefreshToken);
-                await refreshTokenApiCall();
-            } else {
-                setIsLoading(false);
+            try {
+                await fetchCsrfToken();
+                const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
+                if (storedRefreshToken) {
+                    setRefreshToken(storedRefreshToken);
+                    await refreshTokenApiCall();
+                } else {
+                    setLoggedOut();
+                }
+            } catch (error) {
+                console.error("Error during setupAuth:", error);
+                setLoggedOut();
             }
         };
         setupAuth();
         const intervalId = setInterval(refreshTokenApiCall, 2*60*1000); // 2 minutes
         return () => clearInterval(intervalId);
-    }, [fetchCsrfToken, refreshTokenApiCall]);
+    }, [fetchCsrfToken, refreshTokenApiCall, setLoggedOut, setIsLoading, setAccessToken, setIsLoggedIn]);
 
     return (
         <AuthContext.Provider value={{
@@ -84,7 +88,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setIsLoggedIn,
             token,
             setAccessToken,
-            refreshToken: refreshTokenApiCall,
             csrfToken,
             fetchCsrfToken
         }}>
