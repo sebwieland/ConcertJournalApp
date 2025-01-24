@@ -34,12 +34,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [apiClient]);
 
-    const setTokenState = useCallback((accessToken: string, refreshToken: string) => {
-        setAccessToken(accessToken);
-        setIsLoggedIn(true);
-        setRefreshToken(refreshToken);
-    }, [setAccessToken, setIsLoggedIn, setRefreshToken]);
-
     const setLoggedOut = useCallback(() => {
         setIsLoggedIn(false);
         setAccessToken('');
@@ -49,22 +43,23 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const refreshTokenApiCall = useCallback(async () => {
         if (!isLoggedIn || !refreshToken) return;
+        setIsLoading(true); // Start loading state
         try {
             const response = await apiClient.post('/refresh-token', {}, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-XSRF-TOKEN': csrfToken,
-                    'Refresh-Token': refreshToken
                 },
             });
-            setTokenState(response.data.accessToken, refreshToken);
-            setIsLoading(false);
+            setAccessToken(response.data.accessToken);
+            setIsLoading(false); // Stop loading state on success
         } catch (error) {
             setLoggedOut();
+            setIsLoading(false); // Stop loading state on error
             console.error("Failed to refresh token:", error);
         }
-    }, [refreshToken, csrfToken, apiClient, setTokenState, setLoggedOut, isLoggedIn]);
+    }, [refreshToken, csrfToken, apiClient, setLoggedOut, isLoggedIn]);
 
     useEffect(() => {
         const setupAuth = async () => {
@@ -78,6 +73,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             }
         };
         setupAuth();
+        const intervalId = setInterval(refreshTokenApiCall, 2*60*1000); // 2 minutes
+        return () => clearInterval(intervalId);
     }, [fetchCsrfToken, refreshTokenApiCall]);
 
     return (
