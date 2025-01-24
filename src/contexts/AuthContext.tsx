@@ -71,6 +71,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 console.log('CSRF token fetched successfully'); // Debug log for CSRF token fetch
 
                 const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
+                console.log("document:", document.cookie);
                 console.log('Stored refreshToken:', storedRefreshToken); // Debug log for stored refresh token
 
                 if (storedRefreshToken) {
