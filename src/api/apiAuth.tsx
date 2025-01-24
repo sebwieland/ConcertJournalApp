@@ -1,9 +1,10 @@
 import useApiClient from './apiClient';
-import {AuthContext} from "../contexts/AuthContext";
-import {useContext} from "react";
+import { AuthContext } from "../contexts/AuthContext";
+import { useContext } from "react";
 
 interface LoginResponse {
     accessToken: string;
+    refreshToken: string;
 }
 
 interface LoginRequest {
@@ -26,8 +27,7 @@ const useAuthApi = () => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const { csrfToken } = authContext;
-
+    const { csrfToken, refreshToken } = authContext;
 
     const login = async (data: LoginRequest): Promise<LoginResponse> => {
         const params = new URLSearchParams();
@@ -75,7 +75,7 @@ const useAuthApi = () => {
         }
     };
 
-    const register = async (data: RegisterRequest) => {
+    const register = async (data: RegisterRequest): Promise<LoginResponse> => {
         try {
             const response = await apiClient.post('/register', data, {
                 withCredentials: true

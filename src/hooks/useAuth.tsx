@@ -1,4 +1,4 @@
-import { useContext, useState} from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useMutation } from 'react-query';
 import useAuthApi from "../api/apiAuth";
@@ -28,10 +28,15 @@ const useAuth = (): UseAuth => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
 
+    const setTokenState = (accessToken: string, refreshToken: string) => {
+        setAccessToken(accessToken);
+        setIsLoggedIn(true);
+        document.cookie = `refreshToken=${refreshToken}; path=/`;
+    };
+
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            setAccessToken(data.accessToken);
-            setIsLoggedIn(true);
+            setTokenState(data.accessToken, data.refreshToken);
             fetchCsrfToken();
         },
         onError: (error: unknown) => {
@@ -50,8 +55,9 @@ const useAuth = (): UseAuth => {
     });
 
     const { mutateAsync: signUpMutation } = useMutation(authApi.register, {
-        onSuccess: () => {
-            // Handle sign-up success if needed
+        onSuccess: (data) => {
+            setTokenState(data.accessToken, data.refreshToken);
+            fetchCsrfToken();
         },
         onError: (error) => {
             setError(error);
@@ -66,9 +72,10 @@ const useAuth = (): UseAuth => {
 
     const { mutateAsync: logoutMutation } = useMutation(authApi.logout, {
         onSuccess: () => {
-            setIsLoggedIn(false);
-            setAccessToken('');
-            fetchCsrfToken(); // fetch new CSRF token if user want to directly re-login without reloading the page
+            authContext.setIsLoggedIn(false);
+            authContext.setAccessToken('');
+            document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+            fetchCsrfToken();
         },
         onError: (error) => {
             setError(error);

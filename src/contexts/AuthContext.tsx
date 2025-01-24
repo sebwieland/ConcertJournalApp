@@ -16,6 +16,7 @@ const AuthContext = createContext<AuthContextInterface | null>(null);
 const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [token, setAccessToken] = useState<string>('');
+    const [refreshToken, setRefreshToken] = useState<string>('');
     const [csrfToken, setCsrfToken] = useState('');
     const apiClient = useApiClient().apiClient;
 
@@ -31,38 +32,54 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         }
     }, [apiClient]);
 
-    const refreshToken = useCallback(async () => {
-        if (!isLoggedIn || !token) return;
+    const setTokenState = (accessToken: string, refreshToken: string) => {
+        setAccessToken(accessToken);
+        setIsLoggedIn(true);
+        setRefreshToken(refreshToken);
+    };
+
+    const setLoggedOut = () => {
+        setIsLoggedIn(false);
+        setAccessToken('');
+        setRefreshToken('');
+    };
+
+    const refreshTokenApiCall = useCallback(async () => {
+        if (!refreshToken) return;
         try {
             const response = await apiClient.post('/refresh-token', {}, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': csrfToken
+                    'X-XSRF-TOKEN': csrfToken,
+                    'Refresh-Token': refreshToken
                 },
             });
-            setAccessToken(response.data.accessToken);
+            setTokenState(response.data.accessToken, refreshToken);
         } catch (error) {
-            setIsLoggedIn(false);
-            setAccessToken('');
+            setLoggedOut();
             console.error("Failed to refresh token:", error);
         }
-    }, [isLoggedIn, token, csrfToken, apiClient]);
+    }, [refreshToken, csrfToken, apiClient, setTokenState, setLoggedOut]);
 
     useEffect(() => {
         const setupAuth = async () => {
             await fetchCsrfToken();
-            // await obtainAccessTokenUsingRefreshToken(); // If needed, implement this
+            const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
+            if (storedRefreshToken) {
+                setRefreshToken(storedRefreshToken);
+                await refreshTokenApiCall();
+            }
         };
         setupAuth();
-    }, [fetchCsrfToken]);
+    }, [fetchCsrfToken, refreshTokenApiCall]);
 
     useEffect(() => {
         if (token) {
-            const intervalId = setInterval(refreshToken, 2 * 60 * 1000); // 2 minutes
+            const intervalId = setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
             return () => clearInterval(intervalId);
         }
-    }, [token, refreshToken]);
+    }, [token, refreshTokenApiCall]);
 
     return (
         <AuthContext.Provider value={{
@@ -70,7 +87,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setIsLoggedIn,
             token,
             setAccessToken,
-            refreshToken,
+            refreshToken: refreshTokenApiCall,
             csrfToken,
             fetchCsrfToken
         }}>
