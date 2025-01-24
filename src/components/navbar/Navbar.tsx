@@ -21,8 +21,7 @@ const Navbar = () => {
 
     const handleLogout = async () => {
         try {
-            console.log("!Handling logout")
-            await logout()
+            logout()
         } catch (error: unknown) {
             console.error('Error logging out:', error);
         }

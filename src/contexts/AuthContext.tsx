@@ -1,107 +1,82 @@
-import React, {createContext, useState, useEffect, useCallback} from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import useApiClient from '../api/apiClient';
 
 interface AuthContextInterface {
     isLoggedIn: boolean;
     setIsLoggedIn: (isLoggedIn: boolean) => void;
     token: string;
-    setToken: (token: string) => void;
+    setAccessToken: (token: string) => void;
     refreshToken: () => void;
     csrfToken: string;
-    updateCsrfToken: () => void;
-    logout: () => void;
+    fetchCsrfToken: () => void;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
 
-const AuthProvider: React.FC<React.PropsWithChildren> = ({children}) => {
+const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [accessToken, setAccessToken] = useState<string>('');
-    const apiClient = useApiClient().apiClient;
+    const [token, setAccessToken] = useState<string>('');
     const [csrfToken, setCsrfToken] = useState('');
-    const [shouldRefreshToken, setShouldRefreshToken] = useState(true);
+    const apiClient = useApiClient().apiClient;
 
-    useEffect(() => {
-        if (!shouldRefreshToken) return;
-        const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
-        if (cookie && cookie[1]) {
-            setCsrfToken(cookie[1]);
-        }
-
-        const refreshAccessToken = async () => {
-            if (!accessToken) {
-                try {
-                    const response = await apiClient.post('/refresh-token', {}, {
-                        'withCredentials': true,
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    setAccessToken(response.data.accessToken);
-                    setIsLoggedIn(true);
-                } catch (error) {
-                    console.error(error);
-                }
+    const fetchCsrfToken = useCallback(async () => {
+        try {
+            await apiClient.get("/get-xsrf-cookie", { withCredentials: true });
+            const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
+            if (cookie && cookie[1]) {
+                setCsrfToken(cookie[1]);
             }
-        };
-        refreshAccessToken();
-    }, [apiClient, accessToken, shouldRefreshToken]);
-
-    const updateCsrfToken = () => {
-        const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
-        if (cookie && cookie[1]) {
-            setCsrfToken(cookie[1]);
+        } catch (error) {
+            console.error("Error fetching XSRF cookie:", error);
         }
-    };
+    }, [apiClient]);
 
     const refreshToken = useCallback(async () => {
-        if (!isLoggedIn || !shouldRefreshToken) return;
+        if (!isLoggedIn || !token) return;
         try {
             const response = await apiClient.post('/refresh-token', {}, {
-                'withCredentials': true,
+                withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken
                 },
             });
             setAccessToken(response.data.accessToken);
         } catch (error) {
-            console.error(error);
+            setIsLoggedIn(false);
+            setAccessToken('');
+            console.error("Failed to refresh token:", error);
         }
-    }, [apiClient, isLoggedIn, shouldRefreshToken]);
+    }, [isLoggedIn, token, csrfToken, apiClient]);
 
     useEffect(() => {
-        if (isLoggedIn) {
-            refreshToken().catch((error) => console.error(error));
-        }
-    }, [refreshToken, isLoggedIn]);
+        const setupAuth = async () => {
+            await fetchCsrfToken();
+            // await obtainAccessTokenUsingRefreshToken(); // If needed, implement this
+        };
+        setupAuth();
+    }, [fetchCsrfToken]);
 
     useEffect(() => {
-        if (accessToken) {
+        if (token) {
             const intervalId = setInterval(refreshToken, 2 * 60 * 1000); // 2 minutes
             return () => clearInterval(intervalId);
         }
-    }, [accessToken, refreshToken]);
-
-    const logout = useCallback(() => {
-        setShouldRefreshToken(false); // Set the flag to false when logging out
-        // setIsLoggedIn(false);
-        // setAccessToken('');
-    }, []);
+    }, [token, refreshToken]);
 
     return (
         <AuthContext.Provider value={{
             isLoggedIn,
             setIsLoggedIn,
-            token: accessToken,
-            setToken: setAccessToken,
+            token,
+            setAccessToken,
             refreshToken,
             csrfToken,
-            updateCsrfToken,
-            logout
+            fetchCsrfToken
         }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export {AuthContext, AuthProvider};
+export { AuthContext, AuthProvider };

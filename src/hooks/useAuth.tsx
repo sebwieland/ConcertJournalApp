@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import { useContext, useState} from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useMutation } from 'react-query';
 import useAuthApi from "../api/apiAuth";
@@ -24,14 +24,15 @@ const useAuth = (): UseAuth => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const { setIsLoggedIn, token, setToken } = authContext;
+    const { setIsLoggedIn, setAccessToken, fetchCsrfToken } = authContext;
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
 
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            setToken(data.accessToken);
+            setAccessToken(data.accessToken);
             setIsLoggedIn(true);
+            fetchCsrfToken();
         },
         onError: (error: unknown) => {
             if (error instanceof Error) {
@@ -49,8 +50,25 @@ const useAuth = (): UseAuth => {
     });
 
     const { mutateAsync: signUpMutation } = useMutation(authApi.register, {
-        onSuccess: (data) => {
-            // Handle sign-up success
+        onSuccess: () => {
+            // Handle sign-up success if needed
+        },
+        onError: (error) => {
+            setError(error);
+        },
+        onMutate: () => {
+            setIsLoading(true);
+        },
+        onSettled: () => {
+            setIsLoading(false);
+        },
+    });
+
+    const { mutateAsync: logoutMutation } = useMutation(authApi.logout, {
+        onSuccess: () => {
+            setIsLoggedIn(false);
+            setAccessToken('');
+            fetchCsrfToken(); // fetch new CSRF token if user want to directly re-login without reloading the page
         },
         onError: (error) => {
             setError(error);
@@ -64,9 +82,11 @@ const useAuth = (): UseAuth => {
     });
 
     const login = async (data: { email: string; password: string }) => {
-        await authApi.fetchXSRFtoken()
-        await loginMutation(data);
-        await authApi.fetchXSRFtoken()
+        try {
+            await loginMutation(data);
+        } catch (error) {
+            console.error("Failed to login:", error);
+        }
     };
 
     const signUp = async (data: {
@@ -76,23 +96,22 @@ const useAuth = (): UseAuth => {
         firstName: string;
         lastName: string;
     }) => {
-        await signUpMutation(data);
+        try {
+            await signUpMutation(data);
+        } catch (error) {
+            console.error("Failed to sign up:", error);
+        }
     };
 
     const logout = async () => {
-        await authApi.logout();
-        setToken('');
-        setIsLoggedIn(false);
-        authContext.logout();
-        // queryClient.invalidateQueries('token');
-        // document.cookie.split(';').forEach((cookie) => {
-        //     const cookieName = cookie.split('=')[0].trim();
-        //     document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        // });
-        return Promise.resolve()
+        try {
+            await logoutMutation();
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
     };
 
-    return { token, login, logout, signUp, isLoading, error };
+    return { token: authContext.token, login, logout, signUp, isLoading, error };
 };
 
 export default useAuth;
