@@ -24,18 +24,14 @@ const useAuth = (): UseAuth => {
     if (!authContext) {
         throw new Error('AuthContext is not provided');
     }
-    const { setIsLoggedIn, setAccessToken, fetchCsrfToken } = authContext;
+    const { setIsLoggedIn, setAccessToken , fetchCsrfToken } = authContext;
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
 
-    const setTokenState = (accessToken: string, refreshToken: string) => {
-        setAccessToken(accessToken);
-        setIsLoggedIn(true);
-    };
-
     const { mutateAsync: loginMutation } = useMutation(authApi.login, {
         onSuccess: (data) => {
-            setTokenState(data.accessToken, data.refreshToken);
+            setAccessToken(data.accessToken)
+            setIsLoggedIn(true);
             fetchCsrfToken();
         },
         onError: (error: unknown) => {
@@ -54,8 +50,7 @@ const useAuth = (): UseAuth => {
     });
 
     const { mutateAsync: signUpMutation } = useMutation(authApi.register, {
-        onSuccess: (data) => {
-            setTokenState(data.accessToken, data.refreshToken);
+        onSuccess: () => {
             fetchCsrfToken();
         },
         onError: (error) => {

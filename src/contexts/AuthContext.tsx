@@ -48,7 +48,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [setIsLoggedIn, setAccessToken, setRefreshToken, setIsLoading]);
 
     const refreshTokenApiCall = useCallback(async () => {
-        if (!refreshToken) return;
+        if (!isLoggedIn || !refreshToken) return;
         try {
             const response = await apiClient.post('/refresh-token', {}, {
                 withCredentials: true,
@@ -64,7 +64,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setLoggedOut();
             console.error("Failed to refresh token:", error);
         }
-    }, [refreshToken, csrfToken, apiClient, setTokenState, setLoggedOut]);
+    }, [refreshToken, csrfToken, apiClient, setTokenState, setLoggedOut, isLoggedIn]);
 
     useEffect(() => {
         const setupAuth = async () => {
