@@ -70,18 +70,20 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 await fetchCsrfToken();
                 console.log('CSRF token fetched successfully'); // Debug log for CSRF token fetch
 
+                await refreshTokenApiCall();
+                console.log('Refresh token API call completed'); // Debug log for API call completion
+
                 const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
                 console.log("document:", document.cookie);
                 console.log('Stored refreshToken:', storedRefreshToken); // Debug log for stored refresh token
-
-                if (storedRefreshToken) {
-                    setRefreshToken(storedRefreshToken);
-                    await refreshTokenApiCall();
-                    console.log('Refresh token API call completed'); // Debug log for API call completion
-                } else {
-                    setLoggedOut();
-                    console.log('No refresh token found, setting logged out'); // Debug log for no refresh token
-                }
+            // }
+                // if (storedRefreshToken) {
+                //     setRefreshToken(storedRefreshToken);
+                //
+                // } else {
+                //     setLoggedOut();
+                //     console.log('No refresh token found, setting logged out'); // Debug log for no refresh token
+                // }
             } catch (error) {
                 console.error("Error during setupAuth:", error);
                 setLoggedOut();

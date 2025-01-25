@@ -68,7 +68,7 @@ const useAuth = (): UseAuth => {
         onSuccess: () => {
             authContext.setIsLoggedIn(false);
             authContext.setAccessToken('');
-            document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure;";
             fetchCsrfToken();
         },
         onError: (error) => {
