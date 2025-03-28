@@ -13,11 +13,23 @@ RUN npm install
 # Copy the application code to the working directory
 COPY . .
 
-# Build the React application
-RUN npm run build
+# Enable SWC and build the React application
+RUN SWC=true npm run build
 
 # Expose the port that the application will use
 EXPOSE 3000
 
+# Use an official Node.js 16 image for the runtime
+FROM node:16-alpine
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the build artifacts from the build stage
+COPY --from=build /app/build ./build
+
+# Install serve for serving the static files
+RUN npm install -g serve
+
 # Run the command to serve the production build when the container launches
-CMD ["npx", "serve", "-s", "build"]
+CMD ["serve", "-s", "build"]
