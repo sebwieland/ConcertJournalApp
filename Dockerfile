@@ -4,11 +4,11 @@ FROM node:16-alpine AS build
 # Set the working directory to /app
 WORKDIR /app
 
-# Copy the package*.json files to the working directory
+# Copy the package.json and package-lock.json files to the working directory
 COPY package*.json ./
 
 # Install the dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the application code to the working directory
 COPY . .
@@ -16,20 +16,14 @@ COPY . .
 # Enable SWC and build the React application
 RUN SWC=true npm run build
 
-# Expose the port that the application will use
-EXPOSE 3000
-
-# Use an official Node.js 16 image for the runtime
-FROM node:16-alpine
-
-# Set the working directory to /app
-WORKDIR /app
+# Use a lightweight web server to serve the static files
+FROM nginx:alpine
 
 # Copy the build artifacts from the build stage
-COPY --from=build /app/build ./build
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Install serve for serving the static files
-RUN npm install -g serve
+# Expose the port that the application will use
+EXPOSE 80
 
-# Run the command to serve the production build when the container launches
-CMD ["serve", "-s", "build"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
