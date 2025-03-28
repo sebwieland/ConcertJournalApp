@@ -22,7 +22,7 @@ jobs:
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
-          path: ./node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
@@ -102,3 +102,4 @@ jobs:
         run: |
           mkdir -p /tmp/.buildx-cache
           cp -r /tmp/.buildx-cache-new/* /tmp/.buildx-cache || true
+          echo "Cache updated"
