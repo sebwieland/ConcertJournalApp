@@ -89,4 +89,4 @@ jobs:
             registry.wielandseb.synology.me/concertjournalfrontend:latest
           platforms: linux/amd64,linux/arm64
           cache-from: type=registry,ref=registry.wielandseb.synology.me/concertjournalfrontend:cache
-          cache-to: type=inline
+          cache-to: type=registry,ref=registry.wielandseb.synology.me/concertjournalfrontend:cache,mode=max
