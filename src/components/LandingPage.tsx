@@ -20,7 +20,7 @@ export default function LandingPage() {
                                     <StatCard title="Concerts attended" value={statistics.totalCount.toString()} icon={<PlaylistAddCheck />} />
                                     <StatCard title="Most Seen Artist" value={statistics.mostSeenArtist} icon={<MusicNote />} />
                                     <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
-                                    <StatCard title="Most Visited Location:" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
+                                    <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
                                 </div>
                             </div>
                         );
