@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
-      - name: Self-hosted Renovate
-        uses: renovatebot/github-action@latest
+      - name: Renovate
+        uses: renovatebot/github-action@v37.66.0
         with:
           configurationFile: renovate.json
         env:
