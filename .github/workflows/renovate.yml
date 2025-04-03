@@ -14,5 +14,5 @@ jobs:
         uses: renovatebot/github-action@latest
         with:
           configurationFile: renovate.json
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
