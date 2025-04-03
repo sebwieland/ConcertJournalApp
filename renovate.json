@@ -1,0 +1,21 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "github>whitesource/renovate:preset",
+    ":preserveSemverRanges"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@mui/"],
+      "groupName": "MUI packages"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    }
+  ],
+  "node": {
+    "supportPolicy": ["16.x"]
+  }
+}

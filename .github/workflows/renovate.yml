@@ -1,0 +1,16 @@
+name: Renovate
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Renovate
+        uses: renovate/renovate@v37.240.0
+        with:
+          configurationFile: renovate.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
