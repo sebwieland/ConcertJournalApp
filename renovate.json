@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "autodiscover": true,
   "extends": [
     "config:recommended",
     ":preserveSemverRanges",
@@ -8,8 +9,13 @@
   ],
   "packageRules": [
     {
-      "matchPackagePrefixes": ["@mui/"],
-      "groupName": "MUI packages"
+      "matchDepTypes": ["engines"],
+      "matchPackageNames": ["node"],
+      "rangeStrategy": "replace"
+    },
+    {
+      "groupName": "MUI packages",
+      "matchPackagePatterns": ["^@mui/"]
     },
     {
       "matchUpdateTypes": ["minor", "patch"],
