@@ -18,7 +18,8 @@
   ],
   "engines": {
     "node": {
-      "supportPolicy": ["16.x"]
+      "rangeStrategy": "replace",
+      "supportPolicy": ["lts_latest"]
     }
   }
 }

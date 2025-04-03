@@ -19,5 +19,7 @@ jobs:
         uses: renovatebot/github-action@v41.0.18
         with:
           configurationFile: renovate.json
-          args: --autodiscover
-          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --autodiscover=true
+        env:
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOG_LEVEL: debug
