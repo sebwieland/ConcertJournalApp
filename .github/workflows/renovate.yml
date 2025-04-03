@@ -8,8 +8,11 @@ jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Run Renovate
-        uses: renovate/renovate@v37.240.0
+        uses: renovate/renovate@v37.x
         with:
           configurationFile: renovate.json
         env:
