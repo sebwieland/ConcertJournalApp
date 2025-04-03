@@ -2,16 +2,21 @@ name: Renovate
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # Daily at midnight UTC
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
+
       - name: Renovate
-        uses: renovatebot/github-action@v37.66.0
+        uses: renovatebot/github-action@v38.10.0
         with:
           configurationFile: renovate.json
         env:
