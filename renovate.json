@@ -8,7 +8,7 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": ["^@mui/"],
+      "matchPackagePrefixes": ["@mui/"],
       "groupName": "MUI packages"
     },
     {
@@ -16,7 +16,9 @@
       "automerge": true
     }
   ],
-  "node": {
-    "supportPolicy": ["16.x"]
+  "engines": {
+    "node": {
+      "supportPolicy": ["16.x"]
+    }
   }
 }
