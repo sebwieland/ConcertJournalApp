@@ -69,6 +69,7 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
+        if: github.ref =='refs/heads/main'
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image
