@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Autocomplete, Container, Grid2, Rating, TextField} from "@mui/material";
+import {Alert, Autocomplete, Container, Grid, Rating, TextField} from "@mui/material";
 import Button from "@mui/material/Button";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -84,8 +84,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
     return (
         <DefaultLayout>
             <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
-                <Grid2 spacing={1}>
-                    <Grid2 spacing={1}>
+                <Grid spacing={1}>
+                    <Grid spacing={1}>
                         <Autocomplete
                             options={bandSuggestions}
                             value={bandName}
@@ -108,7 +108,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             )}
                         />
 
-                        <Grid2>
+                        <Grid>
                             <Autocomplete
                                 options={placeSuggestions}
                                 value={place}
@@ -130,9 +130,9 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     />
                                 )}
                             />
-                        </Grid2>
+                        </Grid>
 
-                        <Grid2 sx={{textAlign: 'center', marginBottom: 2}}>
+                        <Grid sx={{textAlign: 'center', marginBottom: 2}}>
                             <Rating
                                 name="Rating"
                                 value={rating}
@@ -140,8 +140,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     setRating(newValue ?? 0);
                                 }}
                             />
-                        </Grid2>
-                        <Grid2>
+                        </Grid>
+                        <Grid>
                             <TextField
                                 label="Comment"
                                 variant="outlined"
@@ -150,16 +150,16 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 sx={{marginBottom: 2}}
                                 onChange={(event) => setComment(event.target.value)}
                             />
-                        </Grid2>
-                        <Grid2>
+                        </Grid>
+                        <Grid>
                             <DatePicker
                                 label="Date"
                                 value={date}
                                 sx={{marginBottom: 2, width: '100%'}}
                                 onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                             />
-                        </Grid2>
-                        <Grid2>
+                        </Grid>
+                        <Grid>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -169,8 +169,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             >
                                 {isUpdate ? 'Update Entry' : 'Create New Entry'}
                             </Button>
-                        </Grid2>
-                        <Grid2>
+                        </Grid>
+                        <Grid>
                             <Button
                                 variant="contained"
                                 color="secondary"
@@ -179,16 +179,16 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             >
                                 Go Back
                             </Button>
-                        </Grid2>
-                        <Grid2>
+                        </Grid>
+                        <Grid>
                             {message &&
                                 <Alert
                                     severity={isSuccess ? 'success' : 'error'} sx={{maxWidth: '100%'}}>
                                     {message}
                                 </Alert>}
-                        </Grid2>
-                    </Grid2>
-                </Grid2>
+                        </Grid>
+                    </Grid>
+                </Grid>
             </Container>
         </DefaultLayout>
     );

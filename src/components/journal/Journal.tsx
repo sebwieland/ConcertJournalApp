@@ -6,7 +6,7 @@ import {ConfirmProvider} from "material-ui-confirm";
 import {
     Card,
     CardContent,
-    Grid2,
+    Grid,
     useMediaQuery,
     useTheme,
 } from "@mui/material";
@@ -31,14 +31,14 @@ const Journal = () => {
                 <ConfirmProvider>
                     <DataCollector>
                         {({data, onEdit, onDelete}) => (
-                            <Grid2 container spacing={2}>
-                                <Grid2 style={{width: '100%'}}>
+                            <Grid container spacing={2}>
+                                <Grid style={{width: '100%'}}>
                                     <SortForm
                                         sortOrder={sortOrder}
                                         onSortOrderChange={(newSortOrder) => setSortOrder(newSortOrder)}
                                     />
-                                </Grid2>
-                                <Grid2 style={{width: '100%'}}>
+                                </Grid>
+                                <Grid style={{width: '100%'}}>
                                     <SwipeableList style={{width: '100%'}}>
                                         {sortData(data, sortOrder.column, sortOrder.order).map((item) => (
                                             <StyledSwipeableListItem
@@ -72,8 +72,8 @@ const Journal = () => {
                                             </StyledSwipeableListItem>
                                         ))}
                                     </SwipeableList>
-                                </Grid2>
-                            </Grid2>
+                                </Grid>
+                            </Grid>
                         )}
                     </DataCollector>
                 </ConfirmProvider>

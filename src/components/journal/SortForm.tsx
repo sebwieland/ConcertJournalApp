@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FormControl, Grid2, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
+import {FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 
 interface SortCriteria {
     value: string;
@@ -31,8 +31,8 @@ const SortForm = ({ sortOrder, onSortOrderChange }: SortFormProps) => {
     };
 
     return (
-        <Grid2 container spacing={2}>
-            <Grid2 size={{xs: 12}}>
+        <Grid container spacing={2}>
+            <Grid size={{xs: 12}}>
                 <FormControl fullWidth>
                     <InputLabel id="sort-criteria-label">Sort by</InputLabel>
                     <Select
@@ -49,8 +49,8 @@ const SortForm = ({ sortOrder, onSortOrderChange }: SortFormProps) => {
                         ))}
                     </Select>
                 </FormControl>
-            </Grid2>
-            <Grid2 size={{xs: 12}}>
+            </Grid>
+            <Grid size={{xs: 12}}>
                 <FormControl fullWidth>
                     <InputLabel id="sort-order-label">Sort order</InputLabel>
                     <Select
@@ -67,8 +67,8 @@ const SortForm = ({ sortOrder, onSortOrderChange }: SortFormProps) => {
                         ))}
                     </Select>
                 </FormControl>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 };
 
