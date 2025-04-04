@@ -21,6 +21,5 @@ jobs:
           configurationFile: renovate.json
         env:
           RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LOG_LEVEL: debug
-          # Add autodiscover via environment variable instead:
+#          LOG_LEVEL: debug
           RENOVATE_AUTODISCOVER: true

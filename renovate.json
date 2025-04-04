@@ -9,6 +9,12 @@
   ],
   "packageRules": [
     {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "requiredStatusChecks": ["build-and-publish"]
+    },
+    {
       "matchDepTypes": ["engines"],
       "matchPackageNames": ["node"],
       "rangeStrategy": "replace"
@@ -18,14 +24,23 @@
       "matchPackagePatterns": ["^@mui/"]
     },
     {
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "groupName": "React core",
+      "matchPackagePatterns": ["^react", "^react-dom", "^react-scripts"]
+    },
+    {
+      "groupName": "Testing libraries",
+      "matchPackagePatterns": ["^@testing-library/", "^jest"]
+    },
+    {
+      "groupName": "TypeScript",
+      "matchPackageNames": ["typescript"],
+      "matchPackagePatterns": ["^@types/"]
     }
   ],
   "engines": {
     "node": {
       "rangeStrategy": "replace",
-      "supportPolicy": ["lts_latest"]
+      "supportPolicy": ["lts_active"]
     }
   }
 }
