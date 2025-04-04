@@ -2,11 +2,7 @@ name: Build, Test and Publish
 
 on:
   push:
-    branches:
-      - '**'  # Runs on all branches
   pull_request:
-    branches:
-      - main  # Runs on pull requests to the main branch
   workflow_dispatch:
 
 jobs:
