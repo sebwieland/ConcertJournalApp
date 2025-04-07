@@ -9,38 +9,58 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true,
-      "automergeType": "pr",
-      "requiredStatusChecks": ["build-and-publish"]
+      "automergeType": "pr"
     },
     {
-      "matchDepTypes": ["engines"],
-      "matchPackageNames": ["node"],
+      "matchDepTypes": [
+        "engines"
+      ],
+      "matchPackageNames": [
+        "node"
+      ],
       "rangeStrategy": "replace"
     },
     {
       "groupName": "MUI packages",
-      "matchPackagePatterns": ["^@mui/"]
+      "matchPackageNames": [
+        "/^@mui//"
+      ]
     },
     {
       "groupName": "React core",
-      "matchPackagePatterns": ["^react", "^react-dom", "^react-scripts"]
+      "matchPackageNames": [
+        "/^react/",
+        "/^react-dom/",
+        "/^react-scripts/"
+      ]
     },
     {
       "groupName": "Testing libraries",
-      "matchPackagePatterns": ["^@testing-library/", "^jest"]
+      "matchPackageNames": [
+        "/^@testing-library//",
+        "/^jest/"
+      ]
     },
     {
       "groupName": "TypeScript",
-      "matchPackageNames": ["typescript"],
-      "matchPackagePatterns": ["^@types/"]
+      "matchPackageNames": [
+        "typescript",
+        "/^@types//"
+      ]
+    },
+    {
+      "matchDepTypes": [
+        "engines"
+      ],
+      "matchCategories": [
+        "node"
+      ],
+      "rangeStrategy": "replace"
     }
-  ],
-  "engines": {
-    "node": {
-      "rangeStrategy": "replace",
-      "supportPolicy": ["lts_active"]
-    }
-  }
+  ]
 }
