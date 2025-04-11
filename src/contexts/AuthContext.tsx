@@ -50,6 +50,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                     'X-XSRF-TOKEN': csrfToken,
                 },
             });
+            setIsLoggedIn(true);
             setAccessToken(response.data.accessToken);
         } catch (error) {
             setLoggedOut();
