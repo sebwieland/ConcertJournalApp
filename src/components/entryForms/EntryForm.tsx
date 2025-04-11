@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Autocomplete, Container, Grid, Rating, TextField} from "@mui/material";
+import {Alert, Autocomplete, Container, Grid, Rating, TextField, Typography} from "@mui/material";
 import Button from "@mui/material/Button";
 import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -84,6 +84,9 @@ const EntryForm: React.FC<EntryFormProps> = ({
     return (
         <DefaultLayout>
             <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
+                <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
+                    {isUpdate ? 'Update Entry' : 'Create New Entry'}
+                </Typography>
                 <Grid spacing={1}>
                     <Grid spacing={1}>
                         <Autocomplete
