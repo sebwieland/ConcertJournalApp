@@ -61,21 +61,21 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [csrfToken, apiClient, setLoggedOut, setAccessToken, setIsLoggedIn]);
 
     useEffect(() => {
-        console.log('useEffect is running'); // Debug log for useEffect execution
+        // console.log('useEffect is running'); // Debug log for useEffect execution
 
         const setupAuth = async () => {
-            console.log('setupAuth is starting'); // Debug log for setupAuth start
+            // console.log('setupAuth is starting'); // Debug log for setupAuth start
 
             try {
                 await fetchCsrfToken();
-                console.log('CSRF token fetched successfully'); // Debug log for CSRF token fetch
+                // console.log('CSRF token fetched successfully'); // Debug log for CSRF token fetch
 
                 await refreshTokenApiCall();
-                console.log('Refresh token API call completed'); // Debug log for API call completion
+                // console.log('Refresh token API call completed'); // Debug log for API call completion
 
-                const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
-                console.log("document:", document.cookie);
-                console.log('Stored refreshToken:', storedRefreshToken); // Debug log for stored refresh token
+                // const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
+                // console.log("document:", document.cookie);
+                // console.log('Stored refreshToken:', storedRefreshToken); // Debug log for stored refresh token
             // }
                 // if (storedRefreshToken) {
                 //     setRefreshToken(storedRefreshToken);
@@ -85,7 +85,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 //     console.log('No refresh token found, setting logged out'); // Debug log for no refresh token
                 // }
             } catch (error) {
-                console.error("Error during setupAuth:", error);
+                // console.error("Error during setupAuth:", error);
                 setLoggedOut();
             } finally {
                 setIsLoading(false); // Ensure isLoading is set to false after attempt
@@ -94,11 +94,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         setupAuth();
 
         const intervalId = setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
-        console.log('Set up interval for token refresh'); // Debug log for setting up interval
+        // console.log('Set up interval for token refresh'); // Debug log for setting up interval
 
         return () => {
             clearInterval(intervalId);
-            console.log('Interval cleared on component unmount'); // Debug log for clearing interval
+            // console.log('Interval cleared on component unmount'); // Debug log for clearing interval
         };
     }, [fetchCsrfToken, refreshTokenApiCall, setLoggedOut]);
 
