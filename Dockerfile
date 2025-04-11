@@ -7,12 +7,8 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
-# Copy build output to nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-# Copy custom nginx config
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-# Expose port 80 (nginx default)
-EXPOSE 80
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./build
+RUN npm install -g serve
+CMD ["serve", "-s", "build"]
