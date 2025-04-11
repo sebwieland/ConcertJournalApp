@@ -1,29 +1,32 @@
 import DefaultLayout from "../../theme/DefaultLayout";
 import * as React from "react";
+import {useState} from "react";
 import DataCollector from "./DataCollector";
 import DataTable from "./DataTable";
 import {ConfirmProvider} from "material-ui-confirm";
-import {
-    Card,
-    CardContent,
-    Grid,
-    useMediaQuery,
-    useTheme,
-} from "@mui/material";
+import {Card, CardContent, Grid, useMediaQuery, useTheme,} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import RatingStars from "../utilities/RatingStars";
 import {sortData} from "../../utils/SortData";
 import {SwipeableList} from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import SortForm from "./SortForm";
-import { StyledSwipeableListItem, leadingActions, trailingActions } from "./SwipeableListItem"
-import {useState} from "react";
+import {leadingActions, StyledSwipeableListItem, trailingActions} from "./SwipeableListItem"
 
 
 const Journal = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    const [sortOrder, setSortOrder] = useState({ column: 'date', order: 'desc' });
+    const [sortOrder, setSortOrder] = useState(() => {
+        const saved = localStorage.getItem('journalSortOrder');
+        return saved ? JSON.parse(saved) : {column: 'date', order: 'desc'}
+    });
+
+    const handleSortChange = (newSortOrder: any) => {
+        setSortOrder(newSortOrder);
+        localStorage.setItem('journalSortOrder', JSON.stringify(newSortOrder));
+
+    }
 
     if (isMobile) {
         return (
@@ -35,7 +38,7 @@ const Journal = () => {
                                 <Grid style={{width: '100%'}}>
                                     <SortForm
                                         sortOrder={sortOrder}
-                                        onSortOrderChange={(newSortOrder) => setSortOrder(newSortOrder)}
+                                        onSortOrderChange={handleSortChange}
                                     />
                                 </Grid>
                                 <Grid style={{width: '100%'}}>
