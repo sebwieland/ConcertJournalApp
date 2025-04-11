@@ -5,6 +5,11 @@ import Navbar from "../components/navbar/Navbar"
 import React, {PropsWithChildren, useContext} from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import {AuthContext} from "../contexts/AuthContext";
+import {useNavigate} from "react-router-dom";
+import AddButton from "../components/AddButton";
+
+
+
 
 const DefaultLayout = ({children}: PropsWithChildren) => {
     const {theme} = useTheme();
@@ -15,6 +20,9 @@ const DefaultLayout = ({children}: PropsWithChildren) => {
             <CssBaseline enableColorScheme/>
             {isLoggedIn && (
                 <Navbar />
+            )}
+            {isLoggedIn && location.pathname !== '/new-entry' && location.pathname !== '/sign-in' && (
+                <AddButton/>
             )}
 
             <Stack
