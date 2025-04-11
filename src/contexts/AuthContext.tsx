@@ -51,7 +51,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 },
             });
             setAccessToken(response.data.accessToken);
-            setIsLoggedIn(true);
         } catch (error) {
             setLoggedOut();
             console.error("Failed to refresh token:", error);
@@ -73,7 +72,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 await refreshTokenApiCall();
                 // console.log('Refresh token API call completed'); // Debug log for API call completion
 
-                // const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
+                const storedRefreshToken = document.cookie.match(/refreshToken=([^;]*)/)?.[1] || '';
                 // console.log("document:", document.cookie);
                 // console.log('Stored refreshToken:', storedRefreshToken); // Debug log for stored refresh token
             // }

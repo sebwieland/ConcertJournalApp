@@ -1,11 +1,12 @@
 import {AppBar, Toolbar, Typography, useMediaQuery, useTheme} from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import BookIcon from '@mui/icons-material/Book'
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import {AuthContext} from "../../contexts/AuthContext";
 
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = useState<HTMLElement | null>(null);
@@ -13,6 +14,10 @@ const Navbar = () => {
     const {logout} = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
+    console.log(isLoggedIn)
+
+    // if (!isLoggedIn) return null;
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget as HTMLElement | null);
