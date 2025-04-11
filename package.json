@@ -18,7 +18,7 @@
     "react-scripts": "^5.0.1",
     "react-swipeable-list": "^1.10.0",
     "typescript": "^5.8.3",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^4.2.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.0.0",
