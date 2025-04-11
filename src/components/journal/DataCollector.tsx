@@ -3,6 +3,7 @@ import {useConfirm} from "material-ui-confirm";
 import EventsApi from "../../api/apiEvents";
 import useAuth from "../../hooks/useAuth";
 import {useNavigate} from "react-router-dom";
+import {JSX} from "react";
 
 interface DataCollectorProps {
     children: (state: DataCollectorState) => JSX.Element;
