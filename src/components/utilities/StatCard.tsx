@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {JSX} from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import Box from "@mui/material/Box";
 

@@ -15,9 +15,8 @@
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^7.0.0",
-    "react-scripts": "^5.0.1",
     "react-swipeable-list": "^1.10.0",
-    "typescript": "^5.8.3",
+    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
@@ -26,15 +25,19 @@
     "@testing-library/user-event": "^14.0.0",
     "@types/jest": "^29.0.0",
     "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "serve": "^14.2.4"
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "serve": "^14.2.4",
+    "vite": "^6.2.6",
+    "vite-tsconfig-paths": "^5.1.4"
   },
+  "type": "module",
   "scripts": {
-    "start": "SWC=true PORT=3010 react-scripts start",
-    "build": "SWC=true react-scripts build",
-    "test": "SWC=true react-scripts test",
-    "eject": "SWC=true react-scripts eject"
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "eslintConfig": {
     "extends": [
