@@ -7,6 +7,16 @@ import DefaultLayout from "../../theme/DefaultLayout";
 import {useNavigate} from "react-router-dom";
 import {mbApi} from "../../api/musicBrainzApi";
 
+declare module 'musicbrainz-api' {
+    interface IArtist {
+        tags?: Array<{
+            count: number;
+            name: string;
+        }>;
+    }
+
+    interface IArtistMatch extends IArtist {}
+}
 
 interface EntryFormProps {
     onSubmit: (data: {
@@ -32,9 +42,40 @@ interface EntryFormProps {
     isUpdate?: boolean;
 }
 
+interface ArtistTag {
+    count: number;
+    name: string;
+}
+
+interface ArtistDetails {
+    type?: string;
+    genre?: string;
+    formationYear?: string;
+    country?: string;
+    tags?: ArtistTag[];  // Add this to your interface
+}
+
 async function queryArtistSuggestions(artist: string) {
     const artistsQueryResult = await mbApi.search("artist", {query: artist, limit: 5})
+    // console.log(artistsQueryResult)
     return artistsQueryResult.artists.map(value => value.name);
+}
+
+async function fetchArtistDetails(name: string): Promise<ArtistDetails> {
+    const result = await mbApi.search("artist", {query: name, limit: 1});
+    const artist = result.artists[0];
+    if (!artist) return {};
+
+    const tags = artist.tags ?? [];
+    const sortedTags = [...tags].sort((a, b) => b.count - a.count);
+    const topGenre = sortedTags[0]?.name;
+
+    return {
+        type: artist.type,
+        genre: topGenre,
+        formationYear: artist["life-span"]?.begin,
+        country: artist.country
+    };
 }
 
 
@@ -59,7 +100,10 @@ const EntryForm: React.FC<EntryFormProps> = ({
     const [bandInputValue, setBandInputValue] = useState('');
     const [placeSuggestions, setPlaceSuggestions] = useState<string[]>([]);
     const [placeInputValue, setPlaceInputValue] = useState('');
+    const [artistDetails, setArtistDetails] = useState<ArtistDetails | null>(null);
+    const [showArtistDetails, setShowArtistDetails] = useState(false);
     const navigate = useNavigate()
+
 
     useEffect(() => {
         const fetchSuggestions = async () => {
@@ -115,7 +159,20 @@ const EntryForm: React.FC<EntryFormProps> = ({
                         <Autocomplete
                             options={bandSuggestions}
                             value={bandName}
-                            onChange={(event, newValue) => setBandName(newValue ?? '')}
+                            onChange={async (event, newValue) => {
+                                setBandName(newValue ?? '');
+                                setShowArtistDetails(false);
+                                if (newValue) {
+                                    try {
+                                        const details = await fetchArtistDetails(newValue);
+                                        setArtistDetails(details);
+                                    } catch (error) {
+                                        setArtistDetails(null);
+                                        console.error("Failed to fetch artist details", error);
+                                    }
+                                }
+                            }
+                            }
                             inputValue={bandInputValue}
                             onInputChange={(event, newInputValue) => {
                                 setBandInputValue(newInputValue);
@@ -133,6 +190,22 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 />
                             )}
                         />
+                        <Button
+                            size="small"
+                            onClick={() => setShowArtistDetails(!showArtistDetails)}
+                            sx={{mb: 1}}
+                        >
+                            {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
+                        </Button>
+                        {artistDetails && showArtistDetails && (
+                            <Grid sx={{mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1}}>
+                                <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
+                                <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
+                                <Typography
+                                    variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
+                                <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
+                            </Grid>
+                        )}
 
                         <Grid>
                             <Autocomplete
