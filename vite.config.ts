@@ -20,7 +20,7 @@ export default defineConfig(async () => ({
         react(),
         tsconfigPaths(),
         Sitemap({
-            hostname: 'https://concertjournal.com',
+            hostname: 'https://concertjournal.de',
             dynamicRoutes, // pass the function here
             exclude: ['/secret-page'] // optional exclude
         })
