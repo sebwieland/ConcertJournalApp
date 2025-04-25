@@ -5,7 +5,19 @@ import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import DefaultLayout from "../../theme/DefaultLayout";
 import {useNavigate} from "react-router-dom";
+import {mbApi} from "../../api/musicBrainzApi";
 
+declare module 'musicbrainz-api' {
+    interface IArtist {
+        tags?: Array<{
+            count: number;
+            name: string;
+        }>;
+    }
+
+    interface IArtistMatch extends IArtist {
+    }
+}
 
 interface EntryFormProps {
     onSubmit: (data: {
@@ -29,7 +41,45 @@ interface EntryFormProps {
     isSuccess: boolean;
     data: any[];
     isUpdate?: boolean;
+    showArtistDetailsButton?: boolean;
 }
+
+interface ArtistTag {
+    count: number;
+    name: string;
+}
+
+interface ArtistDetails {
+    type?: string;
+    genre?: string;
+    formationYear?: string;
+    country?: string;
+    tags?: ArtistTag[];  // Add this to your interface
+}
+
+async function queryArtistSuggestions(artist: string) {
+    const artistsQueryResult = await mbApi.search("artist", {query: artist, limit: 5})
+    // console.log(artistsQueryResult)
+    return artistsQueryResult.artists.map(value => value.name);
+}
+
+async function fetchArtistDetails(name: string): Promise<ArtistDetails> {
+    const result = await mbApi.search("artist", {query: name, limit: 1});
+    const artist = result.artists[0];
+    if (!artist) return {};
+
+    const tags = artist.tags ?? [];
+    const sortedTags = [...tags].sort((a, b) => b.count - a.count);
+    const topGenre = sortedTags[0]?.name;
+
+    return {
+        type: artist.type,
+        genre: topGenre,
+        formationYear: artist["life-span"]?.begin,
+        country: artist.country
+    };
+}
+
 
 const EntryForm: React.FC<EntryFormProps> = ({
                                                  onSubmit,
@@ -46,23 +96,43 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                                  message,
                                                  isSuccess,
                                                  data,
-                                                 isUpdate
+                                                 isUpdate,
+                                                 showArtistDetailsButton
                                              }) => {
     const [bandSuggestions, setBandSuggestions] = useState<string[]>([]);
     const [bandInputValue, setBandInputValue] = useState('');
     const [placeSuggestions, setPlaceSuggestions] = useState<string[]>([]);
     const [placeInputValue, setPlaceInputValue] = useState('');
+    const [artistDetails, setArtistDetails] = useState<ArtistDetails | null>(null);
+    const [showArtistDetails, setShowArtistDetails] = useState(false);
     const navigate = useNavigate()
 
+
     useEffect(() => {
-        const fetchSuggestions = () => {
+        const fetchSuggestions = async () => {
             if (!data) return;
-            const uniqueBandNames: string[] = Array.from(new Set(data.map((event: {
-                bandName: string
-            }) => event.bandName)));
-            const suggestions: string[] = uniqueBandNames.filter(s => s.toLowerCase().includes(bandInputValue.toLowerCase()));
-            setBandSuggestions(suggestions);
+            // Get unique local suggestions
+            const uniqueLocalNames = Array.from(new Set(
+                data.map(event => event.bandName)
+                    .filter(name => name.toLowerCase().includes(bandInputValue.toLowerCase()))
+            ));
+
+            try {
+                // Get API suggestions
+                if (bandInputValue != '') {
+                    const apiSuggestions = await queryArtistSuggestions(bandInputValue);
+
+                    // Combine and deduplicate
+                    const allSuggestions = [...uniqueLocalNames, ...apiSuggestions];
+                    const uniqueSuggestions = Array.from(new Set(allSuggestions));
+
+                    setBandSuggestions(uniqueSuggestions);
+                }
+            } catch (error) {
+                setBandSuggestions(uniqueLocalNames);
+            }
         };
+
         fetchSuggestions();
     }, [bandInputValue, data]);
 
@@ -84,7 +154,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
     return (
         <DefaultLayout>
             <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
-                <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
+                <Typography variant="h4" component="h1" sx={{mb: 4, textAlign: 'center'}}>
                     {isUpdate ? 'Update Entry' : 'Create New Entry'}
                 </Typography>
                 <Grid spacing={1}>
@@ -92,7 +162,20 @@ const EntryForm: React.FC<EntryFormProps> = ({
                         <Autocomplete
                             options={bandSuggestions}
                             value={bandName}
-                            onChange={(event, newValue) => setBandName(newValue ?? '')}
+                            onChange={async (event, newValue) => {
+                                setBandName(newValue ?? '');
+                                setShowArtistDetails(false);
+                                if (newValue) {
+                                    try {
+                                        const details = await fetchArtistDetails(newValue);
+                                        setArtistDetails(details);
+                                    } catch (error) {
+                                        setArtistDetails(null);
+                                        console.error("Failed to fetch artist details", error);
+                                    }
+                                }
+                            }
+                            }
                             inputValue={bandInputValue}
                             onInputChange={(event, newInputValue) => {
                                 setBandInputValue(newInputValue);
@@ -110,6 +193,24 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 />
                             )}
                         />
+                        {showArtistDetailsButton && (
+                            <Button
+                                size="small"
+                                onClick={() => setShowArtistDetails(!showArtistDetails)}
+                                sx={{mb: 1}}
+                            >
+                                {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
+                            </Button>
+                        )}
+                        {artistDetails && showArtistDetails && (
+                            <Grid sx={{mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1}}>
+                                <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
+                                <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
+                                <Typography
+                                    variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
+                                <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
+                            </Grid>
+                        )}
 
                         <Grid>
                             <Autocomplete

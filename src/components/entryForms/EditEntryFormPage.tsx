@@ -91,6 +91,7 @@ const EditEntryFormPage = () => {
             isSuccess={isSuccess}
             data={data}
             isUpdate={true}
+            showArtistDetailsButton={false}
         />
     );
 };

@@ -15,7 +15,6 @@ const Navbar = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
-    console.log(isLoggedIn)
 
     // if (!isLoggedIn) return null;
 
@@ -85,7 +84,7 @@ const Navbar = () => {
                             alt="Logo"
                             onClick={() => navigate('/')}
                             style={{cursor: 'pointer', marginRight: 2}}
-                            width="50"
+                            // width="50"
                             height="50"/>
                     </Box>
 
