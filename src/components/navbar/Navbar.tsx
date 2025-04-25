@@ -15,7 +15,6 @@ const Navbar = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
-    console.log(isLoggedIn)
 
     // if (!isLoggedIn) return null;
 

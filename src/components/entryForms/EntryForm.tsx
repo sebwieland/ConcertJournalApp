@@ -5,6 +5,7 @@ import {DatePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import DefaultLayout from "../../theme/DefaultLayout";
 import {useNavigate} from "react-router-dom";
+import {mbApi} from "../../api/musicBrainzApi";
 
 
 interface EntryFormProps {
@@ -31,6 +32,12 @@ interface EntryFormProps {
     isUpdate?: boolean;
 }
 
+async function queryArtistSuggestions(artist: string) {
+    const artistsQueryResult = await mbApi.search("artist", {query: artist, limit: 5})
+    return artistsQueryResult.artists.map(value => value.name);
+}
+
+
 const EntryForm: React.FC<EntryFormProps> = ({
                                                  onSubmit,
                                                  bandName,
@@ -55,14 +62,30 @@ const EntryForm: React.FC<EntryFormProps> = ({
     const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchSuggestions = () => {
+        const fetchSuggestions = async () => {
             if (!data) return;
-            const uniqueBandNames: string[] = Array.from(new Set(data.map((event: {
-                bandName: string
-            }) => event.bandName)));
-            const suggestions: string[] = uniqueBandNames.filter(s => s.toLowerCase().includes(bandInputValue.toLowerCase()));
-            setBandSuggestions(suggestions);
+            // Get unique local suggestions
+            const uniqueLocalNames = Array.from(new Set(
+                data.map(event => event.bandName)
+                    .filter(name => name.toLowerCase().includes(bandInputValue.toLowerCase()))
+            ));
+
+            try {
+                // Get API suggestions
+                if (bandInputValue != '') {
+                    const apiSuggestions = await queryArtistSuggestions(bandInputValue);
+
+                    // Combine and deduplicate
+                    const allSuggestions = [...uniqueLocalNames, ...apiSuggestions];
+                    const uniqueSuggestions = Array.from(new Set(allSuggestions));
+
+                    setBandSuggestions(uniqueSuggestions);
+                }
+            } catch (error) {
+                setBandSuggestions(uniqueLocalNames);
+            }
         };
+
         fetchSuggestions();
     }, [bandInputValue, data]);
 
@@ -84,7 +107,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
     return (
         <DefaultLayout>
             <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
-                <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
+                <Typography variant="h4" component="h1" sx={{mb: 4, textAlign: 'center'}}>
                     {isUpdate ? 'Update Entry' : 'Create New Entry'}
                 </Typography>
                 <Grid spacing={1}>
