@@ -6,7 +6,7 @@ import React, {PropsWithChildren, useContext} from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import {AuthContext} from "../contexts/AuthContext";
 import {useNavigate} from "react-router-dom";
-import AddButton from "../components/AddButton";
+import AddButton from "../components/utilities/AddButton";
 
 
 
