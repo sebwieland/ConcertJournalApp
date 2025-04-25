@@ -15,7 +15,8 @@ declare module 'musicbrainz-api' {
         }>;
     }
 
-    interface IArtistMatch extends IArtist {}
+    interface IArtistMatch extends IArtist {
+    }
 }
 
 interface EntryFormProps {
@@ -40,6 +41,7 @@ interface EntryFormProps {
     isSuccess: boolean;
     data: any[];
     isUpdate?: boolean;
+    showArtistDetailsButton?: boolean;
 }
 
 interface ArtistTag {
@@ -94,7 +96,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                                  message,
                                                  isSuccess,
                                                  data,
-                                                 isUpdate
+                                                 isUpdate,
+                                                 showArtistDetailsButton
                                              }) => {
     const [bandSuggestions, setBandSuggestions] = useState<string[]>([]);
     const [bandInputValue, setBandInputValue] = useState('');
@@ -190,13 +193,15 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 />
                             )}
                         />
-                        <Button
-                            size="small"
-                            onClick={() => setShowArtistDetails(!showArtistDetails)}
-                            sx={{mb: 1}}
-                        >
-                            {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
-                        </Button>
+                        {showArtistDetailsButton && (
+                            <Button
+                                size="small"
+                                onClick={() => setShowArtistDetails(!showArtistDetails)}
+                                sx={{mb: 1}}
+                            >
+                                {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
+                            </Button>
+                        )}
                         {artistDetails && showArtistDetails && (
                             <Grid sx={{mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1}}>
                                 <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
