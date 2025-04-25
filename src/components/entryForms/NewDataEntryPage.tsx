@@ -64,6 +64,7 @@ const CreateNewEntryFormPage = () => {
             message={message}
             isSuccess={isSuccess}
             data={data}
+            showArtistDetailsButton={true}
         />
     );
 };
