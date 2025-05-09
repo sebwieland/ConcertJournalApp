@@ -57,7 +57,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [apiClient]);
 
     const setLoggedOut = useCallback(() => {
-        console.log('setLoggedOut called, clearing auth state');
         setIsLoggedInWithLogging(false);
         setAccessToken('');
         setRefreshToken('');
@@ -65,7 +64,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         
         // Clear the token refresh interval
         if (refreshIntervalId !== null) {
-            console.log('Clearing token refresh interval on logout:', refreshIntervalId);
             clearInterval(refreshIntervalId);
             setRefreshIntervalId(null);
         }
@@ -81,7 +79,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             
             // Only clear auth-related cookies, preserve CSRF token
             if (authCookies.some(authCookie => name.toLowerCase().includes(authCookie.toLowerCase()))) {
-                console.log('Clearing auth cookie:', name);
                 document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
                 document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
             }
@@ -92,15 +89,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key && authStorageKeys.some(authKey => key.toLowerCase().includes(authKey.toLowerCase()))) {
-                console.log('Clearing auth storage item:', key);
                 localStorage.removeItem(key);
             }
-        }
-        
-        console.log('Auth cookies and storage cleared');
-        
-        if (process.env.NODE_ENV === 'development') {
-            console.log('User logged out');
         }
     }, [setAccessToken, setRefreshToken, setIsLoading, refreshIntervalId]);
 

@@ -18,15 +18,8 @@ const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
 
     useEffect(() => {
         setIsLoading(authLoading);
-        if (process.env.NODE_ENV === 'development') {
-            console.log('AuthenticatedPage component mounted');
-            console.log('AuthenticatedPage isLoggedIn:', isLoggedIn);
-            console.log('AuthenticatedPage authLoading:', authLoading);
-        }
         return () => {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('AuthenticatedPage component unmounted');
-            }
+            // No need to log unmount here
         };
     }, [authLoading, isLoggedIn]);
 
