@@ -30,13 +30,36 @@ class DataTable extends React.Component<DataTableProps, {}> {
         { field: 'place', headerName: 'Place', width: 130 },
         {
             field: 'date', headerName: 'Date', width: 130,
-            type: 'date' as const, sortComparator: (v1, v2) => dayjs(v1).diff(dayjs(v2)),
+            type: 'date' as const,
+            sortComparator: (v1, v2) => {
+                // Handle dates that come as arrays [year, month, day]
+                const getDate = (value: any) => {
+                    if (Array.isArray(value)) {
+                        const [year, month, day] = value;
+                        // Note: month in dayjs is 0-indexed, but our array uses 1-indexed months
+                        return dayjs().year(year).month(month - 1).date(day);
+                    }
+                    return dayjs(value);
+                };
+                
+                return getDate(v1).diff(getDate(v2));
+            },
             valueFormatter: (params: any) => {
                 // Add defensive check for date value
                 if (!params || params.value === undefined || params.value === null) {
                     console.warn('Missing date value for row:', params);
                     return 'Unknown date';
                 }
+                
+                // Handle date that comes as an array [year, month, day]
+                if (Array.isArray(params.value)) {
+                    const [year, month, day] = params.value;
+                    // Note: month in dayjs is 0-indexed, but our array uses 1-indexed months
+                    const date = dayjs().year(year).month(month - 1).date(day);
+                    return date.format('DD/MM/YYYY');
+                }
+                
+                // Handle date that comes as a string
                 const date = dayjs(params.value);
                 return date.format('DD/MM/YYYY');
             }

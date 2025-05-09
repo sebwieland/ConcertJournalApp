@@ -112,7 +112,10 @@ const Journal = () => {
                                                             {item.place}
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary">
-                                                            {new Date(item.date).toLocaleDateString()}
+                                                            {Array.isArray(item.date)
+                                                                ? new Date(item.date[0], item.date[1] - 1, item.date[2]).toLocaleDateString()
+                                                                : new Date(item.date).toLocaleDateString()
+                                                            }
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary">
                                                             {item.comment}
