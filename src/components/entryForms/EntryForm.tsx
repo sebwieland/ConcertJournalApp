@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, Autocomplete, Container, Grid, Rating, TextField, Typography} from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { ConcertEvent, CreateEventData, UpdateEventData } from '../../types/events';
+import { Alert, Autocomplete, Container, Grid, Rating, TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
-import {DatePicker} from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import DefaultLayout from "../../theme/DefaultLayout";
-import {useNavigate} from "react-router-dom";
-import {mbApi} from "../../api/musicBrainzApi";
+import { useNavigate } from "react-router-dom";
+import { mbApi } from "../../api/musicBrainzApi";
+import { handleApiError } from '../../api/apiErrors';
 
 declare module 'musicbrainz-api' {
     interface IArtist {
@@ -20,18 +22,12 @@ declare module 'musicbrainz-api' {
 }
 
 interface EntryFormProps {
-    onSubmit: (data: {
-        bandName: string;
-        place: string;
-        date: dayjs.Dayjs;
-        rating: number;
-        comment: string;
-    }) => Promise<void>;
+    onSubmit: (data: CreateEventData | UpdateEventData) => Promise<void>;
     bandName: string;
     setBandName: (bandName: string) => void;
     place: string;
     setPlace: (place: string) => void;
-    date: dayjs.Dayjs;
+    date: string;
     setDate: (date: dayjs.Dayjs) => void;
     rating: number;
     setRating: (rating: number) => void;
@@ -39,7 +35,7 @@ interface EntryFormProps {
     setComment: (comment: string) => void;
     message: string;
     isSuccess: boolean;
-    data: any[];
+    data: ConcertEvent[];
     isUpdate?: boolean;
     showArtistDetailsButton?: boolean;
 }
@@ -54,17 +50,16 @@ interface ArtistDetails {
     genre?: string;
     formationYear?: string;
     country?: string;
-    tags?: ArtistTag[];  // Add this to your interface
+    tags?: ArtistTag[];
 }
 
 async function queryArtistSuggestions(artist: string) {
-    const artistsQueryResult = await mbApi.search("artist", {query: artist, limit: 5})
-    // console.log(artistsQueryResult)
+    const artistsQueryResult = await mbApi.search("artist", { query: artist, limit: 5 });
     return artistsQueryResult.artists.map(value => value.name);
 }
 
 async function fetchArtistDetails(name: string): Promise<ArtistDetails> {
-    const result = await mbApi.search("artist", {query: name, limit: 1});
+    const result = await mbApi.search("artist", { query: name, limit: 1 });
     const artist = result.artists[0];
     if (!artist) return {};
 
@@ -80,33 +75,31 @@ async function fetchArtistDetails(name: string): Promise<ArtistDetails> {
     };
 }
 
-
 const EntryForm: React.FC<EntryFormProps> = ({
-                                                 onSubmit,
-                                                 bandName,
-                                                 setBandName,
-                                                 place,
-                                                 setPlace,
-                                                 date,
-                                                 setDate,
-                                                 rating,
-                                                 setRating,
-                                                 comment,
-                                                 setComment,
-                                                 message,
-                                                 isSuccess,
-                                                 data,
-                                                 isUpdate,
-                                                 showArtistDetailsButton
-                                             }) => {
+    onSubmit,
+    bandName,
+    setBandName,
+    place,
+    setPlace,
+    date,
+    setDate,
+    rating,
+    setRating,
+    comment,
+    setComment,
+    message,
+    isSuccess,
+    data,
+    isUpdate,
+    showArtistDetailsButton
+}) => {
     const [bandSuggestions, setBandSuggestions] = useState<string[]>([]);
     const [bandInputValue, setBandInputValue] = useState('');
     const [placeSuggestions, setPlaceSuggestions] = useState<string[]>([]);
     const [placeInputValue, setPlaceInputValue] = useState('');
     const [artistDetails, setArtistDetails] = useState<ArtistDetails | null>(null);
     const [showArtistDetails, setShowArtistDetails] = useState(false);
-    const navigate = useNavigate()
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSuggestions = async () => {
@@ -119,7 +112,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
 
             try {
                 // Get API suggestions
-                if (bandInputValue != '') {
+                if (bandInputValue !== '') {
                     const apiSuggestions = await queryArtistSuggestions(bandInputValue);
 
                     // Combine and deduplicate
@@ -130,6 +123,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
                 }
             } catch (error) {
                 setBandSuggestions(uniqueLocalNames);
+                console.error("Error fetching band suggestions:", handleApiError(error));
             }
         };
 
@@ -139,7 +133,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
     useEffect(() => {
         const fetchSuggestions = () => {
             if (!data) return;
-            const uniquePlaces: string[] = Array.from(new Set(data.map((event: { place: string }) => event.place)));
+            const uniquePlaces: string[] = Array.from(new Set(data.map((event: ConcertEvent) => event.place)));
             const suggestions: string[] = uniquePlaces.filter(s => s.toLowerCase().includes(placeInputValue.toLowerCase()));
             setPlaceSuggestions(suggestions);
         };
@@ -147,14 +141,19 @@ const EntryForm: React.FC<EntryFormProps> = ({
     }, [placeInputValue, data]);
 
     const handleSubmit = async () => {
-        await onSubmit({bandName, place, date, rating, comment});
+        await onSubmit({
+            bandName: bandName || '',
+            place: place || '',
+            date: date,
+            rating: rating || 0,
+            comment: comment || ''
+        });
     };
-
 
     return (
         <DefaultLayout>
-            <Container maxWidth="sm" sx={{marginTop: "10vh"}} component="form">
-                <Typography variant="h4" component="h1" sx={{mb: 4, textAlign: 'center'}}>
+            <Container maxWidth="sm" sx={{ marginTop: "10vh" }} component="form">
+                <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
                     {isUpdate ? 'Update Entry' : 'Create New Entry'}
                 </Typography>
                 <Grid spacing={1}>
@@ -171,11 +170,10 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                         setArtistDetails(details);
                                     } catch (error) {
                                         setArtistDetails(null);
-                                        console.error("Failed to fetch artist details", error);
+                                        console.error("Failed to fetch artist details", handleApiError(error));
                                     }
                                 }
-                            }
-                            }
+                            }}
                             inputValue={bandInputValue}
                             onInputChange={(event, newInputValue) => {
                                 setBandInputValue(newInputValue);
@@ -189,7 +187,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     label="Band"
                                     variant="outlined"
                                     fullWidth
-                                    sx={{marginBottom: 2}}
+                                    sx={{ marginBottom: 2 }}
                                 />
                             )}
                         />
@@ -197,17 +195,16 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             <Button
                                 size="small"
                                 onClick={() => setShowArtistDetails(!showArtistDetails)}
-                                sx={{mb: 1}}
+                                sx={{ mb: 1 }}
                             >
                                 {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
                             </Button>
                         )}
                         {artistDetails && showArtistDetails && (
-                            <Grid sx={{mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1}}>
+                            <Grid sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
                                 <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
                                 <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
-                                <Typography
-                                    variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
+                                <Typography variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
                                 <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
                             </Grid>
                         )}
@@ -230,13 +227,13 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                         label="Place"
                                         variant="outlined"
                                         fullWidth
-                                        sx={{marginBottom: 2}}
+                                        sx={{ marginBottom: 2 }}
                                     />
                                 )}
                             />
                         </Grid>
 
-                        <Grid sx={{textAlign: 'center', marginBottom: 2}}>
+                        <Grid sx={{ textAlign: 'center', marginBottom: 2 }}>
                             <Rating
                                 name="Rating"
                                 value={rating}
@@ -251,15 +248,15 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 variant="outlined"
                                 fullWidth
                                 value={comment}
-                                sx={{marginBottom: 2}}
+                                sx={{ marginBottom: 2 }}
                                 onChange={(event) => setComment(event.target.value)}
                             />
                         </Grid>
                         <Grid>
                             <DatePicker
                                 label="Date"
-                                value={date}
-                                sx={{marginBottom: 2, width: '100%'}}
+                                value={date ? dayjs(date) : dayjs()}
+                                sx={{ marginBottom: 2, width: '100%' }}
                                 onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                             />
                         </Grid>
@@ -268,7 +265,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 variant="contained"
                                 color="primary"
                                 fullWidth
-                                sx={{marginBottom: 2}}
+                                sx={{ marginBottom: 2 }}
                                 onClick={handleSubmit}
                             >
                                 {isUpdate ? 'Update Entry' : 'Create New Entry'}
@@ -287,7 +284,7 @@ const EntryForm: React.FC<EntryFormProps> = ({
                         <Grid>
                             {message &&
                                 <Alert
-                                    severity={isSuccess ? 'success' : 'error'} sx={{maxWidth: '100%'}}>
+                                    severity={isSuccess ? 'success' : 'error'} sx={{ maxWidth: '100%' }}>
                                     {message}
                                 </Alert>}
                         </Grid>
@@ -298,4 +295,4 @@ const EntryForm: React.FC<EntryFormProps> = ({
     );
 };
 
-export default EntryForm;
+export default React.memo(EntryForm);
