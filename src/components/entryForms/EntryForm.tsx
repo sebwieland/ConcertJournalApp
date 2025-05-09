@@ -255,7 +255,11 @@ const EntryForm: React.FC<EntryFormProps> = ({
                         <Grid>
                             <DatePicker
                                 label="Date"
-                                value={date ? dayjs(date) : dayjs()}
+                                value={
+                                    Array.isArray(date)
+                                        ? dayjs().year(date[0]).month(date[1] - 1).date(date[2])
+                                        : date ? dayjs(date) : dayjs()
+                                }
                                 sx={{ marginBottom: 2, width: '100%' }}
                                 onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                             />
