@@ -1,4 +1,5 @@
-import React, {useState, useEffect, ReactNode} from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { handleApiError } from '../api/apiErrors';
 
 interface Config {
     backendURL: string;
@@ -21,9 +22,14 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
             .then(data => {
                 setConfig(data);
                 setLoading(false);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('Successfully loaded config:', data);
+                }
             })
             .catch(error => {
-                setConfig({backendURL: "http://localhost:8080"})
+                const processedError = handleApiError(error);
+                console.error("Failed to load config:", processedError);
+                setConfig({ backendURL: "http://localhost:8080" });
                 setLoading(false);
             });
     }, []);
@@ -39,4 +45,4 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-export {ConfigContext, ConfigProvider};
+export { ConfigContext, ConfigProvider };
