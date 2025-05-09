@@ -46,9 +46,9 @@ const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
             console.error('Error calling setLoggedOut:', error);
         }
         
-        // Force a hard redirect to ensure the page changes
-        window.location.href = '/sign-in';
-        return null;
+        // Use React Router's Navigate component instead of hard redirect
+        // This prevents a full page reload which can disrupt the auth flow
+        return <Navigate to="/sign-in" replace />;
     }
 
     return element;
