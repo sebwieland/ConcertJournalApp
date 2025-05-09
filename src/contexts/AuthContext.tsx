@@ -95,31 +95,26 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [setAccessToken, setRefreshToken, setIsLoading, refreshIntervalId]);
 
     const refreshTokenApiCall = useCallback(async () => {
-        // Skip token refresh if we're explicitly logged out
-        // Check for both isLoggedIn state and token existence
-        if (!isLoggedIn) {
-            console.log('Skipping token refresh - isLoggedIn is false');
-            return;
-        }
-        
         // If we're on the sign-in page, don't try to refresh the token
         if (window.location.pathname.includes('sign-in') || window.location.pathname.includes('sign-up')) {
             console.log('Skipping token refresh - user is on authentication page');
             return;
         }
         
-        console.log('Attempting to refresh token, current isLoggedIn state:', isLoggedIn);
+        // Check for refresh token cookie regardless of isLoggedIn state
+        // This allows token refresh to work on page reload
+        const hasRefreshToken = document.cookie.split(';')
+            .some(cookie => cookie.trim().startsWith('refreshToken='));
+            
+        if (!hasRefreshToken) {
+            console.log('No refresh token cookie found, cannot refresh token');
+            setLoggedOut();
+            return;
+        }
+        
+        console.log('Attempting to refresh token');
         setIsLoading(true); // Start loading state
         try {
-            // More robust check for refresh token cookie
-            const hasRefreshToken = document.cookie.split(';')
-                .some(cookie => cookie.trim().startsWith('refreshToken='));
-                
-            if (!hasRefreshToken) {
-                console.log('No refresh token cookie found, cannot refresh token');
-                setLoggedOut();
-                return;
-            }
             
             // Ensure we have a CSRF token before making the request
             if (!csrfToken) {
@@ -147,7 +142,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         } finally {
             setIsLoading(false); // Ensure isLoading is set to false after attempt
         }
-    }, [csrfToken, apiClient, setLoggedOut, setAccessToken, setIsLoggedIn, isLoggedIn, token, fetchCsrfToken]);
+    }, [csrfToken, apiClient, setLoggedOut, setAccessToken, setIsLoggedIn, fetchCsrfToken]);
 
     useEffect(() => {
         const setupAuth = async () => {
