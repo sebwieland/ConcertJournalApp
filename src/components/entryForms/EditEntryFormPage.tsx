@@ -15,7 +15,7 @@ const EditEntryFormPage = () => {
     const { token } = useAuth();
     const [bandName, setBandName] = useState('');
     const [place, setPlace] = useState('');
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState<string | number[]>('');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
@@ -34,6 +34,7 @@ const EditEntryFormPage = () => {
                 }
                 setBandName(event.bandName);
                 setPlace(event.place);
+                // Handle date that could be string or array
                 setDate(event.date);
                 setRating(event.rating);
                 setComment(event.comment);
