@@ -7,21 +7,16 @@ interface Statistics {
     mostVisitedLocation: string;
 }
 
-interface ConcertData {
-    id: number;
-    bandName: string;
-    place: string;
-    date: string[];
-    comment: string;
-    rating: number;
-    appUser: {
-        firstName: string;
-        lastName: string;
-        username: string;
-    };
+import { ConcertEvent } from '../types/events';
+
+interface Statistics {
+    totalCount: number;
+    mostSeenArtist: string;
+    mostArtistsOnASingleDay: number;
+    mostVisitedLocation: string;
 }
 
-const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
+const calculateStatistics = (entries: ConcertEvent[] = []): Statistics => {
     if (entries.length === 0) {
         return {
             totalCount: 0,
@@ -35,7 +30,7 @@ const calculateStatistics = (entries: ConcertData[] = []): Statistics => {
     const dailyBandCount: { [date: string]: number } = {};
 
     entries.forEach((item) => {
-        const date = dayjs(`${item.date[0]}-${item.date[1]}-${item.date[2]}`);
+        const date = dayjs(item.date);
         const dateString = date.toISOString().split('T')[0];
         bandCount[item.bandName] = (bandCount[item.bandName] || 0) + 1;
         locationCount[item.place] = (locationCount[item.place] || 0) + 1;

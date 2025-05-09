@@ -14,7 +14,11 @@ const Navbar = () => {
     const {logout} = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    const isLoggedIn = useContext(AuthContext)?.isLoggedIn;
+    const authContext = useContext(AuthContext);
+    if (!authContext) {
+        throw new Error('AuthContext is not provided');
+    }
+    const { isLoggedIn, setLoggedOut } = authContext;
 
     // if (!isLoggedIn) return null;
 
@@ -26,12 +30,29 @@ const Navbar = () => {
         setAnchorElNav(null);
     };
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
+        console.log('Logout button clicked');
+        
+        // Call setLoggedOut directly from AuthContext first to ensure immediate client-side logout
+        setLoggedOut();
+        console.log('Direct setLoggedOut called');
+        
+        // Then call the logout function which handles the API call
         try {
-            logout()
-        } catch (error: unknown) {
-            console.error('Error logging out:', error);
+            logout();
+        } catch (error) {
+            console.warn('Error during logout API call, but client-side logout already completed:', error);
         }
+        
+        // Force navigation to sign-in page immediately
+        console.log('Navigating to sign-in page');
+        navigate('/sign-in');
+        
+        // Force a page reload to clear any lingering state
+        setTimeout(() => {
+            console.log('Forcing page reload to clear state');
+            window.location.href = '/sign-in';
+        }, 100);
     };
     const DesktopView = () => (
         <>

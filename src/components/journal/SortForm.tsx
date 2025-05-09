@@ -1,74 +1,53 @@
-import * as React from "react";
-import {FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
-
-interface SortCriteria {
-    value: string;
-    label: string;
-}
-
-const sortCriteriaOptions: SortCriteria[] = [
-    {value: 'date', label: 'Date'},
-    {value: 'rating', label: 'Rating'}
-];
-
-const sortOrderOptions: SortCriteria[] = [
-    {value: 'asc', label: 'Ascending'},
-    {value: 'desc', label: 'Descending'}
-];
+import React from "react";
+import { FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { SelectChangeEvent } from '@mui/material/Select';
 
 interface SortFormProps {
-    sortOrder: { column: string; order: string };
-    onSortOrderChange: (newSortOrder: { column: string; order: string }) => void;
+    sortOrder: { column: string; order: 'asc' | 'desc' };
+    onSortOrderChange: (newSortOrder: { column: string; order: 'asc' | 'desc' }) => void;
 }
 
 const SortForm = ({ sortOrder, onSortOrderChange }: SortFormProps) => {
-    const handleSortCriteriaChange = (event: SelectChangeEvent<string>) => {
-        onSortOrderChange({ column: event.target.value as string, order: sortOrder.order });
+    const handleColumnChange = (event: SelectChangeEvent<string>) => {
+        const newColumn = event.target.value;
+        onSortOrderChange({ ...sortOrder, column: newColumn });
     };
 
-    const handleSortOrderChange = (event: SelectChangeEvent<string>) => {
-        onSortOrderChange({ column: sortOrder.column, order: event.target.value as string });
+    const handleOrderChange = (event: SelectChangeEvent<'asc' | 'desc'>) => {
+        const newOrder = event.target.value as 'asc' | 'desc';
+        onSortOrderChange({ ...sortOrder, order: newOrder });
     };
 
     return (
-        <Grid container spacing={2}>
-            <Grid size={{xs: 12}}>
-                <FormControl fullWidth>
-                    <InputLabel id="sort-criteria-label">Sort by</InputLabel>
-                    <Select
-                        labelId="sort-criteria-label"
-                        id="sort-criteria"
-                        value={sortOrder.column}
-                        label="Sort by"
-                        onChange={handleSortCriteriaChange}
-                    >
-                        {sortCriteriaOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Grid>
-            <Grid size={{xs: 12}}>
-                <FormControl fullWidth>
-                    <InputLabel id="sort-order-label">Sort order</InputLabel>
-                    <Select
-                        labelId="sort-order-label"
-                        id="sort-order"
-                        value={sortOrder.order}
-                        label="Sort order"
-                        onChange={handleSortOrderChange}
-                    >
-                        {sortOrderOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </Grid>
-        </Grid>
+        <FormControl fullWidth variant="outlined">
+            <InputLabel id="sort-column-label">Sort By</InputLabel>
+            <Select
+                labelId="sort-column-label"
+                id="sort-column"
+                value={sortOrder.column}
+                onChange={handleColumnChange}
+                label="Sort By"
+            >
+                <MenuItem value="date">Date</MenuItem>
+                <MenuItem value="bandName">Band Name</MenuItem>
+                <MenuItem value="place">Place</MenuItem>
+                <MenuItem value="rating">Rating</MenuItem>
+            </Select>
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+                Order:
+            </Typography>
+            <Select
+                labelId="sort-order-label"
+                id="sort-order"
+                value={sortOrder.order}
+                onChange={handleOrderChange}
+                label="Order"
+                sx={{ mt: 1 }}
+            >
+                <MenuItem value="asc">Ascending</MenuItem>
+                <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+        </FormControl>
     );
 };
 

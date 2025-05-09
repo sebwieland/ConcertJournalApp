@@ -1,32 +1,60 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DefaultLayout from '../theme/DefaultLayout';
 import DataCollector from './journal/DataCollector';
-import calculateStatistics from "../utils/calculateStatistics"
-import {ConfirmProvider} from "material-ui-confirm";
+import calculateStatistics from "../utils/calculateStatistics";
+import { ConcertEvent } from "../types/events";
+import { ConfirmProvider } from "material-ui-confirm";
 import StatCard from './utilities/StatCard';
-import {MusicNote, Group, LocationOn, PlaylistAddCheck} from '@mui/icons-material';
+import { MusicNote, Group, LocationOn, PlaylistAddCheck } from '@mui/icons-material';
+import { Alert } from "@mui/material";
+import useEvents from "../hooks/useEvents";
+import { handleApiError } from '../api/apiErrors';
+import LoadingIndicator from "./utilities/LoadingIndicator";
 
 export default function LandingPage() {
+    const { data, error, isLoading, refetch } = useEvents();
+
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('LandingPage component mounted');
+        }
+        return () => {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('LandingPage component unmounted');
+            }
+        };
+    }, []);
+
+    if (isLoading) {
+        return <DefaultLayout><LoadingIndicator /></DefaultLayout>;
+    }
+
+    if (error) {
+        return (
+            <DefaultLayout>
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    {error.message}
+                </Alert>
+            </DefaultLayout>
+        );
+    }
+
+    const events = data || [];
+    const statistics = calculateStatistics(events);
+
     return (
         <DefaultLayout>
             <ConfirmProvider>
-                <DataCollector>
-                    {({data}) => {
-                        const statistics = calculateStatistics(data);
-                        return (
-                            <div>
-                                <h1>Welcome to your Concert Journal!</h1>
-                                <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
-                                    <StatCard title="Concerts attended" value={statistics.totalCount.toString()} icon={<PlaylistAddCheck />} />
-                                    <StatCard title="Most Seen Artist" value={statistics.mostSeenArtist} icon={<MusicNote />} />
-                                    <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
-                                    <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
-                                </div>
-                            </div>
-                        );
-                    }}
-                </DataCollector>
+                <div>
+                    <h1>Welcome to your Concert Journal!</h1>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <StatCard title="Concerts attended" value={statistics.totalCount.toString()} icon={<PlaylistAddCheck />} />
+                        <StatCard title="Most Seen Artist" value={statistics.mostSeenArtist} icon={<MusicNote />} />
+                        <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
+                        <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
+                    </div>
+                </div>
             </ConfirmProvider>
         </DefaultLayout>
     );
-};
+}

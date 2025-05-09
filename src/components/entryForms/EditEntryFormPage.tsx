@@ -5,17 +5,17 @@ import EventsApi from '../../api/apiEvents';
 import useAuth from '../../hooks/useAuth';
 import dayjs from "dayjs";
 import EntryForm from "./EntryForm";
-
+import { ConcertEvent, UpdateEventData } from "../../types/events";
+import { ApiError, handleApiError } from "../../api/apiErrors";
 
 const EditEntryFormPage = () => {
     const eventsApi = EventsApi();
-
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const { data, refetch } = useEvents();
     const { token } = useAuth();
     const [bandName, setBandName] = useState('');
     const [place, setPlace] = useState('');
-    const [date, setDate] = useState(dayjs());
+    const [date, setDate] = useState('');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
@@ -23,73 +23,85 @@ const EditEntryFormPage = () => {
 
     useEffect(() => {
         const fetchEvent = async () => {
-            if (!id ||!data) {
+            if (!id || !data) {
                 return;
             }
             try {
-                const event = data.find((event: any) => event.id === parseInt(id));
+                const eventId = parseInt(id, 10);
+                const event = data.find((event: ConcertEvent) => event.id === eventId);
                 if (!event) {
                     return;
                 }
                 setBandName(event.bandName);
                 setPlace(event.place);
-                // console.log("Edit date: ", event.date)
-                // console.log("Edit date corrected: ", dayjs(new Date(event.date[0], event.date[1]-1, event.date[2])))
-                setDate(dayjs(new Date(event.date[0], event.date[1]-1, event.date[2])));
+                setDate(event.date);
                 setRating(event.rating);
                 setComment(event.comment);
             } catch (error) {
-                console.error('Error fetching event:', error);
+                const processedError = handleApiError(error);
+                console.error('Error fetching event:', processedError);
             }
         };
         fetchEvent();
     }, [id, data]);
 
-    const handleSubmit = async (data: {
-        bandName: string;
-        place: string;
-        date: dayjs.Dayjs;
-        rating: number;
-        comment: string;
-    }) => {
-        if (!data.bandName.trim()) {
-            setMessage('Please enter a band name');
-            setIsSuccess(false);
-            return;
+    useEffect(() => {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('EditEntryFormPage component mounted');
         }
+        return () => {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('EditEntryFormPage component unmounted');
+            }
+        };
+    }, []);
+
+    const handleSubmit = async (formData: UpdateEventData) => {
+        const formattedData: UpdateEventData = {
+            bandName: formData.bandName || '',
+            place: formData.place || '',
+            date: formData.date || '',
+            rating: formData.rating || 0,
+            comment: formData.comment || ''
+        };
         try {
-            await eventsApi.updateEvent(parseInt(id!), {
-                bandName,
-                place,
-                date,
-                rating,
-                comment,
-            }, token);
+            await eventsApi.updateEvent(parseInt(id!, 10), formattedData, token);
             refetch();
             setMessage('Entry updated successfully!');
             setIsSuccess(true);
         } catch (error) {
-            setMessage(`Error updating entry: ${(error as Error).message}`);
+            const processedError = handleApiError(error);
+            setMessage(`Error updating entry: ${processedError.message}`);
             setIsSuccess(false);
+            console.error("Error updating entry:", processedError);
         }
     };
 
     return (
         <EntryForm
-            onSubmit={handleSubmit}
+            onSubmit={async (formData) => {
+                const formattedData: UpdateEventData = {
+                    bandName: formData.bandName || '',
+                    place: formData.place || '',
+                    date: formData.date || '',
+                    rating: formData.rating || 0,
+                    comment: formData.comment || ''
+                };
+                await handleSubmit(formattedData);
+            }}
             bandName={bandName}
             setBandName={setBandName}
             place={place}
             setPlace={setPlace}
             date={date}
-            setDate={setDate}
+            setDate={(newDate: dayjs.Dayjs) => setDate(newDate.toISOString().split('T')[0])}
             rating={rating}
             setRating={setRating}
             comment={comment}
             setComment={setComment}
             message={message}
             isSuccess={isSuccess}
-            data={data}
+            data={data || []}
             isUpdate={true}
             showArtistDetailsButton={false}
         />

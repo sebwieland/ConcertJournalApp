@@ -1,6 +1,7 @@
 import useApiClient from './apiClient';
 import { AuthContext } from "../contexts/AuthContext";
 import { useContext } from "react";
+import { handleApiError } from './apiErrors';
 
 interface LoginResponse {
     accessToken: string;
@@ -47,11 +48,11 @@ const useAuthApi = () => {
                 return response.data;
             } else {
                 console.error("Login failed:", response.statusText);
-                throw new Error(response.statusText);
+                throw handleApiError(new Error(response.statusText));
             }
         } catch (error) {
             console.error("Error during login:", error);
-            throw error;
+            throw handleApiError(error);
         }
     };
 
@@ -67,11 +68,11 @@ const useAuthApi = () => {
 
             if (response.status !== 200) {
                 console.error("Logout failed:", response.statusText);
-                throw new Error(response.statusText);
+                throw handleApiError(new Error(response.statusText));
             }
         } catch (error) {
             console.error("Error during logout:", error);
-            throw error;
+            throw handleApiError(error);
         }
     };
 
@@ -84,7 +85,7 @@ const useAuthApi = () => {
             return response.data;
         } catch (error) {
             console.error("Error during registration:", error);
-            throw error;
+            throw handleApiError(error);
         }
     };
 
