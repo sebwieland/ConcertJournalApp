@@ -31,13 +31,9 @@ const Journal = () => {
     const { data, error, isLoading, refetch } = useEvents();
 
     useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('Journal component mounted');
-        }
+        // Component mounted
         return () => {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Journal component unmounted');
-            }
+            // Component unmounted
         };
     }, []);
 
@@ -47,21 +43,11 @@ const Journal = () => {
     };
 
     const onEdit = (id: React.Key) => {
-        if (typeof id === 'number') {
-            console.log('Editing entry with ID:', id);
-            // Handle edit logic here
-        } else {
-            console.error('Invalid ID type:', id);
-        }
+        // Handle edit logic here
     };
 
     const onDelete = (id: React.Key) => {
-        if (typeof id === 'number') {
-            console.log('Deleting entry with ID:', id);
-            // Handle delete logic here
-        } else {
-            console.error('Invalid ID type:', id);
-        }
+        // Handle delete logic here
     };
 
     if (isLoading) {
@@ -112,10 +98,32 @@ const Journal = () => {
                                                             {item.place}
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary">
-                                                            {Array.isArray(item.date)
-                                                                ? new Date(item.date[0], item.date[1] - 1, item.date[2]).toLocaleDateString()
-                                                                : new Date(item.date).toLocaleDateString()
-                                                            }
+                                                            {(() => {
+                                                                try {
+                                                                    if (Array.isArray(item.date)) {
+                                                                        return new Date(item.date[0], item.date[1] - 1, item.date[2]).toLocaleDateString();
+                                                                    } else if (typeof item.date === 'string' &&
+                                                                              item.date.startsWith('[') &&
+                                                                              item.date.endsWith(']')) {
+                                                                        // Handle string representation of array
+                                                                        try {
+                                                                            const dateArray = JSON.parse(item.date);
+                                                                            if (Array.isArray(dateArray) && dateArray.length === 3) {
+                                                                                return new Date(dateArray[0], dateArray[1] - 1, dateArray[2]).toLocaleDateString();
+                                                                            }
+                                                                        } catch (error) {
+                                                                            console.error('Error parsing string array date in mobile view:', item.date, error);
+                                                                        }
+                                                                    } else if (item.date) {
+                                                                        return new Date(item.date).toLocaleDateString();
+                                                                    } else {
+                                                                        return 'No date';
+                                                                    }
+                                                                } catch (error) {
+                                                                    console.error('Error formatting date in mobile view:', item.date, error);
+                                                                    return 'Invalid date';
+                                                                }
+                                                            })()}
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary">
                                                             {item.comment}
@@ -140,9 +148,24 @@ const Journal = () => {
             <DefaultLayout>
                 <ConfirmProvider>
                     <DataCollector>
-                        {({ data, onEdit, onDelete }) => (
-                            <DataTable data={data} onEdit={onEdit} onDelete={onDelete} />
-                        )}
+                        {({ data, onEdit, onDelete }) => {
+                            // Final validation before passing to DataTable
+                            const validatedData = data.map(item => {
+                                // Create a copy to avoid mutating the original
+                                const validatedItem = { ...item };
+                                
+                                // Ensure date is valid
+                                if (validatedItem.date === undefined || validatedItem.date === null) {
+                                    // Use current date as default
+                                    const today = new Date();
+                                    validatedItem.date = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+                                }
+                                
+                                return validatedItem;
+                            });
+                            
+                            return <DataTable data={validatedData} onEdit={onEdit} onDelete={onDelete} />;
+                        }}
                     </DataCollector>
                 </ConfirmProvider>
             </DefaultLayout>

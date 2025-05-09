@@ -255,11 +255,36 @@ const EntryForm: React.FC<EntryFormProps> = ({
                         <Grid>
                             <DatePicker
                                 label="Date"
-                                value={
-                                    Array.isArray(date)
-                                        ? dayjs().year(date[0]).month(date[1] - 1).date(date[2])
-                                        : date ? dayjs(date) : dayjs()
-                                }
+                                value={(() => {
+                                    try {
+                                        // Handle undefined or null dates
+                                        if (!date) {
+                                            return dayjs(); // Default to current date
+                                        }
+                                        
+                                        if (Array.isArray(date)) {
+                                            return dayjs().year(date[0]).month(date[1] - 1).date(date[2]);
+                                        } else if (typeof date === 'string' &&
+                                                  date.startsWith('[') &&
+                                                  date.endsWith(']')) {
+                                            // Handle string representation of array
+                                            try {
+                                                const dateArray = JSON.parse(date);
+                                                if (Array.isArray(dateArray) && dateArray.length === 3) {
+                                                    return dayjs().year(dateArray[0]).month(dateArray[1] - 1).date(dateArray[2]);
+                                                }
+                                            } catch (error) {
+                                                return dayjs(); // Default to current date on parsing error
+                                            }
+                                        } else if (date) {
+                                            return dayjs(date);
+                                        } else {
+                                            return dayjs();
+                                        }
+                                    } catch (error) {
+                                        return dayjs(); // Default to current date on error
+                                    }
+                                })()}
                                 sx={{ marginBottom: 2, width: '100%' }}
                                 onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                             />
