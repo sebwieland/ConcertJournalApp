@@ -123,51 +123,17 @@ const useAuth = (): UseAuth => {
     };
 
     const logout = () => {
-        console.log("Starting logout process");
-        console.log("Before logout - isLoggedIn:", authContext.isLoggedIn);
-        
-        // Store the current interval IDs to check if they're cleared
-        const intervalsBefore = Object.keys(window).filter(key => key.startsWith('setInterval')).length;
-        console.log("Active intervals before logout:", intervalsBefore);
-        
         // First, ensure client-side logout happens immediately
         setLoggedOut();
-        
-        console.log("Client-side logout completed");
         
         // Then try the API call in the background
         logoutMutation()
             .then(() => {
-                console.log("API logout successful");
+                // No need to log success here
             })
             .catch(error => {
                 console.warn("API logout failed, but client-side logout already completed:", error);
             });
-        
-        console.log("After logout - isLoggedIn:", authContext.isLoggedIn);
-        
-        // Double-check that isLoggedIn is set to false
-        if (authContext.isLoggedIn) {
-            console.warn("Warning: isLoggedIn is still true after logout");
-            console.log("Forcing isLoggedIn to false again");
-            setIsLoggedIn(false);
-            
-            // Check if the refresh token cookie still exists
-            console.log("Checking cookies after logout:", document.cookie);
-        }
-        
-        // Check if intervals are still running
-        const intervalsAfter = Object.keys(window).filter(key => key.startsWith('setInterval')).length;
-        console.log("Active intervals after logout:", intervalsAfter);
-        
-        // Force a check of the auth state after a short delay
-        setTimeout(() => {
-            console.log("Auth state 500ms after logout - isLoggedIn:", authContext.isLoggedIn);
-            if (authContext.isLoggedIn) {
-                console.warn("isLoggedIn is STILL true 500ms after logout, forcing logout again");
-                setLoggedOut();
-            }
-        }, 500);
     };
 
     return { token: authContext.token, login, logout, signUp, isLoading, error };
