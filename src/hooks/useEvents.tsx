@@ -52,17 +52,16 @@ const useEvents = (): UseEvents => {
                     if (Array.isArray(response)) {
                         console.log(`Received ${response.length} events`);
                         
-                        // Check for any items with missing or malformed properties
+                        // Basic validation of event data
                         const itemsWithIssues = response.filter(item =>
                             !item ||
                             typeof item !== 'object' ||
-                            !item.appUser ||
-                            typeof item.appUser !== 'object' ||
-                            !item.appUser.username
+                            !item.bandName ||
+                            !item.date
                         );
                         
                         if (itemsWithIssues.length > 0) {
-                            console.warn('Found items with missing or malformed properties:', itemsWithIssues);
+                            console.warn('Found items with missing required properties:', itemsWithIssues);
                         }
                     } else {
                         console.warn('API response is not an array:', response);

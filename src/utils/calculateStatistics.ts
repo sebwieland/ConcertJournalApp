@@ -30,7 +30,16 @@ const calculateStatistics = (entries: ConcertEvent[] = []): Statistics => {
     const dailyBandCount: { [date: string]: number } = {};
 
     entries.forEach((item) => {
-        const date = dayjs(item.date);
+        // Handle date that comes as an array [year, month, day]
+        let date;
+        if (Array.isArray(item.date)) {
+            const [year, month, day] = item.date;
+            // Note: month in dayjs is 0-indexed, but our array uses 1-indexed months
+            date = dayjs().year(year).month(month - 1).date(day);
+        } else {
+            date = dayjs(item.date);
+        }
+        
         const dateString = date.toISOString().split('T')[0];
         bandCount[item.bandName] = (bandCount[item.bandName] || 0) + 1;
         locationCount[item.place] = (locationCount[item.place] || 0) + 1;
