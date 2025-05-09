@@ -25,11 +25,8 @@ export default function SignInSide() {
     // Redirect to landing page if already logged in
     useEffect(() => {
         if (isLoggedIn) {
-            console.log('User already logged in, redirecting to landing page');
             navigate('/');
         }
-        // We don't call setLoggedOut here anymore to avoid clearing CSRF tokens
-        // which would cause the first login attempt to fail
     }, [isLoggedIn, navigate]);
 
     const handleLogin = async (event: React.FormEvent) => {
@@ -41,20 +38,17 @@ export default function SignInSide() {
             
             // If login was successful, redirect to landing page
             if (result) {
-                console.log('Login successful, redirecting to landing page');
                 navigate('/');
             } else {
                 // Check auth context as a fallback
                 setTimeout(() => {
                     if (authContext.isLoggedIn) {
-                        console.log('Login confirmed via context, redirecting to landing page');
                         navigate('/');
                     }
                 }, 500); // Small delay to allow context to update
             }
         } catch (error) {
             setShowError(true);
-            console.error("Login error:", error);
         }
     };
 

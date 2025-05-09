@@ -31,11 +31,8 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        console.log('Logout button clicked');
-        
         // Call setLoggedOut directly from AuthContext first to ensure immediate client-side logout
         setLoggedOut();
-        console.log('Direct setLoggedOut called');
         
         // Then call the logout function which handles the API call
         try {
@@ -45,12 +42,10 @@ const Navbar = () => {
         }
         
         // Force navigation to sign-in page immediately
-        console.log('Navigating to sign-in page');
         navigate('/sign-in');
         
         // Force a page reload to clear any lingering state
         setTimeout(() => {
-            console.log('Forcing page reload to clear state');
             window.location.href = '/sign-in';
         }, 100);
     };
