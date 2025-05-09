@@ -45,29 +45,35 @@ const useEvents = (): UseEvents => {
             }
             try {
                 const response = await eventsApi.getAllEvents(token);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully fetched events:', response);
+                
+                // Process the response to ensure dates are in the correct format
+                const processedResponse = Array.isArray(response) ? response.map(item => {
+                    // Make a copy of the item to avoid mutating the original
+                    const processedItem = { ...item };
                     
-                    // Add detailed logging to help diagnose data structure issues
-                    if (Array.isArray(response)) {
-                        console.log(`Received ${response.length} events`);
-                        
-                        // Basic validation of event data
-                        const itemsWithIssues = response.filter(item =>
-                            !item ||
-                            typeof item !== 'object' ||
-                            !item.bandName ||
-                            !item.date
-                        );
-                        
-                        if (itemsWithIssues.length > 0) {
-                            console.warn('Found items with missing required properties:', itemsWithIssues);
-                        }
-                    } else {
-                        console.warn('API response is not an array:', response);
+                    // Handle undefined or null dates by providing a default date
+                    if (processedItem.date === undefined || processedItem.date === null) {
+                        // Use current date as default
+                        const today = new Date();
+                        processedItem.date = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
                     }
-                }
-                return response;
+                    // If date is a string that looks like an array, convert it to an actual array
+                    else if (typeof processedItem.date === 'string' &&
+                        processedItem.date.startsWith('[') &&
+                        processedItem.date.endsWith(']')) {
+                        try {
+                            processedItem.date = JSON.parse(processedItem.date);
+                        } catch (error) {
+                            // Provide a default date if parsing fails
+                            const today = new Date();
+                            processedItem.date = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+                        }
+                    }
+                    
+                    return processedItem;
+                }) : response;
+                
+                return processedResponse;
             } catch (error) {
                 throw handleApiError(error);
             }
@@ -84,9 +90,6 @@ const useEvents = (): UseEvents => {
             }
             try {
                 const response = await eventsApi.createEvent(data, token);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully created event:', response);
-                }
                 return response;
             } catch (error) {
                 throw handleApiError(error);
@@ -101,9 +104,6 @@ const useEvents = (): UseEvents => {
             }
             try {
                 const response = await eventsApi.updateEvent(id, data, token);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully updated event:', response);
-                }
                 return response;
             } catch (error) {
                 throw handleApiError(error);
@@ -118,9 +118,6 @@ const useEvents = (): UseEvents => {
             }
             try {
                 const response = await eventsApi.deleteEvent(id, token);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully deleted event:', response);
-                }
                 return response;
             } catch (error) {
                 throw handleApiError(error);

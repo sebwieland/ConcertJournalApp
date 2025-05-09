@@ -25,21 +25,11 @@ const DataCollector = ({ children }: DataCollectorProps) => {
     const { token } = useAuth();
     const navigate = useNavigate();
     
-    // Simplified logging without appUser checks
+    // Component lifecycle hooks
     useEffect(() => {
-        if (process.env.NODE_ENV === 'development' && data) {
-            console.log('DataCollector received data:', data);
-        }
-    }, [data]);
-
-    useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('DataCollector component mounted');
-        }
+        // Component mounted
         return () => {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('DataCollector component unmounted');
-            }
+            // Component unmounted
         };
     }, []);
 
@@ -52,17 +42,43 @@ const DataCollector = ({ children }: DataCollectorProps) => {
             await confirm({ description: "This action is permanent!" });
             await eventsApi.deleteEvent(id, token);
             refetch();
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Successfully deleted event with ID:', id);
-            }
+            // Event successfully deleted
         } catch (error) {
             const processedError = handleApiError(error);
             console.error('Error deleting event:', processedError);
         }
     };
 
+    // Process and validate data before passing to children
+    const processedData = (data || []).map(item => {
+        // Create a copy to avoid mutating the original
+        const processedItem = { ...item };
+        
+        // Ensure date is valid
+        if (processedItem.date === undefined || processedItem.date === null) {
+            // Use current date as default
+            const today = new Date();
+            processedItem.date = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+        }
+        
+        // Convert string array representation to actual array
+        if (typeof processedItem.date === 'string' &&
+            processedItem.date.startsWith('[') &&
+            processedItem.date.endsWith(']')) {
+            try {
+                processedItem.date = JSON.parse(processedItem.date);
+            } catch (error) {
+                // Use current date as fallback
+                const today = new Date();
+                processedItem.date = [today.getFullYear(), today.getMonth() + 1, today.getDate()];
+            }
+        }
+        
+        return processedItem;
+    });
+    
     return children({
-        data: data || [],
+        data: processedData,
         onEdit: handleEdit,
         onDelete: handleDelete
     });
