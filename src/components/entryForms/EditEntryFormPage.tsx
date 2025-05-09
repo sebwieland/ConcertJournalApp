@@ -94,7 +94,11 @@ const EditEntryFormPage = () => {
             place={place}
             setPlace={setPlace}
             date={date}
-            setDate={(newDate: dayjs.Dayjs) => setDate(newDate.toISOString().split('T')[0])}
+            setDate={(newDate: dayjs.Dayjs) => {
+                // Convert the dayjs object to ISO string format (YYYY-MM-DD)
+                const isoDate = newDate.toISOString().split('T')[0];
+                setDate(isoDate);
+            }}
             rating={rating}
             setRating={setRating}
             comment={comment}
