@@ -76,19 +76,7 @@ class DataTable extends React.Component<DataTableProps, {}> {
                 return <RatingStars rating={params.value} />;
             },
         },
-        {
-            field: 'appUser',
-            headerName: 'Username',
-            width: 130,
-            valueGetter: (params: any) => {
-                // Add defensive check to handle undefined params.row
-                if (!params || !params.row || !params.row.appUser) {
-                    console.warn('Missing appUser data for row:', params);
-                    return 'Unknown';
-                }
-                return params.row.appUser.username;
-            },
-        },
+        // Removed appUser column as requested by the user
         {
             field: 'actions',
             headerName: 'Actions',

@@ -25,15 +25,10 @@ const DataCollector = ({ children }: DataCollectorProps) => {
     const { token } = useAuth();
     const navigate = useNavigate();
     
-    // Add logging to help diagnose data structure issues
+    // Simplified logging without appUser checks
     useEffect(() => {
         if (process.env.NODE_ENV === 'development' && data) {
             console.log('DataCollector received data:', data);
-            // Check for any items missing the appUser property
-            const missingAppUser = data.filter(item => !item.appUser);
-            if (missingAppUser.length > 0) {
-                console.warn('Found items missing appUser property:', missingAppUser);
-            }
         }
     }, [data]);
 

@@ -27,7 +27,7 @@ interface EntryFormProps {
     setBandName: (bandName: string) => void;
     place: string;
     setPlace: (place: string) => void;
-    date: string;
+    date: string | number[];
     setDate: (date: dayjs.Dayjs) => void;
     rating: number;
     setRating: (rating: number) => void;
