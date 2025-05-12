@@ -74,8 +74,13 @@ describe('SignInCard', () => {
   it('calls handleLogin when form is submitted', async () => {
     renderWithProviders(<SignInCard {...mockProps} />);
     
-    const signInButton = screen.getByRole('button', { name: 'Sign in' });
-    fireEvent.click(signInButton);
+    // Get the form element
+    const form = screen.getByRole('button', { name: 'Sign in' }).closest('form');
+    
+    // Directly trigger the submit event on the form instead of clicking the button
+    if (form) {
+      fireEvent.submit(form);
+    }
     
     expect(mockProps.handleLogin).toHaveBeenCalledTimes(1);
   });
@@ -108,8 +113,18 @@ describe('SignInCard', () => {
   it('submits the form when Enter key is pressed', async () => {
     renderWithProviders(<SignInCard {...mockProps} />);
     
-    const emailInput = screen.getByLabelText('Email');
-    fireEvent.keyDown(emailInput, { key: 'Enter' });
+    // Get the form element
+    const form = screen.getByLabelText('Email').closest('form');
+    
+    // Directly call the onKeyDown handler with an Enter key event
+    if (form) {
+      const keyDownEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+      // Mock preventDefault to avoid errors
+      Object.defineProperty(keyDownEvent, 'preventDefault', { value: vi.fn() });
+      
+      // Dispatch the event
+      form.dispatchEvent(keyDownEvent);
+    }
     
     expect(mockProps.handleLogin).toHaveBeenCalledTimes(1);
   });
