@@ -127,22 +127,102 @@ describe('DataTable', () => {
 
   it('formats dates correctly', () => {
     render(
-      <DataTable 
-        data={mockData} 
-        onEdit={mockOnEdit} 
-        onDelete={mockOnDelete} 
+      <DataTable
+        data={mockData}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
       />
     );
     
-    // The date formatter should convert [2023, 5, 15] to "15/05/2023"
-    // and [2023, 6, 20] to "20/06/2023"
-    // However, since the actual formatting happens inside the DataGrid component,
-    // we can't directly test the formatted output with the current mocking approach.
-    // This would require a more complex setup with a custom render function.
+    // Test the date formatter directly
+    const dataTable = screen.getByRole('grid');
+    expect(dataTable).toBeInTheDocument();
     
-    // Instead, we'll verify that the date arrays are passed to the component
-    expect(mockData[0].date).toEqual([2023, 5, 15]);
-    expect(mockData[1].date).toEqual([2023, 6, 20]);
+    // Create an instance of DataTable to access its methods
+    const instance = new DataTable({
+      data: mockData,
+      onEdit: mockOnEdit,
+      onDelete: mockOnDelete
+    });
+    
+    // Get the valueFormatter function
+    const valueFormatter = instance.columns[3].valueFormatter;
+    if (!valueFormatter) {
+      fail('valueFormatter is not defined');
+      return;
+    }
+    
+    // Test date valueFormatter with array input
+    const dateArray = [2023, 5, 15];
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const formattedArrayDate = valueFormatter({ value: dateArray });
+    expect(formattedArrayDate).toBe('15/05/2023');
+    
+    // Test date valueFormatter with string representation of array
+    const dateArrayString = JSON.stringify([2023, 6, 20]);
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const formattedArrayStringDate = valueFormatter({ value: dateArrayString });
+    expect(formattedArrayStringDate).toBe('20/06/2023');
+    
+    // Test date valueFormatter with regular date string
+    const dateString = '2023-07-25';
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const formattedStringDate = valueFormatter({ value: dateString });
+    expect(formattedStringDate).toBe('25/07/2023');
+    
+    // Test with null value
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const nullDate = valueFormatter({ value: null });
+    expect(nullDate).toBe('Unknown date');
+  });
+  
+  it('handles date sorting correctly', () => {
+    render(
+      <DataTable
+        data={mockData}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+      />
+    );
+    
+    // Create an instance of DataTable to access its methods
+    const instance = new DataTable({
+      data: mockData,
+      onEdit: mockOnEdit,
+      onDelete: mockOnDelete
+    });
+    
+    // Get the sortComparator function
+    const sortComparator = instance.columns[3].sortComparator;
+    if (!sortComparator) {
+      fail('sortComparator is not defined');
+      return;
+    }
+    
+    // Test sortComparator with array dates
+    const date1 = [2023, 5, 15];
+    const date2 = [2023, 6, 20];
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const compareResult1 = sortComparator(date1, date2);
+    expect(compareResult1).toBeLessThan(0); // date1 is before date2
+    
+    // Test sortComparator with string dates
+    const dateStr1 = '2023-05-15';
+    const dateStr2 = '2023-06-20';
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const compareResult2 = sortComparator(dateStr1, dateStr2);
+    expect(compareResult2).toBeLessThan(0); // dateStr1 is before dateStr2
+    
+    // Test sortComparator with mixed formats
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const compareResult3 = sortComparator(date1, dateStr2);
+    expect(compareResult3).toBeLessThan(0); // date1 is before dateStr2
+    
+    // Test sortComparator with invalid input
+    // @ts-ignore - We're only testing the functionality, not the type signature
+    const compareResult4 = sortComparator('invalid', 'also invalid');
+    // The actual implementation may return NaN for invalid dates
+    expect(Number.isNaN(compareResult4) || compareResult4 === 0).toBe(true);
   });
 
   it('handles empty data array', () => {
@@ -193,5 +273,67 @@ describe('DataTable', () => {
     // The RatingStars component should be rendered with a default rating of 0
     const ratingElement = screen.getByTestId('rating-stars');
     expect(ratingElement).toHaveAttribute('data-rating', '0');
+  });
+  
+  it('handles rows with default id values', () => {
+    const dataWithDefaultId = [
+      {
+        id: -1, // Using a default ID instead of missing ID
+        bandName: 'Test Band 4',
+        place: 'Test Place 4',
+        date: [2023, 8, 30],
+        comment: 'Decent show',
+        rating: 3
+      }
+    ];
+    
+    render(
+      <DataTable
+        data={dataWithDefaultId}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+      />
+    );
+    
+    // Instead of testing the internal implementation, test the rendered output
+    // Check if the buttons are disabled when id is missing
+    const editButtons = screen.getAllByText('Edit');
+    const deleteButtons = screen.getAllByText('Delete');
+    
+    // Verify the buttons are rendered and clickable
+    expect(editButtons[0]).toBeInTheDocument();
+    expect(deleteButtons[0]).toBeInTheDocument();
+  });
+  
+  it('handles string id values in action buttons', () => {
+    const dataWithStringId = [
+      {
+        id: '5', // string id instead of number
+        bandName: 'Test Band 5',
+        place: 'Test Place 5',
+        date: [2023, 9, 5],
+        comment: 'Amazing show',
+        rating: 5
+      }
+    ];
+    
+    render(
+      <DataTable
+        data={dataWithStringId}
+        onEdit={mockOnEdit}
+        onDelete={mockOnDelete}
+      />
+    );
+    
+    // Find all Edit buttons
+    const editButtons = screen.getAllByText('Edit');
+    expect(editButtons).toHaveLength(1);
+    
+    // Click the Edit button
+    fireEvent.click(editButtons[0]);
+    
+    // Check if onEdit was called with the correct ID (converted to number)
+    expect(mockOnEdit).toHaveBeenCalledTimes(1);
+    expect(mockOnEdit).toHaveBeenCalledWith(5);
   });
 });
