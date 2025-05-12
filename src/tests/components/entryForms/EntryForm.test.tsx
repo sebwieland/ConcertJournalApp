@@ -10,8 +10,10 @@ describe('EntryForm Component', () => {
     resetAllMocks();
   });
 
-  it('renders the form with all fields', () => {
-    render(<EntryForm {...mockEntryFormProps} />);
+  it('renders the form with all fields', async () => {
+    await act(async () => {
+      render(<EntryForm {...mockEntryFormProps} />);
+    });
     
     // Check for form elements
     expect(screen.getByLabelText(/band/i)).toBeInTheDocument();
@@ -55,31 +57,35 @@ describe('EntryForm Component', () => {
     });
   });
 
-  it('displays success message when isSuccess is true', () => {
-    render(
-      <EntryForm 
-        {...mockEntryFormProps} 
-        isSuccess={true}
-        message="Successfully saved!"
-      />
-    );
+  it('displays success message when isSuccess is true', async () => {
+    await act(async () => {
+      render(
+        <EntryForm
+          {...mockEntryFormProps}
+          isSuccess={true}
+          message="Successfully saved!"
+        />
+      );
+    });
     
     expect(screen.getByText('Successfully saved!')).toBeInTheDocument();
   });
 
-  it('displays error message when isSuccess is false and message is provided', () => {
-    render(
-      <EntryForm 
-        {...mockEntryFormProps} 
-        isSuccess={false}
-        message="Error saving data"
-      />
-    );
+  it('displays error message when isSuccess is false and message is provided', async () => {
+    await act(async () => {
+      render(
+        <EntryForm
+          {...mockEntryFormProps}
+          isSuccess={false}
+          message="Error saving data"
+        />
+      );
+    });
     
     expect(screen.getByText('Error saving data')).toBeInTheDocument();
   });
 
-  it('updates band name when input changes', () => {
+  it('updates band name when input changes', async () => {
     const setBandName = vi.fn();
     render(
       <EntryForm 
@@ -89,12 +95,14 @@ describe('EntryForm Component', () => {
     );
     
     const bandNameInput = screen.getByLabelText(/band/i);
-    fireEvent.change(bandNameInput, { target: { value: 'New Band Name' } });
+    await act(async () => {
+      fireEvent.change(bandNameInput, { target: { value: 'New Band Name' } });
+    });
     
     expect(setBandName).toHaveBeenCalledWith('New Band Name');
   });
 
-  it('updates place when input changes', () => {
+  it('updates place when input changes', async () => {
     const setPlace = vi.fn();
     render(
       <EntryForm 
@@ -104,12 +112,14 @@ describe('EntryForm Component', () => {
     );
     
     const placeInput = screen.getByLabelText(/place/i);
-    fireEvent.change(placeInput, { target: { value: 'New Place' } });
+    await act(async () => {
+      fireEvent.change(placeInput, { target: { value: 'New Place' } });
+    });
     
     expect(setPlace).toHaveBeenCalledWith('New Place');
   });
 
-  it('updates comment when input changes', () => {
+  it('updates comment when input changes', async () => {
     const setComment = vi.fn();
     render(
       <EntryForm 
@@ -119,12 +129,14 @@ describe('EntryForm Component', () => {
     );
     
     const commentInput = screen.getByLabelText(/comment/i);
-    fireEvent.change(commentInput, { target: { value: 'New Comment' } });
+    await act(async () => {
+      fireEvent.change(commentInput, { target: { value: 'New Comment' } });
+    });
     
     expect(setComment).toHaveBeenCalledWith('New Comment');
   });
 
-  it('updates rating when rating changes', () => {
+  it('updates rating when rating changes', async () => {
     const setRating = vi.fn();
     render(
       <EntryForm 
@@ -135,43 +147,51 @@ describe('EntryForm Component', () => {
     
     // Find the rating component and simulate a rating change
     const ratingElement = screen.getByLabelText('3 Stars');
-    fireEvent.click(ratingElement);
+    await act(async () => {
+      fireEvent.click(ratingElement);
+    });
     
     expect(setRating).toHaveBeenCalledWith(3);
   });
 
-  it('shows artist details button when showArtistDetailsButton is true', () => {
-    render(
-      <EntryForm 
-        {...mockEntryFormProps} 
-        showArtistDetailsButton={true}
-        bandName="Test Band"
-      />
-    );
+  it('shows artist details button when showArtistDetailsButton is true', async () => {
+    await act(async () => {
+      render(
+        <EntryForm
+          {...mockEntryFormProps}
+          showArtistDetailsButton={true}
+          bandName="Test Band"
+        />
+      );
+    });
     
     expect(screen.getByRole('button', { name: /artist details/i })).toBeInTheDocument();
   });
 
-  it('does not show artist details button when showArtistDetailsButton is false', () => {
-    render(
-      <EntryForm 
-        {...mockEntryFormProps} 
-        showArtistDetailsButton={false}
-        bandName="Test Band"
-      />
-    );
+  it('does not show artist details button when showArtistDetailsButton is false', async () => {
+    await act(async () => {
+      render(
+        <EntryForm
+          {...mockEntryFormProps}
+          showArtistDetailsButton={false}
+          bandName="Test Band"
+        />
+      );
+    });
     
     expect(screen.queryByRole('button', { name: /artist details/i })).not.toBeInTheDocument();
   });
 
-  it('shows artist details button when bandName is provided', () => {
-    render(
-      <EntryForm 
-        {...mockEntryFormProps} 
-        bandName="Test Artist"
-        showArtistDetailsButton={true}
-      />
-    );
+  it('shows artist details button when bandName is provided', async () => {
+    await act(async () => {
+      render(
+        <EntryForm
+          {...mockEntryFormProps}
+          bandName="Test Artist"
+          showArtistDetailsButton={true}
+        />
+      );
+    });
     
     // Verify the button is present
     expect(screen.getByRole('button', { name: /artist details/i })).toBeInTheDocument();

@@ -47,11 +47,15 @@ const useAuthApi = () => {
             if (response.status === 200) {
                 return response.data;
             } else {
-                console.error("Login failed:", response.statusText);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error("Login failed:", response.statusText);
+                }
                 throw handleApiError(new Error(response.statusText));
             }
         } catch (error) {
-            console.error("Error during login:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Error during login:", error);
+            }
             throw handleApiError(error);
         }
     };
@@ -67,11 +71,15 @@ const useAuthApi = () => {
             });
 
             if (response.status !== 200) {
-                console.error("Logout failed:", response.statusText);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error("Logout failed:", response.statusText);
+                }
                 throw handleApiError(new Error(response.statusText));
             }
         } catch (error) {
-            console.error("Error during logout:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Error during logout:", error);
+            }
             throw handleApiError(error);
         }
     };
@@ -84,7 +92,9 @@ const useAuthApi = () => {
 
             return response.data;
         } catch (error) {
-            console.error("Error during registration:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Error during registration:", error);
+            }
             throw handleApiError(error);
         }
     };

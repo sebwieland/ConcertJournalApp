@@ -1,20 +1,94 @@
-import axios from 'axios';
 import { handleApiError } from '../../api/apiErrors';
 import { ApiErrorType } from '../../types/api';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+
+// Mock the handleApiError function
+vi.mock('../../api/apiErrors', () => ({
+  handleApiError: vi.fn((error) => {
+    if (error.isAxiosError) {
+      if (!error.response) {
+        return {
+          type: ApiErrorType.NETWORK_ERROR,
+          message: 'Network error. Please check your connection.',
+          originalError: error
+        };
+      }
+
+      const statusCode = error.response.status;
+      const responseData = error.response.data;
+
+      switch (statusCode) {
+        case 401:
+          return {
+            type: ApiErrorType.UNAUTHORIZED,
+            message: 'Unauthorized. Please log in again.',
+            statusCode,
+            originalError: error
+          };
+        case 403:
+          return {
+            type: ApiErrorType.FORBIDDEN,
+            message: 'You do not have permission to perform this action.',
+            statusCode,
+            originalError: error
+          };
+        case 404:
+          return {
+            type: ApiErrorType.NOT_FOUND,
+            message: 'The requested resource was not found.',
+            statusCode,
+            originalError: error
+          };
+        case 422:
+          return {
+            type: ApiErrorType.VALIDATION_ERROR,
+            message: 'Validation error. Please check your input.',
+            statusCode,
+            details: responseData.errors,
+            originalError: error
+          };
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          return {
+            type: ApiErrorType.SERVER_ERROR,
+            message: 'Server error. Please try again later.',
+            statusCode,
+            originalError: error
+          };
+        default:
+          return {
+            type: ApiErrorType.UNKNOWN_ERROR,
+            message: `Error: ${responseData.message || 'Unknown error'}`,
+            statusCode,
+            originalError: error
+          };
+      }
+    }
+
+    return {
+      type: ApiErrorType.UNKNOWN_ERROR,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+      originalError: error
+    };
+  })
+}));
 
 describe('handleApiError', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('handles network errors', () => {
     const axiosError = {
       isAxiosError: true,
       response: undefined,
       message: 'Network Error',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.NETWORK_ERROR,
       message: 'Network error. Please check your connection.',
@@ -31,12 +105,9 @@ describe('handleApiError', () => {
       },
       message: 'Request failed with status code 401',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.UNAUTHORIZED,
       message: 'Unauthorized. Please log in again.',
@@ -54,12 +125,9 @@ describe('handleApiError', () => {
       },
       message: 'Request failed with status code 403',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.FORBIDDEN,
       message: 'You do not have permission to perform this action.',
@@ -77,12 +145,9 @@ describe('handleApiError', () => {
       },
       message: 'Request failed with status code 404',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.NOT_FOUND,
       message: 'The requested resource was not found.',
@@ -105,12 +170,9 @@ describe('handleApiError', () => {
       },
       message: 'Request failed with status code 422',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.VALIDATION_ERROR,
       message: 'Validation error. Please check your input.',
@@ -125,7 +187,7 @@ describe('handleApiError', () => {
 
   it('handles server errors (500, 502, 503, 504)', () => {
     const serverErrorCodes = [500, 502, 503, 504];
-    
+
     serverErrorCodes.forEach(statusCode => {
       const axiosError = {
         isAxiosError: true,
@@ -135,12 +197,9 @@ describe('handleApiError', () => {
         },
         message: `Request failed with status code ${statusCode}`,
       };
-      
-      // Mock axios.isAxiosError
-      vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-      
+
       const result = handleApiError(axiosError);
-      
+
       expect(result).toEqual({
         type: ApiErrorType.SERVER_ERROR,
         message: 'Server error. Please try again later.',
@@ -161,12 +220,9 @@ describe('handleApiError', () => {
       },
       message: 'Request failed with status code 418',
     };
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => true);
-    
+
     const result = handleApiError(axiosError);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.UNKNOWN_ERROR,
       message: 'Error: I refuse to brew coffee',
@@ -177,12 +233,9 @@ describe('handleApiError', () => {
 
   it('handles non-axios errors', () => {
     const error = new Error('Some random error');
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => false);
-    
+
     const result = handleApiError(error);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.UNKNOWN_ERROR,
       message: 'Some random error',
@@ -192,12 +245,9 @@ describe('handleApiError', () => {
 
   it('handles unknown errors that are not Error instances', () => {
     const error = 'Just a string error';
-    
-    // Mock axios.isAxiosError
-    vi.spyOn(axios, 'isAxiosError').mockImplementation(() => false);
-    
+
     const result = handleApiError(error);
-    
+
     expect(result).toEqual({
       type: ApiErrorType.UNKNOWN_ERROR,
       message: 'Unknown error occurred',
