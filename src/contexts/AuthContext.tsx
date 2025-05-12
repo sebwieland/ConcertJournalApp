@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useCallback } from 'react';
 import useApiClient from '../api/apiClient';
 import { handleApiError } from '../api/apiErrors';
 
-interface AuthContextInterface {
+export interface AuthContextInterface {
     isLoading: boolean;
     isLoggedIn: boolean;
     setIsLoggedIn: (isLoggedIn: boolean) => void;
@@ -11,6 +11,7 @@ interface AuthContextInterface {
     csrfToken: string;
     fetchCsrfToken: () => void;
     setLoggedOut: () => void;
+    refreshTokenApiCall: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
@@ -190,7 +191,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setAccessToken,
             csrfToken,
             fetchCsrfToken,
-            setLoggedOut
+            setLoggedOut,
+            refreshTokenApiCall
         }}>
             {children}
         </AuthContext.Provider>
