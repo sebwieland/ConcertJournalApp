@@ -1,72 +1,72 @@
 import React from 'react';
 import { renderHook } from '@testing-library/react';
 import useAuthApi from '../../api/apiAuth';
-import { AuthContext } from '../../contexts/AuthContext';
-import { ConfigContext } from '../../contexts/ConfigContext';
-import { handleApiError } from '../../api/apiErrors';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { AllProviders } from '../utils/test-utils';
+import { 
+  mockLoginData, 
+  mockRegistrationData 
+} from '../utils/test-fixtures';
 
-// Mock apiClient
-const mockApiClientPost = vi.fn();
-const mockApiClient = {
-  apiClient: {
-    post: mockApiClientPost
-  }
-};
+// Mock modules - these must be at the top level due to hoisting
+vi.mock('../../api/apiClient', () => {
+  return {
+    default: () => ({
+      apiClient: {
+        post: vi.fn(),
+        get: vi.fn(),
+        put: vi.fn(),
+        delete: vi.fn(),
+      }
+    })
+  };
+});
 
-vi.mock('../../api/apiClient', () => ({
-  default: () => mockApiClient
-}));
-
-// Mock handleApiError
-vi.mock('../../api/apiErrors', () => ({
-  handleApiError: vi.fn((error) => {
-    return {
+vi.mock('../../api/apiErrors', () => {
+  return {
+    handleApiError: vi.fn((error) => ({
       type: 'UNKNOWN_ERROR',
       message: 'Mocked error',
       originalError: error,
-    };
-  }),
-}));
+    }))
+  };
+});
 
 describe('useAuthApi', () => {
-  const mockAuthContext = {
-    token: 'test-token',
-    isLoading: false,
-    isLoggedIn: true,
-    setIsLoggedIn: vi.fn(),
-    setAccessToken: vi.fn(),
-    csrfToken: 'test-csrf-token',
-    fetchCsrfToken: vi.fn(),
-    setLoggedOut: vi.fn(),
-    refreshTokenApiCall: vi.fn(),
-  };
-
-  const mockConfigContext = {
-    backendURL: 'http://localhost:8080',
-  };
-
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <ConfigContext.Provider value={mockConfigContext}>
-      <AuthContext.Provider value={mockAuthContext}>
-        {children}
-      </AuthContext.Provider>
-    </ConfigContext.Provider>
-  );
+  // Import the mocked modules directly
+  const apiClientMock = vi.hoisted(() => ({
+    default: () => ({
+      apiClient: {
+        post: vi.fn(),
+      }
+    })
+  }));
+  
+  const apiErrorsMock = vi.hoisted(() => ({
+    handleApiError: vi.fn()
+  }));
+  
+  vi.mock('../../api/apiClient', () => apiClientMock);
+  vi.mock('../../api/apiErrors', () => apiErrorsMock);
 
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Set up default behavior for handleApiError
+    apiErrorsMock.handleApiError.mockImplementation((error) => ({
+      type: 'UNKNOWN_ERROR',
+      message: 'Mocked error',
+      originalError: error,
+    }));
   });
 
   it('throws an error if AuthContext is not provided', () => {
     // Create a wrapper without AuthContext
     const noAuthWrapper = ({ children }: { children: React.ReactNode }) => (
-      <ConfigContext.Provider value={mockConfigContext}>
-        {children}
-      </ConfigContext.Provider>
+      <div>{children}</div>
     );
 
     // Use a try-catch block to properly handle the error
-    // This prevents the error from being treated as an unhandled exception
     let error: Error | null = null;
     try {
       renderHook(() => useAuthApi(), { wrapper: noAuthWrapper });
@@ -81,30 +81,24 @@ describe('useAuthApi', () => {
 
   describe('login', () => {
     it('calls apiClient.post with correct parameters', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
-      // Mock successful response
-      const mockResponse = {
+      // Setup mock response
+      apiClientMock.default().apiClient.post.mockResolvedValueOnce({
         status: 200,
         data: {
           accessToken: 'new-access-token',
           refreshToken: 'new-refresh-token',
         },
-      };
+      });
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockResolvedValueOnce(mockResponse);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
       // Call login
-      const loginData = {
-        email: 'test@example.com',
-        password: 'password123',
-      };
-      
-      const response = await result.current.login(loginData);
+      const response = await result.current.login(mockLoginData);
       
       // Check if apiClient.post was called with correct parameters
-      expect(mockApiClientPost).toHaveBeenCalledWith(
+      expect(apiClientMock.default().apiClient.post).toHaveBeenCalledWith(
         '/login',
         'email=test%40example.com&password=password123',
         {
@@ -124,77 +118,62 @@ describe('useAuthApi', () => {
     });
     
     it('handles login failure', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
-      // Mock failed response
-      const mockResponse = {
+      // Setup mock response for failure
+      apiClientMock.default().apiClient.post.mockResolvedValueOnce({
         status: 401,
         statusText: 'Unauthorized',
-      };
+      });
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockResolvedValueOnce(mockResponse);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
-      // Call login
-      const loginData = {
-        email: 'test@example.com',
-        password: 'wrong-password',
-      };
-      
-      // Expect login to throw an error - use toMatchObject instead of toEqual for more flexible matching
-      await expect(result.current.login(loginData)).rejects.toMatchObject({
+      // Expect login to throw an error
+      await expect(result.current.login(mockLoginData)).rejects.toMatchObject({
         type: 'UNKNOWN_ERROR',
         message: 'Mocked error'
       });
       
       // Check if handleApiError was called
-      expect(handleApiError).toHaveBeenCalled();
+      expect(apiErrorsMock.handleApiError).toHaveBeenCalled();
     });
     
     it('handles network errors', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
-      // Mock network error
+      // Setup mock response for network error
       const networkError = new Error('Network Error');
+      apiClientMock.default().apiClient.post.mockRejectedValueOnce(networkError);
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockRejectedValueOnce(networkError);
-      
-      // Call login
-      const loginData = {
-        email: 'test@example.com',
-        password: 'password123',
-      };
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
       // Expect login to throw an error
-      await expect(result.current.login(loginData)).rejects.toEqual({
+      await expect(result.current.login(mockLoginData)).rejects.toMatchObject({
         type: 'UNKNOWN_ERROR',
         message: 'Mocked error',
-        originalError: networkError,
       });
       
       // Check if handleApiError was called with the network error
-      expect(handleApiError).toHaveBeenCalled();
+      expect(apiErrorsMock.handleApiError).toHaveBeenCalledWith(networkError);
     });
   });
   
   describe('logout', () => {
     it('calls apiClient.post with correct parameters', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
       // Mock successful response
-      const mockResponse = {
+      apiClientMock.default().apiClient.post.mockResolvedValueOnce({
         status: 200,
-      };
+      });
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockResolvedValueOnce(mockResponse);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
       // Call logout
       await result.current.logout();
       
       // Check if apiClient.post was called with correct parameters
-      expect(mockApiClientPost).toHaveBeenCalledWith(
+      expect(apiClientMock.default().apiClient.post).toHaveBeenCalledWith(
         '/logout',
         {},
         {
@@ -208,59 +187,49 @@ describe('useAuthApi', () => {
     });
     
     it('handles logout failure', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
       // Mock failed response
-      const mockResponse = {
+      apiClientMock.default().apiClient.post.mockResolvedValueOnce({
         status: 500,
         statusText: 'Internal Server Error',
-      };
+      });
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockResolvedValueOnce(mockResponse);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
-      // Expect logout to throw an error - use toMatchObject instead of toEqual
+      // Expect logout to throw an error
       await expect(result.current.logout()).rejects.toMatchObject({
         type: 'UNKNOWN_ERROR',
         message: 'Mocked error'
       });
       
       // Check if handleApiError was called
-      expect(handleApiError).toHaveBeenCalled();
+      expect(apiErrorsMock.handleApiError).toHaveBeenCalled();
     });
   });
   
   describe('register', () => {
     it('calls apiClient.post with correct parameters', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
-      // Mock successful response
-      const mockResponse = {
+      // Setup mock response
+      apiClientMock.default().apiClient.post.mockResolvedValueOnce({
         status: 200,
         data: {
           accessToken: 'new-access-token',
           refreshToken: 'new-refresh-token',
         },
-      };
+      });
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockResolvedValueOnce(mockResponse);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
       // Call register
-      const registerData = {
-        username: 'testuser',
-        password: 'password123',
-        email: 'test@example.com',
-        firstName: 'Test',
-        lastName: 'User',
-      };
-      
-      const response = await result.current.register(registerData);
+      const response = await result.current.register(mockRegistrationData);
       
       // Check if apiClient.post was called with correct parameters
-      expect(mockApiClientPost).toHaveBeenCalledWith(
+      expect(apiClientMock.default().apiClient.post).toHaveBeenCalledWith(
         '/register',
-        registerData,
+        mockRegistrationData,
         {
           withCredentials: true,
         }
@@ -274,31 +243,22 @@ describe('useAuthApi', () => {
     });
     
     it('handles registration errors', async () => {
-      const { result } = renderHook(() => useAuthApi(), { wrapper });
-      
-      // Mock network error
+      // Setup failed registration mock
       const registrationError = new Error('Email already in use');
+      apiClientMock.default().apiClient.post.mockRejectedValueOnce(registrationError);
       
-      // Use the mock directly instead of requiring the module
-      mockApiClientPost.mockRejectedValueOnce(registrationError);
+      const { result } = renderHook(() => useAuthApi(), { 
+        wrapper: AllProviders 
+      });
       
-      // Call register
-      const registerData = {
-        username: 'testuser',
-        password: 'password123',
-        email: 'existing@example.com',
-        firstName: 'Test',
-        lastName: 'User',
-      };
-      
-      // Expect register to throw an error - use toMatchObject instead of toEqual
-      await expect(result.current.register(registerData)).rejects.toMatchObject({
+      // Expect register to throw an error
+      await expect(result.current.register(mockRegistrationData)).rejects.toMatchObject({
         type: 'UNKNOWN_ERROR',
         message: 'Mocked error'
       });
       
       // Check if handleApiError was called
-      expect(handleApiError).toHaveBeenCalledWith(registrationError);
+      expect(apiErrorsMock.handleApiError).toHaveBeenCalledWith(registrationError);
     });
   });
 });

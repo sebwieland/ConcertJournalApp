@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import SignInCard from '../../../components/signIn/SignInCard';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { renderWithProviders } from '../../utils/test-utils';
 
 // Mock useNavigate
 vi.mock('react-router-dom', async () => {
@@ -24,17 +24,11 @@ describe('SignInCard', () => {
   };
 
   beforeEach(() => {
-    mockProps.setEmail.mockClear();
-    mockProps.setPassword.mockClear();
-    mockProps.handleLogin.mockClear();
+    vi.clearAllMocks();
   });
 
-  const renderWithRouter = (ui: React.ReactElement) => {
-    return render(ui, { wrapper: BrowserRouter });
-  };
-
   it('renders the sign-in form with all required elements', () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     // Use more specific selector to avoid ambiguity
     expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
@@ -54,7 +48,7 @@ describe('SignInCard', () => {
   });
 
   it('calls setEmail when email input changes', async () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     const emailInput = screen.getByLabelText('Email');
     
@@ -66,7 +60,7 @@ describe('SignInCard', () => {
   });
 
   it('calls setPassword when password input changes', async () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     const passwordInput = screen.getByLabelText('Password');
     
@@ -78,7 +72,7 @@ describe('SignInCard', () => {
   });
 
   it('calls handleLogin when form is submitted', async () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     const signInButton = screen.getByRole('button', { name: 'Sign in' });
     fireEvent.click(signInButton);
@@ -87,14 +81,14 @@ describe('SignInCard', () => {
   });
 
   it('shows loading state when isLoading is true', () => {
-    renderWithRouter(<SignInCard {...{ ...mockProps, isLoading: true }} />);
+    renderWithProviders(<SignInCard {...{ ...mockProps, isLoading: true }} />);
     
     expect(screen.getByRole('button', { name: 'Loading...' })).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('shows error message for invalid email format', async () => {
-    renderWithRouter(<SignInCard {...{ ...mockProps, email: 'invalid@email' }} />);
+    renderWithProviders(<SignInCard {...{ ...mockProps, email: 'invalid@email' }} />);
     
     const emailInput = screen.getByLabelText('Email');
     fireEvent.blur(emailInput);
@@ -103,7 +97,7 @@ describe('SignInCard', () => {
   });
 
   it('shows error message for short password', async () => {
-    renderWithRouter(<SignInCard {...{ ...mockProps, password: '12345' }} />);
+    renderWithProviders(<SignInCard {...{ ...mockProps, password: '12345' }} />);
     
     const passwordInput = screen.getByLabelText('Password');
     fireEvent.blur(passwordInput);
@@ -112,7 +106,7 @@ describe('SignInCard', () => {
   });
 
   it('submits the form when Enter key is pressed', async () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     const emailInput = screen.getByLabelText('Email');
     fireEvent.keyDown(emailInput, { key: 'Enter' });
@@ -121,7 +115,7 @@ describe('SignInCard', () => {
   });
 
   it('navigates to sign-up page when sign-up link is clicked', async () => {
-    renderWithRouter(<SignInCard {...mockProps} />);
+    renderWithProviders(<SignInCard {...mockProps} />);
     
     const signUpLink = screen.getByText('Sign up');
     expect(signUpLink.closest('a')).toHaveAttribute('href', '/sign-up');

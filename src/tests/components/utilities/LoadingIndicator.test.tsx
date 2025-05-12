@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import LoadingIndicator from '../../../components/utilities/LoadingIndicator';
+import { describe, it, expect } from 'vitest';
+import { renderWithProviders } from '../../utils/test-utils';
 
 describe('LoadingIndicator', () => {
   it('renders the CircularProgress component', () => {
-    render(<LoadingIndicator />);
+    renderWithProviders(<LoadingIndicator />);
     
     // Check if the component renders with the correct structure
     const loadingElement = document.querySelector('.MuiCircularProgress-root');
@@ -12,7 +14,7 @@ describe('LoadingIndicator', () => {
   });
 
   it('is wrapped in a Box with flex display', () => {
-    render(<LoadingIndicator />);
+    renderWithProviders(<LoadingIndicator />);
     
     // Check if the Box component has the correct styling
     const boxElement = document.querySelector('.MuiBox-root');

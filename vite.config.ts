@@ -11,7 +11,7 @@ const dynamicRoutes = [
     // Add other paths here
 ]
 
-export default defineConfig(async () => ({
+export default defineConfig({
     base: '/',
     build: {
         outDir: 'dist'
@@ -34,7 +34,23 @@ export default defineConfig(async () => ({
         environment: 'jsdom',
         setupFiles: './vitest.setup.ts',
         coverage: {
+            provider: 'v8',
             reporter: ['text', 'json', 'html'],
+            exclude: [
+                'node_modules/',
+                'dist/',
+                '**/*.test.tsx',
+                '**/*.test.ts',
+                'src/tests/utils/**'
+            ],
+            thresholds: {
+                statements: 70,
+                branches: 70,
+                functions: 70,
+                lines: 70
+            }
         },
+        include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+        exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
     },
-}))
+})
