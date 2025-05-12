@@ -1,0 +1,129 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import SignInCard from '../../../components/signIn/SignInCard';
+import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
+
+// Mock useNavigate
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  };
+});
+
+describe('SignInCard', () => {
+  const mockProps = {
+    email: '',
+    setEmail: vi.fn(),
+    password: '',
+    setPassword: vi.fn(),
+    handleLogin: vi.fn(),
+    isLoading: false,
+  };
+
+  beforeEach(() => {
+    mockProps.setEmail.mockClear();
+    mockProps.setPassword.mockClear();
+    mockProps.handleLogin.mockClear();
+  });
+
+  const renderWithRouter = (ui: React.ReactElement) => {
+    return render(ui, { wrapper: BrowserRouter });
+  };
+
+  it('renders the sign-in form with all required elements', () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    // Use more specific selector to avoid ambiguity
+    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    
+    // Check if the email field is rendered
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    
+    // Check if the password field is rendered
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    
+    // Check if the sign-in button is rendered
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    
+    // Check if the sign-up link is rendered
+    expect(screen.getByText('Don\'t have an account?')).toBeInTheDocument();
+    expect(screen.getByText('Sign up')).toBeInTheDocument();
+  });
+
+  it('calls setEmail when email input changes', async () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    const emailInput = screen.getByLabelText('Email');
+    
+    // Use fireEvent instead of userEvent for a single change event
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    
+    // Check if setEmail was called with the complete string
+    expect(mockProps.setEmail).toHaveBeenCalledWith('test@example.com');
+  });
+
+  it('calls setPassword when password input changes', async () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    const passwordInput = screen.getByLabelText('Password');
+    
+    // Use fireEvent instead of userEvent for a single change event
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    
+    // Check if setPassword was called with the complete string
+    expect(mockProps.setPassword).toHaveBeenCalledWith('password123');
+  });
+
+  it('calls handleLogin when form is submitted', async () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    const signInButton = screen.getByRole('button', { name: 'Sign in' });
+    fireEvent.click(signInButton);
+    
+    expect(mockProps.handleLogin).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows loading state when isLoading is true', () => {
+    renderWithRouter(<SignInCard {...{ ...mockProps, isLoading: true }} />);
+    
+    expect(screen.getByRole('button', { name: 'Loading...' })).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  it('shows error message for invalid email format', async () => {
+    renderWithRouter(<SignInCard {...{ ...mockProps, email: 'invalid@email' }} />);
+    
+    const emailInput = screen.getByLabelText('Email');
+    fireEvent.blur(emailInput);
+    
+    expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument();
+  });
+
+  it('shows error message for short password', async () => {
+    renderWithRouter(<SignInCard {...{ ...mockProps, password: '12345' }} />);
+    
+    const passwordInput = screen.getByLabelText('Password');
+    fireEvent.blur(passwordInput);
+    
+    expect(screen.getByText('Password must be at least 6 characters long.')).toBeInTheDocument();
+  });
+
+  it('submits the form when Enter key is pressed', async () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    const emailInput = screen.getByLabelText('Email');
+    fireEvent.keyDown(emailInput, { key: 'Enter' });
+    
+    expect(mockProps.handleLogin).toHaveBeenCalledTimes(1);
+  });
+
+  it('navigates to sign-up page when sign-up link is clicked', async () => {
+    renderWithRouter(<SignInCard {...mockProps} />);
+    
+    const signUpLink = screen.getByText('Sign up');
+    expect(signUpLink.closest('a')).toHaveAttribute('href', '/sign-up');
+  });
+});

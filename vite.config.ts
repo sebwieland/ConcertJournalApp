@@ -28,5 +28,13 @@ export default defineConfig(async () => ({
     server: {
         port: 3010,
         open: true
-    }
+    },
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './vitest.setup.ts',
+        coverage: {
+            reporter: ['text', 'json', 'html'],
+        },
+    },
 }))
