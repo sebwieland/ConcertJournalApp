@@ -1,48 +1,22 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../../tests/utils/test-utils';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import DataTable from '../../../components/journal/DataTable';
-
-// Mock the RatingStars component
-vi.mock('../../../components/utilities/RatingStars', () => ({
-  default: ({ rating }: { rating: number }) => (
-    <div data-testid="rating-stars" data-rating={rating}>
-      Rating: {rating}
-    </div>
-  ),
-}));
+import { mockEventData, mockFunctions } from '../../../tests/utils/test-fixtures';
+import { resetAllMocks } from '../../../tests/utils/test-mocks';
 
 describe('DataTable', () => {
-  const mockData = [
-    {
-      id: 1,
-      bandName: 'Test Band 1',
-      place: 'Test Place 1',
-      date: [2023, 5, 15], // [year, month, day]
-      comment: 'Great show',
-      rating: 4,
-    },
-    {
-      id: 2,
-      bandName: 'Test Band 2',
-      place: 'Test Place 2',
-      date: [2023, 6, 20],
-      comment: 'Amazing performance',
-      rating: 5,
-    },
-  ];
-
-  const mockOnEdit = vi.fn();
-  const mockOnDelete = vi.fn();
+  const mockOnEdit = mockFunctions.onEdit;
+  const mockOnDelete = mockFunctions.onDelete;
 
   beforeEach(() => {
-    mockOnEdit.mockClear();
-    mockOnDelete.mockClear();
+    resetAllMocks();
   });
 
   it('renders the DataGrid with correct columns', () => {
     render(
       <DataTable 
-        data={mockData} 
+        data={mockEventData} 
         onEdit={mockOnEdit} 
         onDelete={mockOnDelete} 
       />
@@ -61,7 +35,7 @@ describe('DataTable', () => {
   it('renders the data rows correctly', () => {
     render(
       <DataTable 
-        data={mockData} 
+        data={mockEventData} 
         onEdit={mockOnEdit} 
         onDelete={mockOnDelete} 
       />
@@ -86,7 +60,7 @@ describe('DataTable', () => {
   it('calls onEdit when Edit button is clicked', () => {
     render(
       <DataTable 
-        data={mockData} 
+        data={mockEventData} 
         onEdit={mockOnEdit} 
         onDelete={mockOnDelete} 
       />
@@ -107,7 +81,7 @@ describe('DataTable', () => {
   it('calls onDelete when Delete button is clicked', () => {
     render(
       <DataTable 
-        data={mockData} 
+        data={mockEventData} 
         onEdit={mockOnEdit} 
         onDelete={mockOnDelete} 
       />
@@ -128,7 +102,7 @@ describe('DataTable', () => {
   it('formats dates correctly', () => {
     render(
       <DataTable
-        data={mockData}
+        data={mockEventData}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
       />
@@ -140,7 +114,7 @@ describe('DataTable', () => {
     
     // Create an instance of DataTable to access its methods
     const instance = new DataTable({
-      data: mockData,
+      data: mockEventData,
       onEdit: mockOnEdit,
       onDelete: mockOnDelete
     });
@@ -179,7 +153,7 @@ describe('DataTable', () => {
   it('handles date sorting correctly', () => {
     render(
       <DataTable
-        data={mockData}
+        data={mockEventData}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
       />
@@ -187,7 +161,7 @@ describe('DataTable', () => {
     
     // Create an instance of DataTable to access its methods
     const instance = new DataTable({
-      data: mockData,
+      data: mockEventData,
       onEdit: mockOnEdit,
       onDelete: mockOnDelete
     });
@@ -295,7 +269,6 @@ describe('DataTable', () => {
       />
     );
     
-    // Instead of testing the internal implementation, test the rendered output
     // Check if the buttons are disabled when id is missing
     const editButtons = screen.getAllByText('Edit');
     const deleteButtons = screen.getAllByText('Delete');
