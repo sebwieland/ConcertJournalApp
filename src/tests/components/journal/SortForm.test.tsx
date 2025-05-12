@@ -1,18 +1,19 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import SortForm from '../../../components/journal/SortForm';
-import userEvent from '@testing-library/user-event';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { renderWithProviders } from '../../utils/test-utils';
 
 describe('SortForm', () => {
   const mockOnSortOrderChange = vi.fn();
   const defaultSortOrder = { column: 'date', order: 'desc' as const };
 
   beforeEach(() => {
-    mockOnSortOrderChange.mockClear();
+    vi.clearAllMocks();
   });
 
   it('renders with the correct initial values', () => {
-    render(
+    renderWithProviders(
       <SortForm 
         sortOrder={defaultSortOrder} 
         onSortOrderChange={mockOnSortOrderChange} 
@@ -30,7 +31,7 @@ describe('SortForm', () => {
   });
 
   it('calls onSortOrderChange when column selection changes', async () => {
-    render(
+    renderWithProviders(
       <SortForm 
         sortOrder={defaultSortOrder} 
         onSortOrderChange={mockOnSortOrderChange} 
@@ -54,7 +55,7 @@ describe('SortForm', () => {
   });
 
   it('calls onSortOrderChange when order selection changes', async () => {
-    render(
+    renderWithProviders(
       <SortForm
         sortOrder={defaultSortOrder}
         onSortOrderChange={mockOnSortOrderChange}
@@ -78,7 +79,7 @@ describe('SortForm', () => {
   });
 
   it('renders all available column options', () => {
-    render(
+    renderWithProviders(
       <SortForm
         sortOrder={defaultSortOrder}
         onSortOrderChange={mockOnSortOrderChange}
@@ -101,7 +102,7 @@ describe('SortForm', () => {
   });
 
   it('renders both order options', () => {
-    render(
+    renderWithProviders(
       <SortForm
         sortOrder={defaultSortOrder}
         onSortOrderChange={mockOnSortOrderChange}
