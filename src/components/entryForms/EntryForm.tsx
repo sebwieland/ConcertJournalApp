@@ -156,8 +156,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                 <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
                     {isUpdate ? 'Update Entry' : 'Create New Entry'}
                 </Typography>
-                <Grid spacing={1}>
-                    <Grid spacing={1}>
+                <Grid container spacing={1}>
+                    <Grid container>
                         <Autocomplete
                             options={bandSuggestions}
                             value={bandName}
@@ -201,15 +201,15 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             </Button>
                         )}
                         {artistDetails && showArtistDetails && (
-                            <Grid sx={{ mb: 2, p: 2, border: '1px solid #ddd', borderRadius: 1 }}>
+                            <div style={{ marginBottom: 16, padding: 16, border: '1px solid #ddd', borderRadius: 4 }}>
                                 <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
                                 <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
                                 <Typography variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
                                 <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
-                            </Grid>
+                            </div>
                         )}
 
-                        <Grid>
+                        <div style={{ width: '100%', marginBottom: 16 }}>
                             <Autocomplete
                                 options={placeSuggestions}
                                 value={place}
@@ -231,9 +231,9 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     />
                                 )}
                             />
-                        </Grid>
+                        </div>
 
-                        <Grid sx={{ textAlign: 'center', marginBottom: 2 }}>
+                        <div style={{ width: '100%', textAlign: 'center', marginBottom: 16 }}>
                             <Rating
                                 name="Rating"
                                 value={rating}
@@ -241,8 +241,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     setRating(newValue ?? 0);
                                 }}
                             />
-                        </Grid>
-                        <Grid>
+                        </div>
+                        <div style={{ width: '100%', marginBottom: 16 }}>
                             <TextField
                                 label="Comment"
                                 variant="outlined"
@@ -251,8 +251,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 sx={{ marginBottom: 2 }}
                                 onChange={(event) => setComment(event.target.value)}
                             />
-                        </Grid>
-                        <Grid>
+                        </div>
+                        <div style={{ width: '100%', marginBottom: 16 }}>
                             <DatePicker
                                 label="Date"
                                 value={(() => {
@@ -288,8 +288,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                 sx={{ marginBottom: 2, width: '100%' }}
                                 onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
                             />
-                        </Grid>
-                        <Grid>
+                        </div>
+                        <div style={{ width: '100%', marginBottom: 16 }}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -299,8 +299,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             >
                                 {isUpdate ? 'Update Entry' : 'Create New Entry'}
                             </Button>
-                        </Grid>
-                        <Grid>
+                        </div>
+                        <div style={{ width: '100%', marginBottom: 16 }}>
                             <Button
                                 variant="contained"
                                 color="secondary"
@@ -309,14 +309,14 @@ const EntryForm: React.FC<EntryFormProps> = ({
                             >
                                 Go Back
                             </Button>
-                        </Grid>
-                        <Grid>
+                        </div>
+                        <div style={{ width: '100%' }}>
                             {message &&
                                 <Alert
                                     severity={isSuccess ? 'success' : 'error'} sx={{ maxWidth: '100%' }}>
                                     {message}
                                 </Alert>}
-                        </Grid>
+                        </div>
                     </Grid>
                 </Grid>
             </Container>

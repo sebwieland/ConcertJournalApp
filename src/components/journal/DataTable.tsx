@@ -131,7 +131,10 @@ class DataTable extends React.Component<DataTableProps, {}> {
             renderCell: (params: GridRenderCellParams) => {
                 // Add defensive check for rating value
                 if (params.value === undefined || params.value === null) {
-                    console.warn('Missing rating value for row:', params);
+                    // Only log warning in development mode
+                    if (process.env.NODE_ENV === 'development') {
+                        console.warn('Missing rating value for row:', params);
+                    }
                     return <RatingStars rating={0} />;
                 }
                 return <RatingStars rating={params.value} />;
@@ -145,7 +148,10 @@ class DataTable extends React.Component<DataTableProps, {}> {
             renderCell: (params: GridRenderCellParams) => {
                 // Add defensive check for params.id
                 if (params.id === undefined || params.id === null) {
-                    console.warn('Missing id for row:', params);
+                    // Only log warning in development mode
+                    if (process.env.NODE_ENV === 'development') {
+                        console.warn('Missing id for row:', params);
+                    }
                     return (
                         <div>
                             <Button variant="contained" color="primary" disabled>Edit</Button>
