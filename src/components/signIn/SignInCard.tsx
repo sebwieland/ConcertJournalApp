@@ -63,7 +63,7 @@ export default function SignInCard({ email, setEmail, password, setPassword, han
                 variant="h4"
                 sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
             >
-                Sign in
+                Sign in to Concert Journal
             </Typography>
             <Box
                 component="form"

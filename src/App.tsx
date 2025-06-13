@@ -19,7 +19,7 @@ const AuthenticatedPage = lazy(() => import("./components/AuthenticatedPage"));
 class App extends React.Component<{}, {}> {
     componentDidMount() {
         if (process.env.NODE_ENV === 'development') {
-            console.log('App component mounted');
+            console.log('App component mounted - Hot reload test');
         }
     }
 

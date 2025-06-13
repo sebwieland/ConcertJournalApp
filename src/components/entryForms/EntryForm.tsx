@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ConcertEvent, CreateEventData, UpdateEventData } from '../../types/events';
-import { Alert, Autocomplete, Container, Grid, Rating, TextField, Typography } from "@mui/material";
+import { Alert, Autocomplete, Container, TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -8,6 +8,7 @@ import DefaultLayout from "../../theme/DefaultLayout";
 import { useNavigate } from "react-router-dom";
 import { mbApi } from "../../api/musicBrainzApi";
 import { handleApiError } from '../../api/apiErrors';
+import { Rating } from "@mui/material";
 
 declare module 'musicbrainz-api' {
     interface IArtist {
@@ -156,172 +157,185 @@ const EntryForm: React.FC<EntryFormProps> = ({
                 <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
                     {isUpdate ? 'Update Entry' : 'Create New Entry'}
                 </Typography>
-                <Grid container spacing={1}>
-                    <Grid container>
-                        <Autocomplete
-                            options={bandSuggestions}
-                            value={bandName}
-                            onChange={async (event, newValue) => {
-                                setBandName(newValue ?? '');
-                                setShowArtistDetails(false);
-                                if (newValue) {
-                                    try {
-                                        const details = await fetchArtistDetails(newValue);
-                                        setArtistDetails(details);
-                                    } catch (error) {
-                                        setArtistDetails(null);
-                                        console.error("Failed to fetch artist details", handleApiError(error));
-                                    }
+                
+                {/* Band field */}
+                <div style={{ marginBottom: '8px' }}>
+                    <Autocomplete
+                        options={bandSuggestions}
+                        value={bandName}
+                        onChange={async (event, newValue) => {
+                            setBandName(newValue ?? '');
+                            setShowArtistDetails(false);
+                            if (newValue) {
+                                try {
+                                    const details = await fetchArtistDetails(newValue);
+                                    setArtistDetails(details);
+                                } catch (error) {
+                                    setArtistDetails(null);
+                                    console.error("Failed to fetch artist details", handleApiError(error));
                                 }
-                            }}
-                            inputValue={bandInputValue}
-                            onInputChange={(event, newInputValue) => {
-                                setBandInputValue(newInputValue);
-                                setBandName(newInputValue);
-                            }}
-                            autoComplete
-                            freeSolo
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Band"
-                                    variant="outlined"
-                                    fullWidth
-                                    sx={{ marginBottom: 2 }}
-                                />
-                            )}
-                        />
-                        {showArtistDetailsButton && (
-                            <Button
-                                size="small"
-                                onClick={() => setShowArtistDetails(!showArtistDetails)}
-                                sx={{ mb: 1 }}
-                            >
-                                {showArtistDetails ? 'Hide artist details' : 'Show artist details'}
-                            </Button>
-                        )}
-                        {artistDetails && showArtistDetails && (
-                            <div style={{ marginBottom: 16, padding: 16, border: '1px solid #ddd', borderRadius: 4 }}>
-                                <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
-                                <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
-                                <Typography variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
-                                <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
-                            </div>
-                        )}
-
-                        <div style={{ width: '100%', marginBottom: 16 }}>
-                            <Autocomplete
-                                options={placeSuggestions}
-                                value={place}
-                                onChange={(event, newValue) => setPlace(newValue ?? '')}
-                                inputValue={placeInputValue}
-                                onInputChange={(event, newInputValue) => {
-                                    setPlaceInputValue(newInputValue);
-                                    setPlace(newInputValue);
-                                }}
-                                autoComplete
-                                freeSolo
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Place"
-                                        variant="outlined"
-                                        fullWidth
-                                        sx={{ marginBottom: 2 }}
-                                    />
-                                )}
-                            />
-                        </div>
-
-                        <div style={{ width: '100%', textAlign: 'center', marginBottom: 16 }}>
-                            <Rating
-                                name="Rating"
-                                value={rating}
-                                onChange={(event, newValue) => {
-                                    setRating(newValue ?? 0);
-                                }}
-                            />
-                        </div>
-                        <div style={{ width: '100%', marginBottom: 16 }}>
+                            }
+                        }}
+                        inputValue={bandInputValue}
+                        onInputChange={(event, newInputValue) => {
+                            setBandInputValue(newInputValue);
+                            setBandName(newInputValue);
+                        }}
+                        autoComplete
+                        freeSolo
+                        renderInput={(params) => (
                             <TextField
-                                label="Comment"
+                                {...params}
+                                label="Band"
                                 variant="outlined"
                                 fullWidth
-                                value={comment}
-                                sx={{ marginBottom: 2 }}
-                                onChange={(event) => setComment(event.target.value)}
                             />
-                        </div>
-                        <div style={{ width: '100%', marginBottom: 16 }}>
-                            <DatePicker
-                                label="Date"
-                                value={(() => {
+                        )}
+                    />
+                </div>
+                
+                {/* Show Artist Details button */}
+                {showArtistDetailsButton && (
+                    <div style={{ marginBottom: '16px' }}>
+                        <Button
+                            size="small"
+                            onClick={() => setShowArtistDetails(!showArtistDetails)}
+                        >
+                            {showArtistDetails ? 'HIDE ARTIST DETAILS' : 'SHOW ARTIST DETAILS'}
+                        </Button>
+                    </div>
+                )}
+                
+                {/* Artist Details display */}
+                {artistDetails && showArtistDetails && (
+                    <div style={{ marginBottom: '16px', padding: '16px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                        <Typography variant="body2">Type: {artistDetails.type || 'Unknown'}</Typography>
+                        <Typography variant="body2">Genre: {artistDetails.genre || 'Unknown'}</Typography>
+                        <Typography variant="body2">Formed: {artistDetails.formationYear || 'Unknown'}</Typography>
+                        <Typography variant="body2">Country: {artistDetails.country || 'Unknown'}</Typography>
+                    </div>
+                )}
+                
+                {/* Place field */}
+                <div style={{ marginBottom: '8px' }}>
+                    <Autocomplete
+                        options={placeSuggestions}
+                        value={place}
+                        onChange={(event, newValue) => setPlace(newValue ?? '')}
+                        inputValue={placeInputValue}
+                        onInputChange={(event, newInputValue) => {
+                            setPlaceInputValue(newInputValue);
+                            setPlace(newInputValue);
+                        }}
+                        autoComplete
+                        freeSolo
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Place"
+                                variant="outlined"
+                                fullWidth
+                            />
+                        )}
+                    />
+                </div>
+                
+                {/* Rating stars */}
+                <div style={{ width: '100%', textAlign: 'center', marginBottom: '16px' }}>
+                    <Rating
+                        name="Rating"
+                        value={rating}
+                        onChange={(event, newValue) => {
+                            setRating(newValue ?? 0);
+                        }}
+                    />
+                </div>
+                
+                {/* Comment field */}
+                <div style={{ marginBottom: '16px' }}>
+                    <TextField
+                        label="Comment"
+                        variant="outlined"
+                        fullWidth
+                        value={comment}
+                        onChange={(event) => setComment(event.target.value)}
+                    />
+                </div>
+                
+                {/* Date picker */}
+                <div style={{ marginBottom: '16px' }}>
+                    <DatePicker
+                        label="Date"
+                        value={(() => {
+                            try {
+                                // Handle undefined or null dates
+                                if (!date) {
+                                    return dayjs(); // Default to current date
+                                }
+                                
+                                if (Array.isArray(date)) {
+                                    return dayjs().year(date[0]).month(date[1] - 1).date(date[2]);
+                                } else if (typeof date === 'string' &&
+                                          date.startsWith('[') &&
+                                          date.endsWith(']')) {
+                                    // Handle string representation of array
                                     try {
-                                        // Handle undefined or null dates
-                                        if (!date) {
-                                            return dayjs(); // Default to current date
-                                        }
-                                        
-                                        if (Array.isArray(date)) {
-                                            return dayjs().year(date[0]).month(date[1] - 1).date(date[2]);
-                                        } else if (typeof date === 'string' &&
-                                                  date.startsWith('[') &&
-                                                  date.endsWith(']')) {
-                                            // Handle string representation of array
-                                            try {
-                                                const dateArray = JSON.parse(date);
-                                                if (Array.isArray(dateArray) && dateArray.length === 3) {
-                                                    return dayjs().year(dateArray[0]).month(dateArray[1] - 1).date(dateArray[2]);
-                                                }
-                                            } catch (error) {
-                                                return dayjs(); // Default to current date on parsing error
-                                            }
-                                        } else if (date) {
-                                            return dayjs(date);
-                                        } else {
-                                            return dayjs();
+                                        const dateArray = JSON.parse(date);
+                                        if (Array.isArray(dateArray) && dateArray.length === 3) {
+                                            return dayjs().year(dateArray[0]).month(dateArray[1] - 1).date(dateArray[2]);
                                         }
                                     } catch (error) {
-                                        return dayjs(); // Default to current date on error
+                                        return dayjs(); // Default to current date on parsing error
                                     }
-                                })()}
-                                sx={{ marginBottom: 2, width: '100%' }}
-                                onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
-                            />
-                        </div>
-                        <div style={{ width: '100%', marginBottom: 16 }}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                fullWidth
-                                sx={{ marginBottom: 2 }}
-                                onClick={handleSubmit}
-                            >
-                                {isUpdate ? 'Update Entry' : 'Create New Entry'}
-                            </Button>
-                        </div>
-                        <div style={{ width: '100%', marginBottom: 16 }}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                fullWidth
-                                onClick={() => navigate(-1)}
-                            >
-                                Go Back
-                            </Button>
-                        </div>
-                        <div style={{ width: '100%' }}>
-                            {message &&
-                                <Alert
-                                    severity={isSuccess ? 'success' : 'error'} sx={{ maxWidth: '100%' }}>
-                                    {message}
-                                </Alert>}
-                        </div>
-                    </Grid>
-                </Grid>
+                                } else if (date) {
+                                    return dayjs(date);
+                                } else {
+                                    return dayjs();
+                                }
+                            } catch (error) {
+                                return dayjs(); // Default to current date on error
+                            }
+                        })()}
+                        sx={{ width: '100%' }}
+                        onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
+                    />
+                </div>
+                
+                {/* Submit button */}
+                <div style={{ marginBottom: '16px' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={handleSubmit}
+                    >
+                        {isUpdate ? 'UPDATE ENTRY' : 'CREATE NEW ENTRY'}
+                    </Button>
+                </div>
+                
+                {/* Go Back button */}
+                <div style={{ marginBottom: '16px' }}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        fullWidth
+                        onClick={() => navigate(-1)}
+                    >
+                        GO BACK
+                    </Button>
+                </div>
+                
+                {/* Alert message */}
+                <div style={{ width: '100%' }}>
+                    {message &&
+                        <Alert
+                            severity={isSuccess ? 'success' : 'error'} sx={{ maxWidth: '100%' }}>
+                            {message}
+                        </Alert>}
+                </div>
             </Container>
         </DefaultLayout>
     );
 };
 
-export default React.memo(EntryForm);
+export default EntryForm;
