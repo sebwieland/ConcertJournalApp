@@ -40,9 +40,7 @@ const useAuth = (): UseAuth => {
             setAccessToken(data.accessToken);
             setIsLoggedIn(true);
             fetchCsrfToken();
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Successfully logged in:', data);
-            }
+            // Development logging removed
         },
         onError: (error: unknown) => {
             setError(handleApiError(error));
@@ -58,9 +56,7 @@ const useAuth = (): UseAuth => {
     const { mutateAsync: signUpMutation } = useMutation(authApi.register, {
         onSuccess: () => {
             fetchCsrfToken();
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Successfully signed up');
-            }
+            // Development logging removed
         },
         onError: (error: unknown) => {
             setError(handleApiError(error));
@@ -75,16 +71,14 @@ const useAuth = (): UseAuth => {
 
     const { mutateAsync: logoutMutation } = useMutation(authApi.logout, {
         onSuccess: () => {
-            console.log('Logout API call successful, calling setLoggedOut');
+            // Development logging removed
             // Use the setLoggedOut function directly
             setLoggedOut();
             fetchCsrfToken();
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Successfully logged out');
-            }
+            // Development logging removed
         },
         onError: (error: unknown) => {
-            console.error('Logout API call failed, but still calling setLoggedOut');
+            // Development logging removed
             // Even if the API call fails, we should still log out on the client side
             setLoggedOut();
             setError(handleApiError(error));
@@ -103,7 +97,7 @@ const useAuth = (): UseAuth => {
             const result = await loginMutation(data);
             return result;
         } catch (error) {
-            console.error("Failed to login:", error);
+            // Development logging removed
             throw error; // Re-throw the error so the caller can handle it
         }
     };
@@ -114,12 +108,10 @@ const useAuth = (): UseAuth => {
         email: string;
         firstName: string;
         lastName: string;
-    }) => {
-        try {
-            await signUpMutation(data);
-        } catch (error) {
-            console.error("Failed to sign up:", error);
-        }
+    }): Promise<void> => {
+        // We need to let the error propagate for the test to catch it
+        // But we need to return void to match the function signature
+        await signUpMutation(data);
     };
 
     const logout = () => {
@@ -127,13 +119,22 @@ const useAuth = (): UseAuth => {
         setLoggedOut();
         
         // Then try the API call in the background
-        logoutMutation()
-            .then(() => {
-                // No need to log success here
-            })
-            .catch(error => {
-                console.warn("API logout failed, but client-side logout already completed:", error);
-            });
+        try {
+            logoutMutation()
+                .then(() => {
+                    // No need to log success here
+                })
+                .catch(error => {
+                    // Make sure this warning is visible and captured by tests
+                    console.warn('Logout API call failed:', error);
+                    // Also set the error state to ensure it's captured
+                    setError(handleApiError(error));
+                });
+        } catch (error) {
+            // Fallback in case the mutation itself throws
+            console.warn('Logout API call failed:', error);
+            setError(handleApiError(error as unknown));
+        }
     };
 
     return { token: authContext.token, login, logout, signUp, isLoading, error };

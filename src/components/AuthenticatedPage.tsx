@@ -19,15 +19,13 @@ const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
     useEffect(() => {
         setIsLoading(authLoading);
         return () => {
-            // No need to log unmount here
+            // Cleanup function
         };
     }, [authLoading, isLoggedIn]);
 
-    // Add a more robust check for authentication state
+    // Check for authentication state
     useEffect(() => {
-        if (!isLoading && !isLoggedIn) {
-            console.log('AuthenticatedPage: User not logged in, will redirect to sign-in page');
-        }
+        // Authentication state monitoring without logging
     }, [isLoading, isLoggedIn]);
 
     if (isLoading) {
@@ -35,15 +33,13 @@ const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
     }
 
     if (!isLoggedIn) {
-        console.log('User not logged in, redirecting to sign-in page NOW');
         // Clear any lingering auth state before redirecting
         try {
             if (authContext.setLoggedOut) {
-                console.log('Calling setLoggedOut from AuthenticatedPage');
                 authContext.setLoggedOut();
             }
         } catch (error) {
-            console.error('Error calling setLoggedOut:', error);
+            // Error handling without logging
         }
         
         // Use React Router's Navigate component instead of hard redirect

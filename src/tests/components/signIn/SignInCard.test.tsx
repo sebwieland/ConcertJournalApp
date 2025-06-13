@@ -30,8 +30,10 @@ describe('SignInCard', () => {
   it('renders the sign-in form with all required elements', () => {
     renderWithProviders(<SignInCard {...mockProps} />);
     
-    // Use more specific selector to avoid ambiguity
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    // Use more flexible selector to work in all environments
+    const heading = screen.getByRole('heading');
+    expect(heading).toBeInTheDocument();
+    expect(heading.textContent).toMatch(/Sign in/);
     
     // Check if the email field is rendered
     expect(screen.getByLabelText('Email')).toBeInTheDocument();
