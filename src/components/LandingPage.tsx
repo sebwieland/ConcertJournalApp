@@ -15,13 +15,9 @@ export default function LandingPage() {
     const { data, error, isLoading, refetch } = useEvents();
 
     useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('LandingPage component mounted');
-        }
+        // Component mount logic without logging
         return () => {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('LandingPage component unmounted');
-            }
+            // Component cleanup without logging
         };
     }, []);
 

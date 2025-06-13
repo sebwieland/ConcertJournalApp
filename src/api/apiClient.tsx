@@ -17,10 +17,7 @@ const useApiClient = () => {
         // Request interceptor
         apiClient.interceptors.request.use(
             (config) => {
-                // Add logging in development
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
-                }
+                // Development logging removed
                 return config;
             },
             (error) => {
@@ -31,19 +28,13 @@ const useApiClient = () => {
         // Response interceptor
         apiClient.interceptors.response.use(
             (response) => {
-                // Add logging in development
-                if (process.env.NODE_ENV === 'development') {
-                    console.log(`API Response: ${response.status} ${response.config.url}`);
-                }
+                // Development logging removed
                 return response;
             },
             (error) => {
                 const processedError = handleApiError(error);
                 
-                // Log errors in development
-                if (process.env.NODE_ENV === 'development') {
-                    console.error('API Error:', processedError);
-                }
+                // Development logging removed
                 
                 return Promise.reject(processedError);
             }
