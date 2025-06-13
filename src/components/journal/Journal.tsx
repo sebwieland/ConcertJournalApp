@@ -33,7 +33,7 @@ const Journal = () => {
     useEffect(() => {
         // Component mounted
         return () => {
-            // Component unmounted
+            // Component unmountedCreateNewEntryFormPage component mounted
         };
     }, []);
 
@@ -112,7 +112,8 @@ const Journal = () => {
                                                                                 return new Date(dateArray[0], dateArray[1] - 1, dateArray[2]).toLocaleDateString();
                                                                             }
                                                                         } catch (error) {
-                                                                            console.error('Error parsing string array date in mobile view:', item.date, error);
+                                                                            // Error handling without logging
+                                                                            return 'Invalid date format';
                                                                         }
                                                                     } else if (item.date) {
                                                                         return new Date(item.date).toLocaleDateString();
@@ -120,7 +121,7 @@ const Journal = () => {
                                                                         return 'No date';
                                                                     }
                                                                 } catch (error) {
-                                                                    console.error('Error formatting date in mobile view:', item.date, error);
+                                                                    // Error handling without logging
                                                                     return 'Invalid date';
                                                                 }
                                                             })()}

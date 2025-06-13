@@ -124,7 +124,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                 }
             } catch (error) {
                 setBandSuggestions(uniqueLocalNames);
-                console.error("Error fetching band suggestions:", handleApiError(error));
+                // Removed detailed error logging
+                handleApiError(error);
             }
         };
 
@@ -172,7 +173,8 @@ const EntryForm: React.FC<EntryFormProps> = ({
                                     setArtistDetails(details);
                                 } catch (error) {
                                     setArtistDetails(null);
-                                    console.error("Failed to fetch artist details", handleApiError(error));
+                                    // Removed detailed error logging
+                                    handleApiError(error);
                                 }
                             }
                         }}

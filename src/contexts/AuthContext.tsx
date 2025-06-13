@@ -25,9 +25,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [refreshIntervalId, setRefreshIntervalId] = useState<number | null>(null);
     const apiClient = useApiClient().apiClient;
     
-    // Add a custom setter that logs state changes
+    // Add a custom setter without logging
     const setIsLoggedInWithLogging = (value: boolean) => {
-        console.log('Setting isLoggedIn to:', value);
         setIsLoggedIn(value);
     };
 
@@ -37,9 +36,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             const existingCookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
             if (existingCookie && existingCookie[1]) {
                 setCsrfToken(existingCookie[1]);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Using existing XSRF token:', existingCookie[1]);
-                }
                 return; // Return early if we already have a token
             }
             
@@ -48,12 +44,10 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
             if (cookie && cookie[1]) {
                 setCsrfToken(cookie[1]);
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully fetched XSRF token:', cookie[1]);
-                }
             }
         } catch (error) {
-            console.error("Error fetching XSRF cookie:", handleApiError(error));
+            // Error handling without logging
+            handleApiError(error);
         }
     }, [apiClient]);
 
@@ -98,7 +92,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const refreshTokenApiCall = useCallback(async () => {
         // If we're on the sign-in page, don't try to refresh the token
         if (window.location.pathname.includes('sign-in') || window.location.pathname.includes('sign-up')) {
-            console.log('Skipping token refresh - user is on authentication page');
             return;
         }
         
@@ -108,18 +101,15 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             .some(cookie => cookie.trim().startsWith('refreshToken='));
             
         if (!hasRefreshToken) {
-            console.log('No refresh token cookie found, cannot refresh token');
             setLoggedOut();
             return;
         }
         
-        console.log('Attempting to refresh token');
         setIsLoading(true); // Start loading state
         try {
             
             // Ensure we have a CSRF token before making the request
             if (!csrfToken) {
-                console.log('No CSRF token available, fetching one before refresh');
                 await fetchCsrfToken();
             }
             
@@ -130,16 +120,11 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                     'X-XSRF-TOKEN': csrfToken,
                 },
             });
-            console.log('Token refresh API call succeeded');
             setIsLoggedInWithLogging(true);
             setAccessToken(response.data.accessToken);
-            if (process.env.NODE_ENV === 'development') {
-                console.log('Successfully refreshed token:', response.data.accessToken);
-            }
         } catch (error) {
-            console.log('Token refresh API call failed, setting logged out state');
             setLoggedOut();
-            console.error("Failed to refresh token:", handleApiError(error));
+            handleApiError(error);
         } finally {
             setIsLoading(false); // Ensure isLoading is set to false after attempt
         }
@@ -152,7 +137,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 await refreshTokenApiCall();
             } catch (error) {
                 setLoggedOut();
-                console.error("Error during setupAuth:", handleApiError(error));
+                handleApiError(error);
             } finally {
                 setIsLoading(false); // Ensure isLoading is set to false after attempt
             }
@@ -161,21 +146,16 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
         // Only set up the refresh interval if we're not already running one AND we're logged in
         if (refreshIntervalId === null && isLoggedIn) {
-            console.log('Setting up token refresh interval (isLoggedIn:', isLoggedIn, ')');
             const intervalId = window.setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
             setRefreshIntervalId(intervalId);
-            
-            console.log('Token refresh interval ID:', intervalId);
         } else if (refreshIntervalId !== null && !isLoggedIn) {
             // If we have an interval but we're not logged in, clear it
-            console.log('Clearing token refresh interval because user is logged out:', refreshIntervalId);
             clearInterval(refreshIntervalId);
             setRefreshIntervalId(null);
         }
 
         return () => {
             if (refreshIntervalId !== null) {
-                console.log('Clearing token refresh interval on unmount:', refreshIntervalId);
                 clearInterval(refreshIntervalId);
                 setRefreshIntervalId(null);
             }

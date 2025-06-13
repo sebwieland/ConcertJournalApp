@@ -19,7 +19,6 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 if (cachedConfig) {
                     try {
                         const parsedConfig = JSON.parse(cachedConfig);
-                        console.log('Using cached config from localStorage');
                         setConfig(parsedConfig);
                         setLoading(false);
                         
@@ -27,7 +26,7 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                         fetchFreshConfig();
                         return;
                     } catch (parseError) {
-                        console.warn('Failed to parse cached config, will fetch fresh config');
+                        // Failed to parse cached config, will fetch fresh config
                         localStorage.removeItem('app_config');
                     }
                 }
@@ -35,7 +34,7 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 // If no cached config, fetch it directly
                 await fetchFreshConfig();
             } catch (error) {
-                console.error("Error in loadConfig:", error);
+                // Error handling without logging
                 setConfig({ backendURL: "http://localhost:8080" });
                 setLoading(false);
             }
@@ -49,11 +48,8 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                // Log the raw response for debugging
+                // Parse the response
                 const text = await response.text();
-                console.log('Raw config response:', text);
-                
-                // Parse the text to JSON
                 const data = JSON.parse(text);
                 
                 setConfig(data);
@@ -61,13 +57,9 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 
                 // Cache the config in localStorage
                 localStorage.setItem('app_config', JSON.stringify(data));
-                
-                if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully loaded config:', data);
-                }
             } catch (error) {
-                const processedError = handleApiError(error);
-                console.error("Failed to load config:", processedError);
+                // Error handling without logging
+                handleApiError(error);
                 setConfig({ backendURL: "http://localhost:8080" });
                 setLoading(false);
             }
