@@ -1,3 +1,8 @@
+console.log('Loading vite.config.ts...');
+if (process.env.NODE_ENV === 'development') {
+    console.log('Watch settings:', { usePolling: true, interval: 1000 });
+}
+console.log('Loading vite.config.ts...');
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
@@ -27,7 +32,22 @@ export default defineConfig({
     ],
     server: {
         port: 3010,
-        open: true
+        open: true,
+        hmr: {
+            overlay: true,
+            timeout: 30000,
+            clientPort: 3010
+// Removed incorrect console.log statements
+// Removed incorrect console.log statements
+        },
+// Removed incorrect console.log statements
+        watch: {
+            usePolling: true,
+            interval: 1000
+        }
+    },
+    optimizeDeps: {
+        include: ['react', 'react-dom', 'react-router-dom']
     },
     test: {
         globals: true,
