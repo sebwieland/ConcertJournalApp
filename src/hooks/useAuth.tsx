@@ -108,13 +108,10 @@ const useAuth = (): UseAuth => {
         email: string;
         firstName: string;
         lastName: string;
-    }) => {
-        try {
-            await signUpMutation(data);
-        } catch (error) {
-            // Development logging removed
-            throw error; // Re-throw the error so the caller can handle it
-        }
+    }): Promise<void> => {
+        // We need to let the error propagate for the test to catch it
+        // But we need to return void to match the function signature
+        await signUpMutation(data);
     };
 
     const logout = () => {
@@ -122,14 +119,22 @@ const useAuth = (): UseAuth => {
         setLoggedOut();
         
         // Then try the API call in the background
-        logoutMutation()
-            .then(() => {
-                // No need to log success here
-            })
-            .catch(error => {
-                // Development logging removed
-                // Just silently handle the error
-            });
+        try {
+            logoutMutation()
+                .then(() => {
+                    // No need to log success here
+                })
+                .catch(error => {
+                    // Make sure this warning is visible and captured by tests
+                    console.warn('Logout API call failed:', error);
+                    // Also set the error state to ensure it's captured
+                    setError(handleApiError(error));
+                });
+        } catch (error) {
+            // Fallback in case the mutation itself throws
+            console.warn('Logout API call failed:', error);
+            setError(handleApiError(error as unknown));
+        }
     };
 
     return { token: authContext.token, login, logout, signUp, isLoading, error };
