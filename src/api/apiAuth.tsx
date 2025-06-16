@@ -36,18 +36,54 @@ const useAuthApi = () => {
         params.append('password', data.password);
 
         try {
+            // Safe logging that won't break tests
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Login request to:", apiClient?.defaults?.baseURL || 'undefined');
+                console.log("Current domain:", window.location.hostname);
+                
+                // Safely check if we can create a URL
+                try {
+                    if (apiClient?.defaults?.baseURL) {
+                        const apiUrl = new URL(apiClient.defaults.baseURL);
+                        console.log("API domain:", apiUrl.hostname);
+                        console.log("Same site?", window.location.hostname === apiUrl.hostname);
+                    }
+                } catch (e) {
+                    console.log("Could not parse API URL");
+                }
+                
+                console.log("Current cookies:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
+            }
+            
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-XSRF-TOKEN': csrfToken
+            };
+            
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Login request headers:", headers);
+            }
+            
             const response = await apiClient.post('/login', params.toString(), {
                 withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-XSRF-TOKEN': csrfToken
-                }
+                headers
             });
 
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Login response status:", response?.status || 'undefined');
+                console.log("Login response headers:", response?.headers || 'undefined');
+                console.log("Cookies after login:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
+            }
+            
             if (response.status === 200) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Login successful, returning data:", response.data);
+                }
                 return response.data;
             } else {
-                // Development logging removed
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error("Login failed with status:", response.status);
+                }
                 throw handleApiError(new Error(response.statusText));
             }
         } catch (error) {
