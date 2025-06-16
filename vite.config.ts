@@ -19,7 +19,10 @@ const dynamicRoutes = [
 export default defineConfig({
     base: '/',
     build: {
-        outDir: 'dist'
+        outDir: 'dist',
+        // Ensure components are included in production builds
+        minify: true,
+        sourcemap: true
     },
     plugins: [
         react(),
@@ -30,6 +33,10 @@ export default defineConfig({
             exclude: ['/secret-page'] // optional exclude
         })
     ],
+    define: {
+        // Make environment variables available to the client
+        'process.env.VITE_ENSURE_COMPONENTS': JSON.stringify(process.env.VITE_ENSURE_COMPONENTS || 'false')
+    },
     server: {
         port: 3010,
         open: true,
