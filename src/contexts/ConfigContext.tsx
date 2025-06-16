@@ -42,15 +42,29 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
         
         const fetchFreshConfig = async () => {
             try {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Fetching config.json...");
+                }
                 const response = await fetch('/config.json');
                 
                 if (!response.ok) {
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.error(`HTTP error loading config! status: ${response.status}`);
+                    }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 // Parse the response
                 const text = await response.text();
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Config.json content:", text);
+                }
                 const data = JSON.parse(text);
+                
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Parsed config:", data);
+                    console.log("Using backend URL:", data.backendURL);
+                }
                 
                 setConfig(data);
                 setLoading(false);
@@ -58,7 +72,11 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 // Cache the config in localStorage
                 localStorage.setItem('app_config', JSON.stringify(data));
             } catch (error) {
-                // Error handling without logging
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error("Error loading config:", error);
+                    console.log("Falling back to default backend URL: http://localhost:8080");
+                }
+                
                 handleApiError(error);
                 setConfig({ backendURL: "http://localhost:8080" });
                 setLoading(false);
