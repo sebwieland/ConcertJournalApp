@@ -32,21 +32,76 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const fetchCsrfToken = useCallback(async () => {
         try {
+            // Only log in non-test environments
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("=== CSRF Token Fetch ===");
+                console.log("Current domain:", window.location.hostname);
+                
+                // Safely check API domain
+                try {
+                    if (apiClient?.defaults?.baseURL) {
+                        const apiUrl = new URL(apiClient.defaults.baseURL);
+                        console.log("API domain:", apiUrl.hostname);
+                        console.log("Protocol:", window.location.protocol);
+                        console.log("API protocol:", apiUrl.protocol);
+                    }
+                } catch (e) {
+                    console.log("Could not parse API URL");
+                }
+                
+                console.log("Current cookies:", document.cookie);
+            }
+            
             // Check if we already have a CSRF token before making the API call
             const existingCookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
             if (existingCookie && existingCookie[1]) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Found existing CSRF token:", existingCookie[1]);
+                }
                 setCsrfToken(existingCookie[1]);
                 return; // Return early if we already have a token
             }
             
             // If no token exists, fetch a new one
-            await apiClient.get("/get-xsrf-cookie", { withCredentials: true });
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("No CSRF token found, fetching new one");
+            }
+            
+            try {
+                const response = await apiClient.get("/get-xsrf-cookie", {
+                    withCredentials: true,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("CSRF token response status:", response.status);
+                    console.log("CSRF token response headers:", response.headers);
+                }
+            } catch (fetchError) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error("Error fetching CSRF token:", fetchError);
+                }
+            }
+            
             const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("After fetch, cookies:", document.cookie);
+            }
+            
             if (cookie && cookie[1]) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("New CSRF token received:", cookie[1]);
+                }
                 setCsrfToken(cookie[1]);
+            } else if (process.env.NODE_ENV !== 'test') {
+                console.warn("Failed to get CSRF token after fetch");
             }
         } catch (error) {
-            // Error handling without logging
+            if (process.env.NODE_ENV !== 'test') {
+                console.error("CSRF token fetch error:", error);
+            }
             handleApiError(error);
         }
     }, [apiClient]);
@@ -62,31 +117,6 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             clearInterval(refreshIntervalId);
             setRefreshIntervalId(null);
         }
-        
-        // Clear only authentication-related cookies, preserve CSRF token
-        const authCookies = ['refreshToken', 'accessToken', 'auth', 'session'];
-        const cookies = document.cookie.split(";");
-        
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i];
-            const eqPos = cookie.indexOf("=");
-            const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-            
-            // Only clear auth-related cookies, preserve CSRF token
-            if (authCookies.some(authCookie => name.toLowerCase().includes(authCookie.toLowerCase()))) {
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
-            }
-        }
-        
-        // Clear auth-related local storage items
-        const authStorageKeys = ['token', 'auth', 'user', 'session'];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && authStorageKeys.some(authKey => key.toLowerCase().includes(authKey.toLowerCase()))) {
-                localStorage.removeItem(key);
-            }
-        }
     }, [setAccessToken, setRefreshToken, setIsLoading, refreshIntervalId]);
 
     const refreshTokenApiCall = useCallback(async () => {
@@ -95,24 +125,8 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             return;
         }
         
-        // Check for refresh token cookie regardless of isLoggedIn state
-        // This allows token refresh to work on page reload
-        const hasRefreshToken = document.cookie.split(';')
-            .some(cookie => cookie.trim().startsWith('refreshToken='));
-            
-        if (!hasRefreshToken) {
-            setLoggedOut();
-            return;
-        }
-        
         setIsLoading(true); // Start loading state
         try {
-            
-            // Ensure we have a CSRF token before making the request
-            if (!csrfToken) {
-                await fetchCsrfToken();
-            }
-            
             const response = await apiClient.post('/refresh-token', {}, {
                 withCredentials: true,
                 headers: {
@@ -124,7 +138,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setAccessToken(response.data.accessToken);
         } catch (error) {
             setLoggedOut();
-            handleApiError(error);
+            console.error("Failed to refresh token:", error);
         } finally {
             setIsLoading(false); // Ensure isLoading is set to false after attempt
         }
@@ -137,30 +151,18 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                 await refreshTokenApiCall();
             } catch (error) {
                 setLoggedOut();
-                handleApiError(error);
             } finally {
                 setIsLoading(false); // Ensure isLoading is set to false after attempt
             }
         };
         setupAuth();
 
-        // Only set up the refresh interval if we're not already running one AND we're logged in
-        if (refreshIntervalId === null && isLoggedIn) {
-            const intervalId = window.setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
-            setRefreshIntervalId(intervalId);
-        } else if (refreshIntervalId !== null && !isLoggedIn) {
-            // If we have an interval but we're not logged in, clear it
-            clearInterval(refreshIntervalId);
-            setRefreshIntervalId(null);
-        }
+        const intervalId = setInterval(refreshTokenApiCall, 2 * 60 * 1000); // 2 minutes
 
         return () => {
-            if (refreshIntervalId !== null) {
-                clearInterval(refreshIntervalId);
-                setRefreshIntervalId(null);
-            }
+            clearInterval(intervalId);
         };
-    }, [fetchCsrfToken, refreshTokenApiCall, setLoggedOut, refreshIntervalId, isLoggedIn]);
+    }, [fetchCsrfToken, refreshTokenApiCall, setLoggedOut]);
 
     return (
         <AuthContext.Provider value={{

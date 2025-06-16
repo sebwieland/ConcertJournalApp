@@ -71,16 +71,12 @@ const useAuth = (): UseAuth => {
 
     const { mutateAsync: logoutMutation } = useMutation(authApi.logout, {
         onSuccess: () => {
-            // Development logging removed
-            // Use the setLoggedOut function directly
-            setLoggedOut();
+            authContext.setIsLoggedIn(false);
+            authContext.setAccessToken('');
+            document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure;";
             fetchCsrfToken();
-            // Development logging removed
         },
-        onError: (error: unknown) => {
-            // Development logging removed
-            // Even if the API call fails, we should still log out on the client side
-            setLoggedOut();
+        onError: (error) => {
             setError(handleApiError(error));
         },
         onMutate: () => {
@@ -114,26 +110,11 @@ const useAuth = (): UseAuth => {
         await signUpMutation(data);
     };
 
-    const logout = () => {
-        // First, ensure client-side logout happens immediately
-        setLoggedOut();
-        
-        // Then try the API call in the background
+    const logout = async () => {
         try {
-            logoutMutation()
-                .then(() => {
-                    // No need to log success here
-                })
-                .catch(error => {
-                    // Make sure this warning is visible and captured by tests
-                    console.warn('Logout API call failed:', error);
-                    // Also set the error state to ensure it's captured
-                    setError(handleApiError(error));
-                });
+            await logoutMutation();
         } catch (error) {
-            // Fallback in case the mutation itself throws
-            console.warn('Logout API call failed:', error);
-            setError(handleApiError(error as unknown));
+            console.error("Failed to logout:", error);
         }
     };
 
