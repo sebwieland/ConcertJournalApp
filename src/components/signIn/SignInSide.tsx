@@ -33,21 +33,38 @@ export default function SignInSide() {
         event.preventDefault();
         setShowError(false);
         try {
+            console.log("Login attempt started");
             // Wait for login to complete
             const result = await login({ email, password });
             
+            console.log("Login API response:", result);
+            console.log("Auth context state:", {
+                isLoggedIn: authContext.isLoggedIn,
+                hasToken: !!authContext.token,
+            });
+            
             // If login was successful, redirect to landing page
             if (result) {
+                console.log("Attempting to navigate to landing page");
                 navigate('/');
             } else {
+                console.log("No result from login, checking auth context as fallback");
                 // Check auth context as a fallback
                 setTimeout(() => {
+                    console.log("Fallback check - Auth context state:", {
+                        isLoggedIn: authContext.isLoggedIn,
+                        hasToken: !!authContext.token,
+                    });
                     if (authContext.isLoggedIn) {
+                        console.log("Auth context shows logged in, navigating");
                         navigate('/');
+                    } else {
+                        console.log("Still not logged in after fallback check");
                     }
                 }, 500); // Small delay to allow context to update
             }
         } catch (error) {
+            console.error("Login error:", error);
             setShowError(true);
         }
     };

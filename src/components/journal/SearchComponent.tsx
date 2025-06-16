@@ -20,6 +20,12 @@ interface SearchComponentProps {
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
+  console.log("SearchComponent: Rendering with data", {
+    dataProvided: !!data,
+    dataLength: data?.length || 0,
+    dataType: data ? typeof data : 'undefined'
+  });
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<ConcertEvent[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -47,7 +53,20 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
     }
     
     try {
+      // Add defensive check for data
+      if (!Array.isArray(data)) {
+        console.error("Search data is not an array:", data);
+        setSearchResults([]);
+        setHasSearched(true);
+        return;
+      }
+      
       const results = data.filter(event => {
+        // Skip null or undefined events
+        if (!event) {
+          return false;
+        }
+        
         // Add null checks to prevent errors
         const bandName = event.bandName?.toLowerCase() || '';
         const place = event.place?.toLowerCase() || '';

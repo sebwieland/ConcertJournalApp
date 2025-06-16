@@ -6,14 +6,29 @@ const EventsApi = () => {
     const apiClient = useApiClient().apiClient;
 
     const getAllEvents = async (token: string): Promise<ConcertEvent[]> => {
+        console.log("apiEvents: getAllEvents called with token", {
+            hasToken: !!token,
+            tokenLength: token?.length || 0,
+            baseURL: apiClient.defaults.baseURL
+        });
+        
         try {
+            console.log("apiEvents: Making GET request to /allEvents");
             const response = await apiClient.get('/allEvents', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            
+            console.log("apiEvents: Response received", {
+                status: response.status,
+                hasData: !!response.data,
+                dataLength: Array.isArray(response.data) ? response.data.length : 'not an array'
+            });
+            
             return response.data;
         } catch (error) {
+            console.error("apiEvents: Error in getAllEvents", error);
             throw handleApiError(error);
         }
     };

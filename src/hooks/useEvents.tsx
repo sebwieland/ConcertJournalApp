@@ -40,11 +40,24 @@ const useEvents = (): UseEvents => {
     const { data, error, isLoading, refetch } = useQuery(
         'allEvents',
         async () => {
+            console.log("useEvents: Query executing with token", {
+                hasToken: !!token,
+                tokenLength: token?.length || 0
+            });
+            
             if (!token) {
+                console.error("useEvents: No authentication token found");
                 throw handleApiError(new Error('No authentication token found'));
             }
+            
             try {
+                console.log("useEvents: Calling getAllEvents API");
                 const response = await eventsApi.getAllEvents(token);
+                console.log("useEvents: API response received", {
+                    responseReceived: !!response,
+                    responseLength: Array.isArray(response) ? response.length : 'not an array',
+                    responseType: typeof response
+                });
                 
                 // Process the response to ensure dates are in the correct format
                 const processedResponse = Array.isArray(response) ? response.map(item => {

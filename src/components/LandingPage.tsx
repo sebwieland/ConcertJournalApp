@@ -13,20 +13,29 @@ import LoadingIndicator from "./utilities/LoadingIndicator";
 import SearchComponent from './journal/SearchComponent';
 
 export default function LandingPage() {
+    console.log("LandingPage: Component rendering");
     const { data, error, isLoading, refetch } = useEvents();
+    console.log("LandingPage: useEvents hook result", {
+        hasData: !!data,
+        dataLength: data?.length,
+        hasError: !!error,
+        isLoading
+    });
 
     useEffect(() => {
-        // Component mount logic
+        console.log("LandingPage: Component mounted");
         return () => {
-            // Component cleanup
+            console.log("LandingPage: Component unmounting");
         };
     }, []);
 
     if (isLoading) {
+        console.log("LandingPage: Showing loading indicator");
         return <DefaultLayout><LoadingIndicator /></DefaultLayout>;
     }
 
     if (error) {
+        console.log("LandingPage: Showing error", error);
         return (
             <DefaultLayout>
                 <Alert severity="error" sx={{ mt: 2 }}>
@@ -37,7 +46,9 @@ export default function LandingPage() {
     }
 
     const events = data || [];
+    console.log("LandingPage: Events data available", { count: events.length });
     const statistics = calculateStatistics(events);
+    console.log("LandingPage: Statistics calculated", statistics);
 
     return (
         <DefaultLayout>
@@ -56,7 +67,13 @@ export default function LandingPage() {
                     <h2>Search Your Journal</h2>
                     {/* Force the SearchComponent to be included in all builds */}
                     <div data-testid="search-component-container">
-                        <SearchComponent data={events} />
+                        {events && events.length > 0 ? (
+                            <SearchComponent data={events} />
+                        ) : (
+                            <Alert severity="info" sx={{ mt: 2 }}>
+                                No concert data available for search. Add some concerts to get started!
+                            </Alert>
+                        )}
                     </div>
                 </div>
             </ConfirmProvider>

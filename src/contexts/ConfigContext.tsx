@@ -42,15 +42,19 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
         
         const fetchFreshConfig = async () => {
             try {
+                console.log("Fetching config.json...");
                 const response = await fetch('/config.json');
                 
                 if (!response.ok) {
+                    console.error(`Config fetch error! status: ${response.status}`);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 // Parse the response
                 const text = await response.text();
+                console.log("Raw config.json content:", text);
                 const data = JSON.parse(text);
+                console.log("Parsed config:", data);
                 
                 setConfig(data);
                 setLoading(false);
@@ -58,8 +62,10 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 // Cache the config in localStorage
                 localStorage.setItem('app_config', JSON.stringify(data));
             } catch (error) {
+                console.error("Error loading config:", error);
                 // Error handling without logging
                 handleApiError(error);
+                console.log("Using fallback config with localhost:8080");
                 setConfig({ backendURL: "http://localhost:8080" });
                 setLoading(false);
             }
