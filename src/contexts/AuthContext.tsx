@@ -32,21 +32,76 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
     const fetchCsrfToken = useCallback(async () => {
         try {
+            // Only log in non-test environments
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("=== CSRF Token Fetch ===");
+                console.log("Current domain:", window.location.hostname);
+                
+                // Safely check API domain
+                try {
+                    if (apiClient?.defaults?.baseURL) {
+                        const apiUrl = new URL(apiClient.defaults.baseURL);
+                        console.log("API domain:", apiUrl.hostname);
+                        console.log("Protocol:", window.location.protocol);
+                        console.log("API protocol:", apiUrl.protocol);
+                    }
+                } catch (e) {
+                    console.log("Could not parse API URL");
+                }
+                
+                console.log("Current cookies:", document.cookie);
+            }
+            
             // Check if we already have a CSRF token before making the API call
             const existingCookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
             if (existingCookie && existingCookie[1]) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("Found existing CSRF token:", existingCookie[1]);
+                }
                 setCsrfToken(existingCookie[1]);
                 return; // Return early if we already have a token
             }
             
             // If no token exists, fetch a new one
-            await apiClient.get("/get-xsrf-cookie", { withCredentials: true });
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("No CSRF token found, fetching new one");
+            }
+            
+            try {
+                const response = await apiClient.get("/get-xsrf-cookie", {
+                    withCredentials: true,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("CSRF token response status:", response.status);
+                    console.log("CSRF token response headers:", response.headers);
+                }
+            } catch (fetchError) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error("Error fetching CSRF token:", fetchError);
+                }
+            }
+            
             const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("After fetch, cookies:", document.cookie);
+            }
+            
             if (cookie && cookie[1]) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("New CSRF token received:", cookie[1]);
+                }
                 setCsrfToken(cookie[1]);
+            } else if (process.env.NODE_ENV !== 'test') {
+                console.warn("Failed to get CSRF token after fetch");
             }
         } catch (error) {
-            // Error handling without logging
+            if (process.env.NODE_ENV !== 'test') {
+                console.error("CSRF token fetch error:", error);
+            }
             handleApiError(error);
         }
     }, [apiClient]);
@@ -95,34 +150,77 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             return;
         }
         
+        if (process.env.NODE_ENV !== 'test') {
+            console.log("=== Token Refresh Attempt ===");
+            console.log("Current path:", window.location.pathname);
+            console.log("Current cookies:", document.cookie);
+        }
+        
         // Check for refresh token cookie regardless of isLoggedIn state
         // This allows token refresh to work on page reload
         const hasRefreshToken = document.cookie.split(';')
             .some(cookie => cookie.trim().startsWith('refreshToken='));
             
+        if (process.env.NODE_ENV !== 'test') {
+            console.log("Has refresh token cookie:", hasRefreshToken);
+            console.log("Current auth state:", { isLoggedIn, hasToken: !!token });
+        }
+        
         if (!hasRefreshToken) {
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("No refresh token found, logging out");
+            }
             setLoggedOut();
             return;
         }
         
         setIsLoading(true); // Start loading state
         try {
-            
             // Ensure we have a CSRF token before making the request
             if (!csrfToken) {
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log("No CSRF token, fetching one before refresh");
+                }
                 await fetchCsrfToken();
+            }
+            
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Using CSRF token for refresh:", csrfToken);
+            }
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-XSRF-TOKEN': csrfToken,
+            };
+            
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Refresh token request headers:", headers);
             }
             
             const response = await apiClient.post('/refresh-token', {}, {
                 withCredentials: true,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': csrfToken,
-                },
+                headers
             });
+            
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Refresh token response:", {
+                    status: response.status,
+                    hasAccessToken: !!response.data.accessToken
+                });
+                
+                console.log("Cookies after refresh:", document.cookie);
+            }
+            
             setIsLoggedInWithLogging(true);
             setAccessToken(response.data.accessToken);
+            
+            if (process.env.NODE_ENV !== 'test') {
+                console.log("Auth state updated after refresh:", { isLoggedIn: true, hasToken: !!response.data.accessToken });
+            }
         } catch (error) {
+            if (process.env.NODE_ENV !== 'test') {
+                console.error("Token refresh error:", error);
+            }
             setLoggedOut();
             handleApiError(error);
         } finally {

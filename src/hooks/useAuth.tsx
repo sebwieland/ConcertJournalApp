@@ -125,14 +125,18 @@ const useAuth = (): UseAuth => {
                     // No need to log success here
                 })
                 .catch(error => {
-                    // Make sure this warning is visible and captured by tests
-                    console.warn('Logout API call failed:', error);
+                    // Only log in non-test environments
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.warn('Logout API call failed:', error);
+                    }
                     // Also set the error state to ensure it's captured
                     setError(handleApiError(error));
                 });
         } catch (error) {
             // Fallback in case the mutation itself throws
-            console.warn('Logout API call failed:', error);
+            if (process.env.NODE_ENV !== 'test') {
+                console.warn('Logout API call failed:', error);
+            }
             setError(handleApiError(error as unknown));
         }
     };
