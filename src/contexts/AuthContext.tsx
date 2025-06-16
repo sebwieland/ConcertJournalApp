@@ -129,8 +129,18 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             
             // Only clear auth-related cookies, preserve CSRF token
             if (authCookies.some(authCookie => name.toLowerCase().includes(authCookie.toLowerCase()))) {
+                // Clear cookie without domain specification
                 document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
+                
+                // Clear with current domain
                 document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                
+                // Clear with parent domain (with leading dot)
+                const domainParts = window.location.hostname.split('.');
+                if (domainParts.length >= 2) {
+                    const parentDomain = '.' + domainParts.slice(-2).join('.');
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + parentDomain;
+                }
             }
         }
         
