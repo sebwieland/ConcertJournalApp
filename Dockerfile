@@ -1,19 +1,24 @@
 # Build stage
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./
-# Add logging and fix for Rollup musl issue
+# Add logging and explicitly install Rollup native dependencies
 RUN echo "Node version: $(node -v)" && \
     echo "NPM version: $(npm -v)" && \
-    # Set environment variable to skip optional Rollup native dependencies
-    export ROLLUP_SKIP_NODEJS_NATIVE=1 && \
-    npm install
+    # Install dependencies
+    npm install && \
+    # Explicitly install the Rollup native dependencies for both architectures
+    if [ "$(uname -m)" = "x86_64" ]; then \
+        npm install --no-save @rollup/rollup-linux-x64-gnu; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+        npm install --no-save @rollup/rollup-linux-arm64-gnu; \
+    fi
 COPY . .
-# Set environment variable to skip optional Rollup native dependencies during build
-RUN export ROLLUP_SKIP_NODEJS_NATIVE=1 && npm run build
+# Build the application
+RUN npm run build
 
 # Production stage
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /app
 COPY --from=build /app/dist ./build
 RUN npm install -g serve
