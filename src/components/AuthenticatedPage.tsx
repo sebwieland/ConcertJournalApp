@@ -38,7 +38,7 @@ const AuthenticatedPage = memo(({ element }: AuthenticatedPageProps) => {
         console.log("Auth context state:", {
             isLoggedIn: authContext.isLoggedIn,
             hasToken: !!authContext.token,
-            cookies: document.cookie
+            cookies: typeof document !== 'undefined' ? document.cookie : 'not available in test'
         });
         
         // Clear any lingering auth state before redirecting

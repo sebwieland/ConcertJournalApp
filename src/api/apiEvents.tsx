@@ -9,7 +9,7 @@ const EventsApi = () => {
         console.log("apiEvents: getAllEvents called with token", {
             hasToken: !!token,
             tokenLength: token?.length || 0,
-            baseURL: apiClient.defaults.baseURL
+            baseURL: apiClient?.defaults?.baseURL || 'undefined'
         });
         
         try {

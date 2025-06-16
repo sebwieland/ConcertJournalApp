@@ -34,7 +34,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
         try {
             // Check if we already have a CSRF token before making the API call
             const existingCookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
-            console.log("Checking for existing CSRF token in cookies:", document.cookie);
+            console.log("Checking for existing CSRF token in cookies:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
             if (existingCookie && existingCookie[1]) {
                 console.log("Found existing CSRF token:", existingCookie[1]);
                 setCsrfToken(existingCookie[1]);
@@ -45,7 +45,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             console.log("No CSRF token found, fetching new one");
             await apiClient.get("/get-xsrf-cookie", { withCredentials: true });
             const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
-            console.log("After fetch, cookies:", document.cookie);
+            console.log("After fetch, cookies:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
             if (cookie && cookie[1]) {
                 console.log("New CSRF token received:", cookie[1]);
                 setCsrfToken(cookie[1]);

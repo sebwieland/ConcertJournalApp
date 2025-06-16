@@ -18,6 +18,9 @@ vi.mock('../../api/apiClient', () => ({
   default: () => ({
     apiClient: {
       post: mockPost,
+      defaults: {
+        baseURL: 'http://localhost:8080'
+      }
     },
   }),
 }));

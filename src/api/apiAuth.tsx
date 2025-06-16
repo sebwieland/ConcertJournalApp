@@ -36,9 +36,9 @@ const useAuthApi = () => {
         params.append('password', data.password);
 
         try {
-            console.log("Login request to:", apiClient.defaults.baseURL);
-            console.log("With CSRF token:", csrfToken);
-            console.log("Current cookies:", document.cookie);
+            console.log("Login request to:", apiClient?.defaults?.baseURL || 'undefined');
+            console.log("With CSRF token:", csrfToken || 'none');
+            console.log("Current cookies:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
             
             const response = await apiClient.post('/login', params.toString(), {
                 withCredentials: true,
@@ -48,9 +48,9 @@ const useAuthApi = () => {
                 }
             });
 
-            console.log("Login response status:", response.status);
-            console.log("Login response headers:", response.headers);
-            console.log("Cookies after login:", document.cookie);
+            console.log("Login response status:", response?.status || 'undefined');
+            console.log("Login response headers:", response?.headers || 'undefined');
+            console.log("Cookies after login:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
 
             if (response.status === 200) {
                 console.log("Login successful, returning data:", response.data);
