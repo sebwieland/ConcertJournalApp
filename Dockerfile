@@ -1,13 +1,26 @@
 # Build stage
-FROM node:22-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+# Add logging and explicitly install Rollup native dependencies
+RUN echo "Node version: $(node -v)" && \
+    echo "NPM version: $(npm -v)" && \
+    # Install dependencies
+    npm install && \
+    # Explicitly install the Rollup native dependencies for both architectures
+    if [ "$(uname -m)" = "x86_64" ]; then \
+        npm install --no-save @rollup/rollup-linux-x64-gnu; \
+    elif [ "$(uname -m)" = "aarch64" ]; then \
+        npm install --no-save @rollup/rollup-linux-arm64-gnu; \
+    fi
 COPY . .
-RUN npm run build
+# Build the application with explicit environment variables
+RUN NODE_ENV=production \
+    VITE_ENSURE_COMPONENTS=true \
+    npm run build
 
 # Production stage
-FROM node:22-alpine
+FROM node:20-slim
 WORKDIR /app
 COPY --from=build /app/dist ./build
 RUN npm install -g serve
