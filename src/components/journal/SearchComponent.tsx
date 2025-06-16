@@ -106,7 +106,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
   };
 
   return (
-    <Box sx={{ width: '100%', mb: 4 }}>
+    <Box sx={{ width: '100%', mb: 4 }} data-testid="search-component">
       <Box sx={{ display: 'flex', mb: 2 }}>
         <TextField
           fullWidth
@@ -115,6 +115,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
+          data-testid="search-input"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -134,6 +135,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
           variant="contained"
           color="primary"
           onClick={handleSearch}
+          data-testid="search-button"
           sx={{
             ml: 1,
             px: 3,

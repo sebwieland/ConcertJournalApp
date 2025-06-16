@@ -16,9 +16,9 @@ export default function LandingPage() {
     const { data, error, isLoading, refetch } = useEvents();
 
     useEffect(() => {
-        // Component mount logic without logging
+        // Component mount logic
         return () => {
-            // Component cleanup without logging
+            // Component cleanup
         };
     }, []);
 
@@ -54,7 +54,10 @@ export default function LandingPage() {
                     <Divider sx={{ my: 3 }} />
                     
                     <h2>Search Your Journal</h2>
-                    <SearchComponent data={events} />
+                    {/* Force the SearchComponent to be included in all builds */}
+                    <div data-testid="search-component-container">
+                        <SearchComponent data={events} />
+                    </div>
                 </div>
             </ConfirmProvider>
         </DefaultLayout>

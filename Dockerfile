@@ -14,8 +14,10 @@ RUN echo "Node version: $(node -v)" && \
         npm install --no-save @rollup/rollup-linux-arm64-gnu; \
     fi
 COPY . .
-# Build the application
-RUN npm run build
+# Build the application with explicit environment variables
+RUN NODE_ENV=production \
+    VITE_ENSURE_COMPONENTS=true \
+    npm run build
 
 # Production stage
 FROM node:20-slim
