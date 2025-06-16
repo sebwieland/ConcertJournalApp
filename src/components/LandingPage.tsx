@@ -6,10 +6,11 @@ import { ConcertEvent } from "../types/events";
 import { ConfirmProvider } from "material-ui-confirm";
 import StatCard from './utilities/StatCard';
 import { MusicNote, Group, LocationOn, PlaylistAddCheck } from '@mui/icons-material';
-import { Alert } from "@mui/material";
+import { Alert, Divider } from "@mui/material";
 import useEvents from "../hooks/useEvents";
 import { handleApiError } from '../api/apiErrors';
 import LoadingIndicator from "./utilities/LoadingIndicator";
+import SearchComponent from './journal/SearchComponent';
 
 export default function LandingPage() {
     const { data, error, isLoading, refetch } = useEvents();
@@ -49,6 +50,11 @@ export default function LandingPage() {
                         <StatCard title="Most Artists on a Single Day" value={statistics.mostArtistsOnASingleDay.toString()} icon={<Group />} />
                         <StatCard title="Most Visited Location" value={statistics.mostVisitedLocation} icon={<LocationOn />} />
                     </div>
+                    
+                    <Divider sx={{ my: 3 }} />
+                    
+                    <h2>Search Your Journal</h2>
+                    <SearchComponent data={events} />
                 </div>
             </ConfirmProvider>
         </DefaultLayout>
