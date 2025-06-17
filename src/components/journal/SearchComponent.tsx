@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { sortData } from '../../utils/SortData';
 import {
   TextField,
   Button,
@@ -75,7 +76,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
       if (process.env.NODE_ENV === 'development') {
         console.log("Search results:", results);
       }
-      setSearchResults(results);
+      // Sort the results by date in descending order (newest first)
+      const sortedResults = sortData(results, 'date', 'desc');
+      setSearchResults(sortedResults);
       setHasSearched(true);
     } catch (error) {
       console.error("Error during search:", error);
@@ -112,6 +115,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
       handleSearch();
     }
   };
+  
 
   const formatDate = (date: string | number[]) => {
     try {
@@ -183,6 +187,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
           Search
         </Button>
       </Box>
+      
 
       {hasSearched && (
         <Box>
