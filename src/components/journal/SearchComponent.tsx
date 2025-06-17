@@ -1,45 +1,55 @@
-import React, { useState } from 'react';
-import { 
-  TextField, 
-  Button, 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  TextField,
+  Button,
+  Box,
+  Card,
+  CardContent,
+  Typography,
   InputAdornment,
   IconButton,
-  Stack
+  Stack,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import RatingStars from '../utilities/RatingStars';
 import { ConcertEvent } from '../../types/events';
+import { SwipeableList } from 'react-swipeable-list';
+import 'react-swipeable-list/dist/styles.css';
+import { leadingActions, StyledSwipeableListItem, trailingActions } from "./SwipeableListItem";
 
 interface SearchComponentProps {
   data: ConcertEvent[];
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
+const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelete }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<ConcertEvent[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {
+  // Memoize the search function to avoid unnecessary re-renders
+  const performSearch = useCallback((searchText: string, sourceData: ConcertEvent[]) => {
     // Log for debugging
-    console.log("Search button clicked");
-    console.log("Search term:", searchTerm);
-    console.log("Available data:", data);
+    console.log("Performing search");
+    console.log("Search term:", searchText);
+    console.log("Available data:", sourceData);
     
-    if (!searchTerm.trim()) {
+    if (!searchText.trim()) {
       setSearchResults([]);
       setHasSearched(false);
       return;
     }
 
-    const term = searchTerm.toLowerCase();
+    const term = searchText.toLowerCase();
     
     // Handle case where data might be undefined or empty
-    if (!data || data.length === 0) {
+    if (!sourceData || sourceData.length === 0) {
       console.log("No data available for search");
       setSearchResults([]);
       setHasSearched(true);
@@ -47,7 +57,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
     }
     
     try {
-      const results = data.filter(event => {
+      const results = sourceData.filter(event => {
         // Add null checks to prevent errors
         const bandName = event.bandName?.toLowerCase() || '';
         const place = event.place?.toLowerCase() || '';
@@ -66,6 +76,18 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
       setSearchResults([]);
       setHasSearched(true);
     }
+  }, []);
+
+  // Re-run search when data changes (e.g., after deletion)
+  useEffect(() => {
+    if (hasSearched && searchTerm.trim()) {
+      console.log("Data changed, refreshing search results");
+      performSearch(searchTerm, data);
+    }
+  }, [data, hasSearched, searchTerm, performSearch]);
+
+  const handleSearch = () => {
+    performSearch(searchTerm, data);
   };
 
   const handleClear = () => {
@@ -155,36 +177,76 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data }) => {
       {hasSearched && (
         <Box>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {searchResults.length === 0 
-              ? 'No results found' 
+            {searchResults.length === 0
+              ? 'No results found'
               : `Found ${searchResults.length} result${searchResults.length !== 1 ? 's' : ''}`}
           </Typography>
           
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            {searchResults.map((result) => (
-              <Box key={result.id} sx={{ width: { xs: '100%', sm: '45%', md: '30%' } }}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent>
-                    <Typography variant="h5" component="div">
-                      {result.bandName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {result.place}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(result.date)}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {result.comment}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <RatingStars rating={result.rating} />
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-          </Box>
+          {isMobile ? (
+            // Mobile view with swipeable list items
+            <Box style={{ width: '100%' }}>
+              <SwipeableList style={{ width: '100%' }}>
+                {searchResults.map((result) => (
+                  <StyledSwipeableListItem
+                    key={result.id}
+                    leadingActions={onDelete ? leadingActions(onDelete, result.id) : undefined}
+                    trailingActions={onEdit ? trailingActions(onEdit, result.id) : undefined}
+                  >
+                    <Card sx={{
+                      width: '100%',
+                      height: '100%',
+                      marginBottom: theme.spacing(1)
+                    }}>
+                      <CardContent sx={{ height: '100%' }}>
+                        <Typography variant="h5" component="div">
+                          {result.bandName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {result.place}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(result.date)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {result.comment}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          <RatingStars rating={result.rating} />
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </StyledSwipeableListItem>
+                ))}
+              </SwipeableList>
+            </Box>
+          ) : (
+            // Desktop view with grid layout
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+              {searchResults.map((result) => (
+                <Box key={result.id} sx={{ width: { xs: '100%', sm: '45%', md: '30%' } }}>
+                  <Card sx={{ height: '100%' }}>
+                    <CardContent>
+                      <Typography variant="h5" component="div">
+                        {result.bandName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {result.place}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(result.date)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {result.comment}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <RatingStars rating={result.rating} />
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
       )}
     </Box>

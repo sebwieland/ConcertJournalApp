@@ -56,7 +56,15 @@ export default function LandingPage() {
                     <h2>Search Your Journal</h2>
                     {/* Force the SearchComponent to be included in all builds */}
                     <div data-testid="search-component-container">
-                        <SearchComponent data={events} />
+                        <DataCollector>
+                            {({ data: collectedData, onEdit, onDelete }) => (
+                                <SearchComponent
+                                    data={events}
+                                    onEdit={onEdit}
+                                    onDelete={onDelete}
+                                />
+                            )}
+                        </DataCollector>
                     </div>
                 </div>
             </ConfirmProvider>
