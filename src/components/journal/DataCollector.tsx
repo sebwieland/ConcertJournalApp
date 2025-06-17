@@ -45,7 +45,9 @@ const DataCollector = ({ children }: DataCollectorProps) => {
             // Event successfully deleted
         } catch (error) {
             const processedError = handleApiError(error);
-            console.error('Error deleting event:', processedError);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error deleting event:', processedError);
+            }
         }
     };
 

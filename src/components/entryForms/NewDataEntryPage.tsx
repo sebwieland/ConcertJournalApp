@@ -51,7 +51,9 @@ const CreateNewEntryFormPage = () => {
             const processedError = handleApiError(error);
             setMessage(`Error creating new entry: ${processedError.message}`);
             setIsSuccess(false);
-            console.error("Error creating new entry:", processedError);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Error creating new entry:", processedError);
+            }
         }
     };
 

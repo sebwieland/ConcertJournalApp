@@ -7,13 +7,13 @@ const useApiClient = () => {
     const config = useContext(ConfigContext);
     const API_URL = config?.backendURL ?? 'http://localhost:8080';
     
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV === 'development') {
         console.log("API Client - Using backend URL:", API_URL);
         console.log("API Client - Config context:", config);
     }
 
     return useMemo(() => {
-        if (process.env.NODE_ENV !== 'test') {
+        if (process.env.NODE_ENV === 'development') {
             console.log("Creating API client with URL:", API_URL);
         }
         

@@ -40,7 +40,9 @@ const EditEntryFormPage = () => {
                 setComment(event.comment);
             } catch (error) {
                 const processedError = handleApiError(error);
-                console.error('Error fetching event:', processedError);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error fetching event:', processedError);
+                }
             }
         };
         fetchEvent();
@@ -74,7 +76,9 @@ const EditEntryFormPage = () => {
             const processedError = handleApiError(error);
             setMessage(`Error updating entry: ${processedError.message}`);
             setIsSuccess(false);
-            console.error("Error updating entry:", processedError);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Error updating entry:", processedError);
+            }
         }
     };
 

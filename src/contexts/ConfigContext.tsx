@@ -42,13 +42,13 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
         
         const fetchFreshConfig = async () => {
             try {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("Fetching config.json...");
                 }
                 const response = await fetch('/config.json');
                 
                 if (!response.ok) {
-                    if (process.env.NODE_ENV !== 'test') {
+                    if (process.env.NODE_ENV === 'development') {
                         console.error(`HTTP error loading config! status: ${response.status}`);
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,12 +56,12 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 
                 // Parse the response
                 const text = await response.text();
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("Config.json content:", text);
                 }
                 const data = JSON.parse(text);
                 
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("Parsed config:", data);
                     console.log("Using backend URL:", data.backendURL);
                 }
@@ -72,7 +72,7 @@ const ConfigProvider = ({ children }: { children: ReactNode }) => {
                 // Cache the config in localStorage
                 localStorage.setItem('app_config', JSON.stringify(data));
             } catch (error) {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.error("Error loading config:", error);
                     console.log("Falling back to default backend URL: http://localhost:8080");
                 }

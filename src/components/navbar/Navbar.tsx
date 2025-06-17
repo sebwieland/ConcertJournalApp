@@ -38,7 +38,9 @@ const Navbar = () => {
         try {
             logout();
         } catch (error) {
-            console.warn('Error during logout API call, but client-side logout already completed:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('Error during logout API call, but client-side logout already completed:', error);
+            }
         }
         
         // Force navigation to sign-in page immediately

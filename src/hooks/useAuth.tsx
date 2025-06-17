@@ -114,7 +114,9 @@ const useAuth = (): UseAuth => {
         try {
             await logoutMutation();
         } catch (error) {
-            console.error("Failed to logout:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Failed to logout:", error);
+            }
         }
     };
 

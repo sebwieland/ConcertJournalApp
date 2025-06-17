@@ -33,7 +33,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const fetchCsrfToken = useCallback(async () => {
         try {
             // Only log in non-test environments
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("=== CSRF Token Fetch ===");
                 console.log("Current domain:", window.location.hostname);
                 
@@ -55,7 +55,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             // Check if we already have a CSRF token before making the API call
             const existingCookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
             if (existingCookie && existingCookie[1]) {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("Found existing CSRF token:", existingCookie[1]);
                 }
                 setCsrfToken(existingCookie[1]);
@@ -63,7 +63,7 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             }
             
             // If no token exists, fetch a new one
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("No CSRF token found, fetching new one");
             }
             
@@ -75,31 +75,31 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
                     }
                 });
                 
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("CSRF token response status:", response.status);
                     console.log("CSRF token response headers:", response.headers);
                 }
             } catch (fetchError) {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.error("Error fetching CSRF token:", fetchError);
                 }
             }
             
             const cookie = document.cookie.match(/XSRF-TOKEN=([^;]*)/);
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("After fetch, cookies:", document.cookie);
             }
             
             if (cookie && cookie[1]) {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("New CSRF token received:", cookie[1]);
                 }
                 setCsrfToken(cookie[1]);
-            } else if (process.env.NODE_ENV !== 'test') {
+            } else if (process.env.NODE_ENV === 'development') {
                 console.warn("Failed to get CSRF token after fetch");
             }
         } catch (error) {
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.error("CSRF token fetch error:", error);
             }
             handleApiError(error);
@@ -138,7 +138,9 @@ const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
             setAccessToken(response.data.accessToken);
         } catch (error) {
             setLoggedOut();
-            console.error("Failed to refresh token:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Failed to refresh token:", error);
+            }
         } finally {
             setIsLoading(false); // Ensure isLoading is set to false after attempt
         }

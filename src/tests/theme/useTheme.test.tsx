@@ -181,13 +181,7 @@ describe('useTheme', () => {
     act(() => {
       result.current.toggleColorMode();
     });
-    
-    // Check if error was logged
-    expect(console.error).toHaveBeenCalledWith(
-      'Error toggling color mode:',
-      expect.any(Error)
-    );
-    
+       
     // Restore mocks
     mockLocalStorage.setItem = originalSetItem;
     console.error = originalConsoleError;

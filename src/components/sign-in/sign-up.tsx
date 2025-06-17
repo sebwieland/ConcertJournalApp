@@ -60,7 +60,9 @@ export default function SignUpCard() {
                     navigate('/sign-in', { replace: true });
                 }, 2000);
             } catch (error) {
-                console.log(error);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(error);
+                }
                 if (error instanceof AxiosError) {
                     if (error.status === 409) {
                         setSignUpMessage('User already exists. Please try a different email address.');
@@ -68,11 +70,15 @@ export default function SignUpCard() {
                         setSignUpMessage("Unknown error")
                     }
                 }
-                console.error('Error signing up:', error);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error signing up:', error);
+                }
             }
         } else {
             setSignUpMessage('Invalid email or password. Please try again')
-            console.error('Invalid inputs');
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Invalid inputs');
+            }
         }
     };
 

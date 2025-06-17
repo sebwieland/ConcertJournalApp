@@ -43,7 +43,7 @@ export default function SignInCard({ email, setEmail, password, setPassword, han
     const navigate = useNavigate();
 
     useLayoutEffect(() => {
-        if (isLoading && process.env.NODE_ENV !== 'test') {
+        if (isLoading && process.env.NODE_ENV === 'development') {
             console.log('Loading...');
         }
     }, [isLoading]);

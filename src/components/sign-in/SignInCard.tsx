@@ -53,11 +53,15 @@ export default function SignInCard() {
                 await login({email, password});
                 navigate('/', {replace: true});
             } catch (error) {
-                console.error('Error logging in:', error);
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Error logging in:', error);
+                }
                 setSignInError('Invalid email or password. Please try again')
             }
         } else {
-            console.error('Invalid inputs');
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Invalid inputs');
+            }
         }
     };
 

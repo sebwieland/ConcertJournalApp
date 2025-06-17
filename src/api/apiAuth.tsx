@@ -37,7 +37,7 @@ const useAuthApi = () => {
 
         try {
             // Safe logging that won't break tests
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("Login request to:", apiClient?.defaults?.baseURL || 'undefined');
                 console.log("Current domain:", window.location.hostname);
                 
@@ -60,7 +60,7 @@ const useAuthApi = () => {
                 'X-XSRF-TOKEN': csrfToken
             };
             
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("Login request headers:", headers);
             }
             
@@ -69,19 +69,19 @@ const useAuthApi = () => {
                 headers
             });
 
-            if (process.env.NODE_ENV !== 'test') {
+            if (process.env.NODE_ENV === 'development') {
                 console.log("Login response status:", response?.status || 'undefined');
                 console.log("Login response headers:", response?.headers || 'undefined');
                 console.log("Cookies after login:", typeof document !== 'undefined' ? document.cookie : 'not available in test');
             }
             
             if (response.status === 200) {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.log("Login successful, returning data:", response.data);
                 }
                 return response.data;
             } else {
-                if (process.env.NODE_ENV !== 'test') {
+                if (process.env.NODE_ENV === 'development') {
                     console.error("Login failed with status:", response.status);
                 }
                 throw handleApiError(new Error(response.statusText));

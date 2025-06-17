@@ -50,14 +50,18 @@ const calculateStatistics = (entries: ConcertEvent[] = []): Statistics => {
                         date = dayjs(item.date);
                     }
                 } catch (error) {
-                    console.error('Error parsing string array date in statistics:', item.date, error);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('Error parsing string array date in statistics:', item.date, error);
+                    }
                     date = dayjs(item.date);
                 }
             } else if (item.date) {
                 date = dayjs(item.date);
             } else {
                 // Skip items without dates
-                console.warn('Item missing date:', item);
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn('Item missing date:', item);
+                }
                 return;
             }
             
@@ -66,7 +70,9 @@ const calculateStatistics = (entries: ConcertEvent[] = []): Statistics => {
             locationCount[item.place] = (locationCount[item.place] || 0) + 1;
             dailyBandCount[dateString] = (dailyBandCount[dateString] || 0) + 1;
         } catch (error) {
-            console.error('Error processing date in statistics:', item.date, error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error processing date in statistics:', item.date, error);
+            }
         }
     });
 

@@ -75,7 +75,9 @@ class DataTable extends React.Component<DataTableProps, {}> {
                     
                     return date1.diff(date2);
                 } catch (error) {
-                    console.error('Error comparing dates:', v1, v2, error);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.error('Error comparing dates:', v1, v2, error);
+                    }
                     return 0; // Return 0 if comparison fails
                 }
             },

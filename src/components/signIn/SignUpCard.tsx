@@ -51,7 +51,7 @@ export default function SignUpCard({ username, setUsername, password, setPasswor
     const navigate = useNavigate();
 
     useLayoutEffect(() => {
-        if (isLoading) {
+        if (isLoading && process.env.NODE_ENV === 'development') {
             console.log('Loading...');
         }
     }, [isLoading]);
@@ -60,27 +60,37 @@ export default function SignUpCard({ username, setUsername, password, setPasswor
         let isValid = true;
 
         if (!username || username.length < 3) {
-            console.error("Username must be at least 3 characters long.");
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Username must be at least 3 characters long.");
+            }
             isValid = false;
         }
 
         if (!password || password.length < 6) {
-            console.error("Password must be at least 6 characters long.");
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Password must be at least 6 characters long.");
+            }
             isValid = false;
         }
 
         if (!email || !/\S+@\S+\.\S+/.test(email)) {
-            console.error("Please enter a valid email address.");
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Please enter a valid email address.");
+            }
             isValid = false;
         }
 
         if (!firstName || firstName.length < 1) {
-            console.error("Please enter your first name.");
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Please enter your first name.");
+            }
             isValid = false;
         }
 
         if (!lastName || lastName.length < 1) {
-            console.error("Please enter your last name.");
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Please enter your last name.");
+            }
             isValid = false;
         }
 

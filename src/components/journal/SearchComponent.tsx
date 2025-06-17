@@ -35,10 +35,12 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
 
   // Memoize the search function to avoid unnecessary re-renders
   const performSearch = useCallback((searchText: string, sourceData: ConcertEvent[]) => {
-    // Log for debugging
-    console.log("Performing search");
-    console.log("Search term:", searchText);
-    console.log("Available data:", sourceData);
+    // Log for debugging (development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Performing search");
+      console.log("Search term:", searchText);
+      console.log("Available data:", sourceData);
+    }
     
     if (!searchText.trim()) {
       setSearchResults([]);
@@ -50,7 +52,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
     
     // Handle case where data might be undefined or empty
     if (!sourceData || sourceData.length === 0) {
-      console.log("No data available for search");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("No data available for search");
+      }
       setSearchResults([]);
       setHasSearched(true);
       return;
@@ -68,7 +72,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
                comment.includes(term);
       });
       
-      console.log("Search results:", results);
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Search results:", results);
+      }
       setSearchResults(results);
       setHasSearched(true);
     } catch (error) {
@@ -81,7 +87,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
   // Re-run search when data changes (e.g., after deletion)
   useEffect(() => {
     if (hasSearched && searchTerm.trim()) {
-      console.log("Data changed, refreshing search results");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Data changed, refreshing search results");
+      }
       performSearch(searchTerm, data);
     }
   }, [data, hasSearched, searchTerm, performSearch]);
@@ -98,7 +106,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ data, onEdit, onDelet
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      console.log("Enter key pressed");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Enter key pressed");
+      }
       handleSearch();
     }
   };

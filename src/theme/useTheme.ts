@@ -33,7 +33,9 @@ const useTheme = () => {
             setMode(newMode);
             localStorage.setItem('themeMode', newMode);
         } catch (error) {
-            console.error('Error toggling color mode:', error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error('Error toggling color mode:', error);
+            }
         }
     };
 

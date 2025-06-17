@@ -21,7 +21,9 @@ export default function SignUpSide() {
             await signUp({ username, password, email, firstName, lastName });
         } catch (error) {
             setShowError(true);
-            console.error("Sign up error:", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("Sign up error:", error);
+            }
         }
     };
 
